@@ -5,7 +5,7 @@
         "fields": {
             "name": "Fisika Kelas 10",
             "description": "Ini course untuk pelajaran kelas 10 Fisika ",
-            "image_banner": "courses-banner/banner1.jpg",
+            "image_banner": "courses-banner/banner1.jpg"
         }
     },
     {
@@ -14,7 +14,7 @@
         "fields": {
             "name": "Kimia Kelas 10",
             "description": "Ini course untuk pelajaran Kimia Kelas 10",
-            "image_banner": "courses-banner/banner2.jpg",
+            "image_banner": "courses-banner/banner2.jpg"
         }
     },
     {
@@ -23,7 +23,7 @@
         "fields": {
             "name": "Matematika Kelas 10",
             "description": "Ini course untuk pelajaran Matematika Kelas 10",
-            "image_banner": "courses-banner/banner3.jpg",
+            "image_banner": "courses-banner/banner3.jpg"
         }
     },
     {
@@ -32,7 +32,7 @@
         "fields": {
             "name": "Bahasa Korea Kelas 10",
             "description": "Ini course untuk pelajaran Bahasa Korea Kelas 10",
-            "image_banner": "courses-banner/banner4.jpg",
+            "image_banner": "courses-banner/banner4.jpg"
         }
     },
     {
@@ -41,7 +41,7 @@
         "fields": {
             "name": "Bahasa Indonesia Kelas 10",
             "description": "Ini course untuk pelajaran Bahasa Indonesia Kelas 10",
-            "image_banner": "courses-banner/banner5.jpg",
+            "image_banner": "courses-banner/banner5.jpg"
         }
     },
     {
@@ -50,7 +50,7 @@
         "fields": {
             "name": "Bahasa Inggris Kelas 10",
             "description": "Ini course untuk pelajaran Bahasa Inggris Kelas 10",
-            "image_banner": "courses-banner/banner6.jpg",
+            "image_banner": "courses-banner/banner6.jpg"
         }
     },
     {
@@ -59,7 +59,7 @@
         "fields": {
             "name": "Seni Budaya Kelas 10",
             "description": "Ini course untuk pelajaran Seni Budaya Kelas 10",
-            "image_banner": "courses-banner/banner7.jpg",
+            "image_banner": "courses-banner/banner7.jpg"
         }
     },
     {
@@ -68,7 +68,7 @@
         "fields": {
             "name": "Pendidikan Kewarganegaraan Kelas 10",
             "description": "Ini course untuk pelajaran Pendidikan Kewarganegaraan Kelas 10",
-            "image_banner": "courses-banner/banner8.jpg",
+            "image_banner": "courses-banner/banner8.jpg"
         }
     },
     {
@@ -77,7 +77,7 @@
         "fields": {
             "name": "Ekonomi Kelas 10",
             "description": "Ini course untuk pelajaran Ekonomi Kelas 10",
-            "image_banner": "courses-banner/banner9.jpg",
+            "image_banner": "courses-banner/banner9.jpg"
         }
     },
     {
@@ -86,7 +86,7 @@
         "fields": {
             "name": "Sejarah Kelas 10",
             "description": "Ini course untuk pelajaran Sejarah Kelas 10",
-            "image_banner": "courses-banner/banner10.jpg",
+            "image_banner": "courses-banner/banner10.jpg"
         }
     },
     {
@@ -95,7 +95,7 @@
         "fields": {
             "name": "Sosiologi Kelas 10",
             "description": "Ini course untuk pelajaran Sosiologi Kelas 10",
-            "image_banner": "courses-banner/banner11.jpg",
+            "image_banner": "courses-banner/banner11.jpg"
         }
     },
     {
@@ -104,8 +104,8 @@
         "fields": {
             "name": "Geografi Kelas 10",
             "description": "Ini course untuk pelajaran Geografi Kelas 10",
-            "image_banner": "courses-banner/banner12.jpg",
+            "image_banner": "courses-banner/banner12.jpg"
         }
-    },
+    }
 
 ]
