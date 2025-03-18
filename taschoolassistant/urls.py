@@ -30,4 +30,5 @@ urlpatterns = [
     # path('', include(router.urls)),
     path('admin/', admin.site.urls),
     path("api/users/", include("taschoolassistant.users.urls")),
+    path("api/courses/", include("taschoolassistant.courses.urls")),
 ]
