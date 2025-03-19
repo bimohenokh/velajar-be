@@ -16,21 +16,19 @@ class Course(Model):
     objects = CourseManager()
 
 
-class CourseInstructor(Model):
-    course = ForeignKey(Course, on_delete=CASCADE)
-    teacher = ForeignKey(User, on_delete=CASCADE)
-    is_participating = BooleanField(default=True)
-    is_owner = BooleanField(default=False)
-
-    objects = CourseInstructorManager()
-
-
 class CourseParticipant(Model):
     course = ForeignKey(Course, on_delete=CASCADE)
-    student = ForeignKey(User, on_delete=CASCADE)
+    participant = ForeignKey(User, on_delete=CASCADE)
     is_participating = BooleanField(default=True)
 
     objects = CourseParticipantManager()
+
+
+class CourseInstructor(Model):
+    course_participant = ForeignKey(CourseParticipant, on_delete=CASCADE)
+    is_owner = BooleanField(default=False)
+
+    objects = CourseInstructorManager()
 
 
 class CourseSession(Model):
