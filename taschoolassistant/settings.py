@@ -34,6 +34,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    'EXCEPTION_HANDLER': 'taschoolassistant.exception_handlers.custom_exception_handler'
 }
 
 
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'taschoolassistant.users',
+    'taschoolassistant.courses',
 ]
 
 MIDDLEWARE = [
