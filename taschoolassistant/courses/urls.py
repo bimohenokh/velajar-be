@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.urls import path
 from .views import CourseReadView, CoursePostView, CourseDeleteView, CourseDetailView, CourseUpdateView
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("", CourseReadView.as_view(), name="course"),
@@ -9,3 +11,5 @@ urlpatterns = [
     path("delete/<int:pk>", CourseDeleteView.as_view(), name="delete-course"),
 
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
