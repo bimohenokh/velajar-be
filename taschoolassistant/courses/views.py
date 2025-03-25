@@ -1,12 +1,11 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import Course, CourseParticipant, CourseInstructor
-from .serializers import CourseSerializer, CourseParticipantSerializer
+from .serializers import CourseSerializer
 from rest_framework import status
 from ..utils.response import ApiResponse
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from ..users.serializers import UserSerializer
-from rest_framework.response import responses
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 # Create your views here.
@@ -56,6 +55,7 @@ class CourseDetailView(APIView):
 
 class CoursePostView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request):
         try:
