@@ -34,5 +34,8 @@ class CourseView(APIView):
             return ApiResponse.error(message=str(e))
 
     def post(self, request):
-
-        pass
+        serializer = CourseSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return ApiResponse.success(serializer.data, message="Course succesfully created", status=status.HTTP_201_CREATED)
+        return ApiResponse.error(error="Bad request when post")
