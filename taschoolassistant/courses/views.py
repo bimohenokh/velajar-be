@@ -6,6 +6,7 @@ from rest_framework import status
 from ..utils.response import ApiResponse
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.core.files.storage import default_storage
 
 
 # Create your views here.
@@ -103,25 +104,43 @@ class CourseUpdateView(APIView):
 
     def put(self, request, pk=None):
         try:
-            user = request.user
             try:
                 selected_course = Course.objects.get(pk=pk)
             except Course.DoesNotExist:
                 return ApiResponse.error(
                     message="Course not found"
                 )
+
             request_data = request.data
 
-            serializer = CourseSerializer(
-                selected_course, data=request_data, partial=True)
+            try:
+                # ✅ Check if a new image is provided
+                if "image_banner" in request.FILES:
+                    # ✅ Delete old image before updating
+                    if selected_course.image_banner:
+                        old_image_path = selected_course.image_banner.path
+                        if default_storage.exists(old_image_path):
+                            default_storage.delete(old_image_path)
 
-            if serializer.is_valid():
-                serializer.save()
+                    selected_course.image_banner = request.FILES["image_banner"]
+
+                # ✅ Update other fields
+                selected_course.name = request_data.get(
+                    "name", selected_course.name)
+                selected_course.description = request_data.get(
+                    "description", selected_course.description)
+                selected_course.jenjang_kelas = request_data.get(
+                    "jenjang_kelas", selected_course.description)
+                selected_course.save()
+
+                # ✅ Serialize updated course
+                serializer = CourseSerializer(selected_course)
+
                 return ApiResponse.success(
                     data=serializer.data,
                     message="Course successfully updated"
                 )
-            else:
+            except:
                 return ApiResponse.error(
                     message="Invalid data",
                     errors=serializer.errors,
