@@ -3,12 +3,15 @@ from django.db.models import Manager
 
 class CourseManager(Manager):
 
-    def get_courses(self, user, name):
+    def get_courses(self, user, name, jenjang_kelas):
         query = self.filter(courseparticipant__participant=user,
                             courseparticipant__is_participating=True)
 
         if name:
             query = query.filter(name__icontains=name)
+
+        if jenjang_kelas:
+            query = query.filter(jenjang_kelas=jenjang_kelas)
 
         return query
 

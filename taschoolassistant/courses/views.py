@@ -20,9 +20,9 @@ class CourseReadView(APIView):
     def get(self, request):
         try:
             user = request.user
-            print(user.role)
             name = request.GET.get('name', None)
-            courses_instance = Course.objects.get_courses(user, name)
+            jenjang = request.GET.get('jenjang_kelas', None)
+            courses_instance = Course.objects.get_courses(user, name, jenjang)
             if not courses_instance.exists():
                 return ApiResponse.error(message="Courses empty", status_code=status.HTTP_404_NOT_FOUND)
             serializer = self.course_serializer(
