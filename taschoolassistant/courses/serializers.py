@@ -13,7 +13,6 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-
 class CourseParticipantSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseParticipant
