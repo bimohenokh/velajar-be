@@ -20,7 +20,8 @@ class RegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()  # ✅ Save first, then use the instance
 
-        return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)  # ✅ Serialize again
+        # ✅ Serialize again
+        return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
 
 class LoginView(APIView):
@@ -33,7 +34,8 @@ class LoginView(APIView):
         identifier = serializer.validated_data["identifier"]
         password = serializer.validated_data["password"]
 
-        user = User.objects.filter(email=identifier).first() or User.objects.filter(username=identifier).first()
+        user = User.objects.filter(email=identifier).first(
+        ) or User.objects.filter(username=identifier).first()
 
         if not user or not user.check_password(password):
             raise AuthenticationFailed("Invalid credentials")
