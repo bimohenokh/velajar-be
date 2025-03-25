@@ -5,6 +5,8 @@ from django.db.models import Model, CharField, ImageField, CASCADE, ForeignKey, 
 
 from taschoolassistant.courses.managers import CourseManager, CourseInstructorManager, CourseParticipantManager, \
     CourseSessionManager, CourseSessionResourceManager
+from enum import Enum
+
 
 # Create your models here.
 User = get_user_model()
