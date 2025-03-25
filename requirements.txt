@@ -2,3 +2,4 @@ djangorestframework
 djangorestframework-simplejwt
 psycopg2-binary
 Django
+pillow
