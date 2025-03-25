@@ -7,3 +7,9 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = "__all__"
+
+
+class CourseParticipantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseParticipant
+        fields = "__all__"
