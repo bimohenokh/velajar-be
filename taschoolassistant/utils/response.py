@@ -19,6 +19,7 @@ class ApiResponse:
         """
         Standardized error response.
         """
+        # print(status_code)
         return Response({
             "status": "error",
             "message": message,

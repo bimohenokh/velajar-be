@@ -6,6 +6,8 @@ from django.db.models import Model, CharField, ImageField, CASCADE, ForeignKey, 
 from taschoolassistant.courses.managers import CourseManager, CourseInstructorManager, CourseParticipantManager, \
     CourseSessionManager, CourseSessionResourceManager
 from enum import Enum
+import os
+from django.conf import settings
 
 
 # Create your models here.
@@ -30,6 +32,15 @@ class Course(Model):
     )
 
     objects = CourseManager()
+
+    def delete(self, *args, **kwargs):
+        """Delete banner file before deleting Course instance"""
+        if self.image_banner:
+            image_banner_path = os.path.join(
+                settings.MEDIA_ROOT, str(self.image_banner))
+            if os.path.exists(image_banner_path):
+                os.remove(image_banner_path)
+        super().delete(*args, **kwargs)
 
 
 class CourseParticipant(Model):
