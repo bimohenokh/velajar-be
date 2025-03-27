@@ -16,11 +16,11 @@ class CourseManager(Manager):
         return query
 
     def get_detail_course_by_id(self, user, id):
-        return self.get(
+        return self.filter(
             courseparticipant__participant=user,
             courseparticipant__is_participating=True,
             id=id
-        )
+        ).first()
 
 
 class CourseInstructorManager(Manager):
