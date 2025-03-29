@@ -1,5 +1,4 @@
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiResponse, extend_schema
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -19,13 +18,16 @@ class RegisterView(APIView):
     permission_classes = [AllowAny]
 
     @extend_schema(
-        request=RegisterSerializer,
+        request=RegisterInSerializer,
         responses={
-            201: UserSerializer,
-            400: OpenApiResponse(
-                description="Validation error",
-                response={"status": "error", "message": "Validation failed", "errors": {"field": "error message"}}
-            )
+            201: StandardOutSerializer.open_api_wrap(UserSerializer, 201, "User registered successfully"),
+            400: StandardErrorOutSerializer.open_api_wrap(
+                400,
+                "Validation error",
+                {
+                    "field": ["error message"]
+                }
+            ),
         },
     )
     def post(self, request):
@@ -45,13 +47,20 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
 
     @extend_schema(
-        request=LoginSerializer,
+        request=LoginInSerializer,
         responses={
-            200: LoginSerializer,  # ✅ Correct way to define response
-            401: OpenApiResponse(
-                description="Invalid credentials",
-                response={"status": "error", "message": "Invalid credentials"},
-            )
+            200: StandardOutSerializer.open_api_wrap(
+                LoginOutSerializer,
+                200,
+                "Login Successful"
+            ),
+            401: StandardErrorOutSerializer.open_api_wrap(
+                401,
+                "Invalid credentials",
+                {
+                    "detail": "Invalid credentials"
+                }
+            ),
         },
     )
     def post(self, request):
