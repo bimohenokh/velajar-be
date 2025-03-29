@@ -1,4 +1,4 @@
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
+from drf_spectacular.utils import extend_schema
 from rest_framework.views import APIView
 from .models import Course, CourseParticipant, CourseInstructor, CourseSession
 from .schemas import course_schema, course_by_id_schema
