@@ -1,4 +1,5 @@
 from rest_framework.views import exception_handler
+from taschoolassistant.utils.response import ApiResponse
 
 
 def custom_exception_handler(exc, context):
@@ -9,10 +10,11 @@ def custom_exception_handler(exc, context):
     if response is None:
         return None
 
-    # ✅ Customize only non-500 errors
-    response.data = {
-        "status_code": response.status_code,
-        "error": response.data,  # Keep original error messages
-    }
+    print(response.status_code)
 
-    return response
+    # ✅ Customize only non-500 errors
+    return ApiResponse.error(
+        message="A request error occurred",
+        status_code=response.status_code,
+        errors=response.data
+    )

@@ -9,23 +9,31 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import sys
+from datetime import timedelta
 from pathlib import Path
+import os
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env()
+
+env_file_path = os.path.join(BASE_DIR, ".env")
+if os.path.exists(env_file_path):
+    environ.Env.read_env(env_file_path)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@%=9s)qxz(=6#-!^r&+hfon1=%2zy)5*2wrcoe*s^)#n#35e95'
+SECRET_KEY = env("SECRET_KEY", default='django-insecure-@%=9s)qxz(=6#-!^r&+hfon1=%2zy)5*2wrcoe*s^)#n#35e95')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost"])
 
 
 # Application definition
@@ -34,7 +42,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'EXCEPTION_HANDLER': 'taschoolassistant.exception_handlers.custom_exception_handler'
+    # 'EXCEPTION_HANDLER': 'taschoolassistant.utils.exception_handlers.custom_exception_handler'
 }
 
 
@@ -49,6 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'taschoolassistant.core',
     'taschoolassistant.users',
     'taschoolassistant.courses',
 ]
@@ -87,12 +96,39 @@ WSGI_APPLICATION = 'taschoolassistant.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Use SQLite for testing
+if "test" in sys.argv:
+    DATABASES = {
+        'default': {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",  # In-memory SQLite database for tests
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env("DATABASE_NAME"),
+            'USER': env("DATABASE_USER"),
+            'PASSWORD': env("DATABASE_PASSWORD"),
+            'HOST': env("DATABASE_HOST"),
+            'PORT': env("DATABASE_PORT"),
+        }
+    }
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / "static"]  # Local static files
+STATIC_ROOT = BASE_DIR / "staticfiles"  # For `collectstatic` in production
+
+# Media files (User uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / "media"
+
+# File upload settings
+FILE_UPLOAD_HANDLERS = [
+    "django.core.files.uploadhandler.MemoryFileUploadHandler",
+    "django.core.files.uploadhandler.TemporaryFileUploadHandler",
+]
 
 
 # Password validation
@@ -114,6 +150,14 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# JWT Configuration
+SIMPLE_JWT = {
+    "SIGNING_KEY": env("JWT_SECRET_KEY", default="your-jwt-secret-key"),
+    "ACCESS_TOKEN_LIFETIME": timedelta(seconds=env.int("JWT_ACCESS_TOKEN_LIFETIME", default=3600)),
+    "REFRESH_TOKEN_LIFETIME": timedelta(seconds=env.int("JWT_REFRESH_TOKEN_LIFETIME", default=86400)),
+}
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -129,9 +173,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Optimize settings for testing
+if "test" in sys.argv:
+    DEBUG = False  # Disable debug mode for faster tests
+    PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]  # Speed up password hashing
+    SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"] = timedelta(seconds=5)  # Short-lived token for testing
+    SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"] = timedelta(minutes=1)
