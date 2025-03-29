@@ -1,10 +1,9 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import Course, CourseParticipant, CourseInstructor
 from .serializers import CourseSerializer
 from rest_framework import status
 from ..utils.response import ApiResponse
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.core.files.storage import default_storage
 from rest_framework.exceptions import NotFound, ValidationError
@@ -16,7 +15,8 @@ class CourseView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
-    def __init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.course_serializer = CourseSerializer
 
     def get(self, request):
@@ -65,7 +65,8 @@ class CourseViewById(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
-    def __init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.course_serializer = CourseSerializer
 
     def get(self, request, pk=None):
@@ -109,7 +110,7 @@ class CourseViewById(APIView):
                 data=serializer.data,
                 message="Course successfully updated"
             )
-        except:
+        except :
             raise ValidationError("Invalid input data type")
 
     def delete(self, request, pk):
