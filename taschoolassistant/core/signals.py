@@ -1,7 +1,7 @@
-from django.db.models import FileField
-from django.db.models.signals import post_delete, pre_save, post_save
-from django.dispatch import receiver
 from django.db import transaction
+from django.db.models import FileField
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 
 @receiver(post_delete)
