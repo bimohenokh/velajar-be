@@ -1,14 +1,10 @@
+from enum import Enum
+
 from django.contrib.auth import get_user_model
-from django.core.files.storage import default_storage
 from django.db.models import Model, CharField, ImageField, CASCADE, ForeignKey, BooleanField, FileField
-from typing_extensions import override
 
 from taschoolassistant.courses.managers import CourseManager, CourseInstructorManager, CourseParticipantManager, \
     CourseSessionManager, CourseSessionResourceManager
-from enum import Enum
-import os
-from django.conf import settings
-
 
 # Create your models here.
 User = get_user_model()
