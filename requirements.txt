@@ -3,3 +3,4 @@ djangorestframework-simplejwt
 psycopg2-binary
 Django
 pillow
+django-environ
