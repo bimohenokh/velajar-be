@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 from rest_framework.views import APIView
 from .models import Course, CourseParticipant, CourseInstructor, CourseSession
 from .schemas import course_schema, course_by_id_schema
@@ -19,6 +20,18 @@ class CourseView(APIView):
         super().__init__(**kwargs)
         self.course_serializer = CourseSerializer
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name="name", type=str, required=False, description="Filter courses by name"),
+            OpenApiParameter(name="jenjang_kelas", type=str, required=False,
+                             description="Filter courses by jenjang kelas"),
+        ],
+        responses={
+            200: CourseSerializer(many=True),
+            404: OpenApiResponse(description="Course not found"),
+        },
+        description="Retrieve a list of courses filtered by optional parameters."
+    )
     def get(self, request):
         user = request.user
         name = request.GET.get('name', None)
@@ -34,6 +47,14 @@ class CourseView(APIView):
             message="Course succesfully retrieved"
         )
 
+    @extend_schema(
+        request=CourseSerializer,
+        responses={
+            201: CourseSerializer,
+            400: OpenApiResponse(description="Invalid input data"),
+        },
+        description="Create a new course and assign the user as a participant and instructor."
+    )
     def post(self, request):
         user = request.user
         role = user.role
@@ -73,6 +94,13 @@ class CourseViewById(APIView):
         super().__init__(**kwargs)
         self.course_serializer = CourseSerializer
 
+    @extend_schema(
+        responses={
+            200: CourseSerializer,
+            404: OpenApiResponse(description="Course not found"),
+        },
+        description="Retrieve a course by its ID."
+    )
     def get(self, request, pk=None):
         user = request.user
         course_instance = Course.objects.get_detail_course_by_id(user, pk)
@@ -98,6 +126,13 @@ class CourseViewById(APIView):
             status_code=status.HTTP_200_OK
         )
 
+    @extend_schema(
+        responses={
+            204: None,
+            404: OpenApiResponse(description="Course not found"),
+        },
+        description="Delete a course by its ID."
+    )
     def delete(self, request, pk):
         try:
             course = Course.objects.get(id=pk)
