@@ -1,6 +1,8 @@
 from rest_framework.exceptions import APIException
+from rest_framework.response import Response
 from rest_framework.views import exception_handler
-from taschoolassistant.utils.response import ApiResponse
+
+from taschoolassistant.core.serializers import StandardErrorOutSerializer
 
 
 def custom_exception_handler(exc: APIException, context):
@@ -12,8 +14,11 @@ def custom_exception_handler(exc: APIException, context):
         return None
 
     # ✅ Customize only non-500 errors
-    return ApiResponse.error(
-        message=exc.default_detail,
-        status_code=response.status_code,
-        errors=response.data
+    return Response(
+        StandardErrorOutSerializer({
+            "status": exc.status_code,
+            "message": exc.default_detail,
+            "errors": exc or {}
+        }).data,
+        status=exc.status_code
     )
