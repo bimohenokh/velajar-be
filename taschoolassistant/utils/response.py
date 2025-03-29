@@ -18,17 +18,3 @@ class ApiResponse:
             }).data,
             status=status_code
         )
-
-    @staticmethod
-    def error(message="An error occurred", status_code=status.HTTP_400_BAD_REQUEST, errors=None):
-        """
-        Standardized error response.
-        """
-        return Response(
-            StandardErrorOutSerializer({
-                "status": status_code,
-                "message": message,
-                "errors": errors or {}
-            }).data,
-            status=status_code
-        )
