@@ -10,7 +10,6 @@ class ApiResponse:
         """
         Standardized success response.
         """
-
         return Response(
             StandardOutSerializer({
                 "status": status_code,
