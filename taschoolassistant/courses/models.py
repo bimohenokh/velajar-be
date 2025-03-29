@@ -1,7 +1,9 @@
 from enum import Enum
 
 from django.contrib.auth import get_user_model
+from django.core.files.storage import default_storage
 from django.db.models import Model, CharField, ImageField, CASCADE, ForeignKey, BooleanField, FileField
+from typing_extensions import override
 
 from taschoolassistant.courses.managers import CourseManager, CourseInstructorManager, CourseParticipantManager, \
     CourseSessionManager, CourseSessionResourceManager
@@ -32,15 +34,6 @@ class Course(Model):
     )
 
     objects = CourseManager()
-
-    def delete(self, *args, **kwargs):
-        """Delete banner file before deleting Course instance"""
-        if self.image_banner:
-            image_banner_path = os.path.join(
-                settings.MEDIA_ROOT, str(self.image_banner))
-            if os.path.exists(image_banner_path):
-                os.remove(image_banner_path)
-        super().delete(*args, **kwargs)
 
 
 class CourseParticipant(Model):
