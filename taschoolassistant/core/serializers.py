@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework.fields import CharField, IntegerField, SerializerMethodField, DictField
+from rest_framework.fields import CharField, IntegerField, SerializerMethodField, DictField, JSONField
 from rest_framework.serializers import Serializer
 from typing_extensions import Generic, TypeVar
 
@@ -33,7 +33,7 @@ class StandardOutSerializer(Serializer, Generic[T]):
 class StandardErrorOutSerializer(Serializer):
     status = IntegerField(default=400)
     message = CharField(default="An error occurred")
-    errors = DictField(default={})
+    errors = JSONField(default=dict)
 
     @classmethod
     def open_api_wrap(cls, the_status=400, the_message="An error occurred", the_error=None):
