@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 import os
 import environ
@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'taschoolassistant.core',
     'taschoolassistant.users',
     'taschoolassistant.courses',
 ]
@@ -137,6 +138,14 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+# JWT Configuration
+SIMPLE_JWT = {
+    "SIGNING_KEY": env("JWT_SECRET_KEY", default="your-jwt-secret-key"),
+    "ACCESS_TOKEN_LIFETIME": timedelta(seconds=env.int("JWT_ACCESS_TOKEN_LIFETIME", default=3600)),
+    "REFRESH_TOKEN_LIFETIME": timedelta(seconds=env.int("JWT_REFRESH_TOKEN_LIFETIME", default=86400)),
+}
 
 
 # Internationalization
