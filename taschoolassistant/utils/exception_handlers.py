@@ -1,6 +1,5 @@
 from rest_framework.views import exception_handler
 from taschoolassistant.utils.response import ApiResponse
-from rest_framework.exceptions import NotFound
 
 
 def custom_exception_handler(exc, context):

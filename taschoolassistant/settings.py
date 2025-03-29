@@ -41,7 +41,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'EXCEPTION_HANDLER': 'taschoolassistant.utils.exception_handlers'
+    # 'EXCEPTION_HANDLER': 'taschoolassistant.utils.exception_handlers.custom_exception_handler'
 }
 
 
