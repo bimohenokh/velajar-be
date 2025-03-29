@@ -1,15 +1,14 @@
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiResponse, extend_schema
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.generics import RetrieveAPIView
-from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
+from .serializers import RegisterInSerializer, LoginInSerializer, UserSerializer, LoginOutSerializer
+from ..core.serializers import StandardOutSerializer, StandardErrorOutSerializer
+from ..utils.response import ApiResponse
 
 User = get_user_model()
 
@@ -18,39 +17,52 @@ class RegisterView(APIView):
     permission_classes = [AllowAny]
 
     @extend_schema(
-        request=RegisterSerializer,
+        request=RegisterInSerializer,
         responses={
-            201: UserSerializer,
-            400: OpenApiResponse(
-                description="Validation error",
-                response={"status": "error", "message": "Validation failed", "errors": {"field": "error message"}}
-            )
+            201: StandardOutSerializer.open_api_wrap(UserSerializer, 201, "User registered successfully"),
+            400: StandardErrorOutSerializer.open_api_wrap(
+                400,
+                "Validation error",
+                {
+                    "field": ["error message"]
+                }
+            ),
         },
     )
     def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
+        serializer = RegisterInSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()  # ✅ Save first, then use the instance
+        user = serializer.save()
 
-        # ✅ Serialize again
-        return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+        return ApiResponse.success(
+            data=UserSerializer(user).data,
+            message="User registered successfully",
+            status_code=status.HTTP_201_CREATED
+        )
 
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
     @extend_schema(
-        request=LoginSerializer,
+        request=LoginInSerializer,
         responses={
-            200: LoginSerializer,  # ✅ Correct way to define response
-            401: OpenApiResponse(
-                description="Invalid credentials",
-                response={"status": "error", "message": "Invalid credentials"},
-            )
+            200: StandardOutSerializer.open_api_wrap(
+                LoginOutSerializer,
+                200,
+                "Login Successful"
+            ),
+            401: StandardErrorOutSerializer.open_api_wrap(
+                401,
+                "Invalid credentials",
+                {
+                    "detail": "Invalid credentials"
+                }
+            ),
         },
     )
     def post(self, request):
-        serializer = LoginSerializer(data=request.data)
+        serializer = LoginInSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         identifier = serializer.validated_data["identifier"]
@@ -64,19 +76,34 @@ class LoginView(APIView):
 
         refresh = RefreshToken.for_user(user)
 
-        return Response(
-            {
+        return ApiResponse.success(
+            data=LoginOutSerializer({
                 "refresh": str(refresh),
                 "access": str(refresh.access_token),
                 "user": UserSerializer(user).data,
-            },
-            status=status.HTTP_200_OK,
+            }).data,
+            message="Login successful",
+            status_code=status.HTTP_200_OK
         )
 
 
-class ProfileView(RetrieveAPIView):
+class ProfileView(APIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_object(self):
-        return self.request.user
+    @extend_schema(
+        responses={
+            200: StandardOutSerializer.open_api_wrap(
+                serializer_class,
+                200,
+                "User profile retrieved successfully"
+            ),
+        },
+    )
+    def get(self, request):
+        serializer = self.serializer_class(request.user)
+        return ApiResponse.success(
+            data=serializer.data,
+            message="User profile retrieved successfully",
+            status_code=status.HTTP_200_OK
+        )

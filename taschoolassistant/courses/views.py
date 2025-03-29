@@ -3,6 +3,8 @@ from rest_framework.views import APIView
 from .models import Course, CourseParticipant, CourseInstructor
 from .serializers import CourseSerializer
 from rest_framework import status
+
+from ..core.serializers import StandardOutSerializer, StandardErrorOutSerializer
 from ..utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -18,36 +20,45 @@ class CourseView(APIView):
         self.course_serializer = CourseSerializer
 
     @extend_schema(
-        parameters=[
-            OpenApiParameter(name="name", type=str, required=False, description="Filter courses by name"),
-            OpenApiParameter(name="jenjang_kelas", type=str, required=False,
-                             description="Filter courses by jenjang kelas"),
-        ],
+        request=CourseSerializer,
         responses={
-            200: CourseSerializer(many=True),
-            404: OpenApiResponse(description="Course not found"),
+            201: StandardOutSerializer.open_api_wrap(
+                CourseSerializer,
+                201,
+                "Course succesfully retrieved"
+            ),
         },
-        description="Retrieve a list of courses filtered by optional parameters."
     )
     def get(self, request):
         user = request.user
         name = request.GET.get('name', None)
         jenjang = request.GET.get('jenjang_kelas', None)
-        courses_instance = Course.objects.get_courses(user, name, jenjang)
+        courses_instance = Course.objects.get_courses(user, name, jenjang)  # TODO kalau gk ada return kosong aja gk sih?
         if not courses_instance.exists():
             raise NotFound("Course not found")
         serializer = self.course_serializer(
             courses_instance, many=True)
 
-        return ApiResponse.success(serializer.data, message="Course succesfully retrieved")
+        return ApiResponse.success(
+            data=serializer.data,
+            message="Course succesfully retrieved"
+        )
 
     @extend_schema(
         request=CourseSerializer,
         responses={
-            201: CourseSerializer,
-            400: OpenApiResponse(description="Invalid input data"),
+            201: StandardOutSerializer.open_api_wrap(
+                CourseSerializer,
+                201, "Course successfully created"
+            ),
+            400: StandardErrorOutSerializer.open_api_wrap(
+                400,
+                "Validation error",
+                {
+                    "field": ["error message"]
+                }
+            ),
         },
-        description="Create a new course and assign the user as a participant and instructor."
     )
     def post(self, request):
         user = request.user
@@ -88,11 +99,20 @@ class CourseViewById(APIView):
         self.course_serializer = CourseSerializer
 
     @extend_schema(
+        request=CourseSerializer,
         responses={
-            200: CourseSerializer,
-            404: OpenApiResponse(description="Course not found"),
+            201: StandardOutSerializer.open_api_wrap(
+                CourseSerializer,
+                200, "Course successfully retrieved"
+            ),
+            404: StandardErrorOutSerializer.open_api_wrap(
+                404,
+                "Not found.",
+                {
+                    "detail": "Course not found"
+                }
+            ),
         },
-        description="Retrieve a course by its ID."
     )
     def get(self, request, pk=None):
         user = request.user
@@ -107,17 +127,31 @@ class CourseViewById(APIView):
     @extend_schema(
         request=CourseSerializer,
         responses={
-            200: CourseSerializer,
-            400: OpenApiResponse(description="Invalid input data"),
-            404: OpenApiResponse(description="Course not found"),
+            201: StandardOutSerializer.open_api_wrap(
+                CourseSerializer,
+                200, "Course successfully retrieved"
+            ),
+            400: StandardErrorOutSerializer.open_api_wrap(
+                400,
+                "Validation error",
+                {
+                    "field": ["error message"]
+                }
+            ),
+            404: StandardErrorOutSerializer.open_api_wrap(
+                404,
+                "Course not found.",
+                {
+                    "detail": "Course not found"
+                }
+            ),
         },
-        description="Update a course by its ID. Supports partial updates."
     )
     def put(self, request, pk=None):
         try:
             selected_course = Course.objects.get(pk=pk)
         except Course.DoesNotExist:
-            raise NotFound("Course not found")
+            raise NotFound("Course not found.")
 
         serializer = self.course_serializer(selected_course, request.data, partial=True)  # TODO jadinya http patch?
         serializer.is_valid(raise_exception=True)
@@ -125,13 +159,20 @@ class CourseViewById(APIView):
 
         return ApiResponse.success(
             data=serializer.data,
-            message="Course successfully updated"
+            message="Course successfully updated",
+            status_code=status.HTTP_200_OK
         )
 
     @extend_schema(
         responses={
             204: None,
-            404: OpenApiResponse(description="Course not found"),
+            404: StandardErrorOutSerializer.open_api_wrap(
+                404,
+                "Course not found.",
+                {
+                    "detail": "Course not found"
+                }
+            ),
         },
         description="Delete a course by its ID."
     )
