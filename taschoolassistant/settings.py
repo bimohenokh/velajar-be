@@ -42,7 +42,8 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'EXCEPTION_HANDLER': 'taschoolassistant.utils.exception_handlers.custom_exception_handler'
+    'EXCEPTION_HANDLER': 'taschoolassistant.utils.exception_handlers.custom_exception_handler',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 
@@ -57,6 +58,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',  # required for Django collectstatic discovery
     'taschoolassistant.core',
     'taschoolassistant.users',
     'taschoolassistant.courses',
@@ -155,6 +158,18 @@ SIMPLE_JWT = {
     "SIGNING_KEY": env("JWT_SECRET_KEY", default="your-jwt-secret-key"),
     "ACCESS_TOKEN_LIFETIME": timedelta(seconds=env.int("JWT_ACCESS_TOKEN_LIFETIME", default=3600)),
     "REFRESH_TOKEN_LIFETIME": timedelta(seconds=env.int("JWT_REFRESH_TOKEN_LIFETIME", default=86400)),
+}
+
+# OpenAPI Schema settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Your Project API',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_DIST': 'SIDECAR',  # shorthand to use the sidecar instead
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+    # OTHER SETTINGS
 }
 
 

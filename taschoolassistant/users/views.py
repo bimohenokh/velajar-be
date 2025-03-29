@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import RetrieveAPIView
@@ -15,6 +17,16 @@ User = get_user_model()
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=RegisterSerializer,
+        responses={
+            201: UserSerializer,
+            400: OpenApiResponse(
+                description="Validation error",
+                response={"status": "error", "message": "Validation failed", "errors": {"field": "error message"}}
+            )
+        },
+    )
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -27,6 +39,16 @@ class RegisterView(APIView):
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=LoginSerializer,
+        responses={
+            200: LoginSerializer,  # ✅ Correct way to define response
+            401: OpenApiResponse(
+                description="Invalid credentials",
+                response={"status": "error", "message": "Invalid credentials"},
+            )
+        },
+    )
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
