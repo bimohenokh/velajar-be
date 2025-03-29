@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
 
-from taschoolassistant.core.serializers import StandardOutSerializer, StandardErrorOutSerializer
+from taschoolassistant.core.serializers import StandardOutSerializer
 
 
 class ApiResponse:
