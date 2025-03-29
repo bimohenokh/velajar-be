@@ -5,7 +5,6 @@ from rest_framework import status
 from ..utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
-from django.core.files.storage import default_storage
 from rest_framework.exceptions import NotFound, ValidationError
 
 
@@ -85,33 +84,14 @@ class CourseViewById(APIView):
         except Course.DoesNotExist:
             raise NotFound("Course not found")
 
-        request_data = request.data
+        serializer = self.course_serializer(selected_course, request.data, partial=True)  # TODO jadinya http patch?
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-        try:
-            if "image_banner" in request.FILES:
-                if selected_course.image_banner:
-                    old_image_path = selected_course.image_banner.path
-                    if default_storage.exists(old_image_path):
-                        default_storage.delete(old_image_path)
-
-                selected_course.image_banner = request.FILES["image_banner"]
-
-            selected_course.name = request_data.get(
-                "name", selected_course.name)
-            selected_course.description = request_data.get(
-                "description", selected_course.description)
-            selected_course.jenjang_kelas = request_data.get(
-                "jenjang_kelas", selected_course.description)
-            selected_course.save()
-
-            serializer = self.course_serializer(selected_course)
-
-            return ApiResponse.success(
-                data=serializer.data,
-                message="Course successfully updated"
-            )
-        except :
-            raise ValidationError("Invalid input data type")
+        return ApiResponse.success(
+            data=serializer.data,
+            message="Course successfully updated"
+        )
 
     def delete(self, request, pk):
         try:
