@@ -5,7 +5,7 @@ from .serializers import CourseSerializer
 from rest_framework import status
 
 from ..core.serializers import StandardOutSerializer, StandardErrorOutSerializer
-from ..utils.response import ApiResponse
+from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.exceptions import NotFound, ValidationError

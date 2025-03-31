@@ -8,7 +8,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .serializers import RegisterInSerializer, LoginInSerializer, UserSerializer, LoginOutSerializer
 from ..core.serializers import StandardOutSerializer, StandardErrorOutSerializer
-from ..utils.response import ApiResponse
+from taschoolassistant.core.utils.response import ApiResponse
 
 User = get_user_model()
 
