@@ -23,18 +23,6 @@ class StandardOutSerializer(Serializer):
 
         return representation
 
-    @classmethod
-    def open_api_wrap(cls, serializer: T, the_status=200, the_message="[Doing] successful"):
-        class WrappedStandardOutSerializer(cls):
-            status = IntegerField(default=the_status)
-            message = CharField(default=the_message)
-            data = serializer()
-
-            class Meta:
-                ref_name = f"StandardOut{serializer.__name__}"
-
-        return WrappedStandardOutSerializer
-
 
 class StandardErrorOutSerializer(Serializer):
     status = IntegerField(default=400)
@@ -55,15 +43,3 @@ class StandardErrorOutSerializer(Serializer):
             representation["errors"] = errors  # Keep as-is if already a dictionary
 
         return representation
-
-    @classmethod
-    def open_api_wrap(cls, the_status=400, the_message="An error occurred", the_error=None):
-        class WrappedStandardErrorOutSerializer(cls):
-            status = IntegerField(default=the_status)
-            message = CharField(default=the_message)
-            errors = JSONField(default=the_error or {})
-
-            class Meta:
-                ref_name = f"StandardErrorOut{the_status}"
-
-        return WrappedStandardErrorOutSerializer
