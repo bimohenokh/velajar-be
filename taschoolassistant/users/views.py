@@ -17,19 +17,6 @@ User = get_user_model()
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
-    @extend_schema(
-        request=RegisterInSerializer,
-        responses={
-            201: StandardOutSerializer.open_api_wrap(UserSerializer, 201, "User registered successfully"),
-            400: StandardErrorOutSerializer.open_api_wrap(
-                400,
-                "Validation error",
-                {
-                    "field": ["error message"]
-                }
-            ),
-        },
-    )
     def post(self, request):
         serializer = RegisterInSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -46,23 +33,6 @@ class RegisterView(APIView):
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
-    @extend_schema(
-        request=LoginInSerializer,
-        responses={
-            200: StandardOutSerializer.open_api_wrap(
-                LoginOutSerializer,
-                200,
-                "Login Successful"
-            ),
-            401: StandardErrorOutSerializer.open_api_wrap(
-                401,
-                "Invalid credentials",
-                {
-                    "detail": "Invalid credentials"
-                }
-            ),
-        },
-    )
     def post(self, request):
         serializer = LoginInSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -101,3 +71,8 @@ class ProfileView(APIView):
             message="User profile retrieved successfully",
             status_code=status.HTTP_200_OK
         )
+
+
+setattr(RegisterView, "post", register_post_schema(RegisterView.post))
+setattr(LoginView, "post", register_post_schema(LoginView.post))
+setattr(ProfileView, "get", register_post_schema(ProfileView.get))

@@ -1,4 +1,3 @@
-from drf_spectacular.utils import extend_schema
 from rest_framework.views import APIView
 from .models import Course, CourseParticipant, CourseInstructor, CourseSession
 from .schemas import course_schema, course_by_id_schema
@@ -20,16 +19,6 @@ class CourseView(APIView):
         super().__init__(**kwargs)
         self.course_serializer = CourseSerializer
 
-    @extend_schema(
-        request=CourseSerializer,
-        responses={
-            201: StandardOutSerializer.open_api_wrap(
-                CourseSerializer,
-                201,
-                "Course succesfully retrieved"
-            ),
-        },
-    )
     def get(self, request):
         user = request.user
         name = request.GET.get('name', None)
@@ -45,22 +34,6 @@ class CourseView(APIView):
             message="Course succesfully retrieved"
         )
 
-    @extend_schema(
-        request=CourseSerializer,
-        responses={
-            201: StandardOutSerializer.open_api_wrap(
-                CourseSerializer,
-                201, "Course successfully created"
-            ),
-            400: StandardErrorOutSerializer.open_api_wrap(
-                400,
-                "Validation error",
-                {
-                    "field": ["error message"]
-                }
-            ),
-        },
-    )
     def post(self, request):
         user = request.user
         role = user.role
@@ -100,22 +73,6 @@ class CourseViewById(APIView):
         super().__init__(**kwargs)
         self.course_serializer = CourseSerializer
 
-    @extend_schema(
-        request=CourseSerializer,
-        responses={
-            201: StandardOutSerializer.open_api_wrap(
-                CourseSerializer,
-                200, "Course successfully retrieved"
-            ),
-            404: StandardErrorOutSerializer.open_api_wrap(
-                404,
-                "Not found.",
-                {
-                    "detail": "Course not found"
-                }
-            ),
-        },
-    )
     def get(self, request, pk=None):
         user = request.user
         course_instance = Course.objects.get_detail_course_by_id(user, pk)
@@ -141,19 +98,6 @@ class CourseViewById(APIView):
             status_code=status.HTTP_200_OK
         )
 
-    @extend_schema(
-        responses={
-            204: None,
-            404: StandardErrorOutSerializer.open_api_wrap(
-                404,
-                "Course not found.",
-                {
-                    "detail": "Course not found"
-                }
-            ),
-        },
-        description="Delete a course by its ID."
-    )
     def delete(self, request, pk):
         try:
             course = Course.objects.get(id=pk)
