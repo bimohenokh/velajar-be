@@ -6,8 +6,8 @@ from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from .schemas import register_post_schema
 from .serializers import RegisterInSerializer, LoginInSerializer, UserSerializer, LoginOutSerializer
-from ..core.serializers import StandardOutSerializer, StandardErrorOutSerializer
 from taschoolassistant.core.utils.response import ApiResponse
 
 User = get_user_model()
@@ -16,19 +16,6 @@ User = get_user_model()
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
-    @extend_schema(
-        request=RegisterInSerializer,
-        responses={
-            201: StandardOutSerializer.open_api_wrap(UserSerializer, 201, "User registered successfully"),
-            400: StandardErrorOutSerializer.open_api_wrap(
-                400,
-                "Validation error",
-                {
-                    "field": ["error message"]
-                }
-            ),
-        },
-    )
     def post(self, request):
         serializer = RegisterInSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -44,23 +31,6 @@ class RegisterView(APIView):
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
-    @extend_schema(
-        request=LoginInSerializer,
-        responses={
-            200: StandardOutSerializer.open_api_wrap(
-                LoginOutSerializer,
-                200,
-                "Login Successful"
-            ),
-            401: StandardErrorOutSerializer.open_api_wrap(
-                401,
-                "Invalid credentials",
-                {
-                    "detail": "Invalid credentials"
-                }
-            ),
-        },
-    )
     def post(self, request):
         serializer = LoginInSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -91,15 +61,6 @@ class ProfileView(APIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
-    @extend_schema(
-        responses={
-            200: StandardOutSerializer.open_api_wrap(
-                serializer_class,
-                200,
-                "User profile retrieved successfully"
-            ),
-        },
-    )
     def get(self, request):
         serializer = self.serializer_class(request.user)
         return ApiResponse.success(
@@ -107,3 +68,8 @@ class ProfileView(APIView):
             message="User profile retrieved successfully",
             status_code=status.HTTP_200_OK
         )
+
+
+setattr(RegisterView, "post", register_post_schema(RegisterView.post))
+setattr(LoginView, "post", register_post_schema(LoginView.post))
+setattr(ProfileView, "get", register_post_schema(ProfileView.get))
