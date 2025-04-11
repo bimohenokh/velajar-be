@@ -1,4 +1,3 @@
-from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -6,13 +5,14 @@ from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .schemas import register_post_schema
+from .schemas import register_schema, login_schema, profile_schema
 from .serializers import RegisterInSerializer, LoginInSerializer, UserSerializer, LoginOutSerializer
 from taschoolassistant.core.utils.response import ApiResponse
 
 User = get_user_model()
 
 
+@register_schema
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -28,6 +28,7 @@ class RegisterView(APIView):
         )
 
 
+@login_schema
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
@@ -57,6 +58,7 @@ class LoginView(APIView):
         )
 
 
+@profile_schema
 class ProfileView(APIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
@@ -68,8 +70,3 @@ class ProfileView(APIView):
             message="User profile retrieved successfully",
             status_code=status.HTTP_200_OK
         )
-
-
-setattr(RegisterView, "post", register_post_schema(RegisterView.post))
-setattr(LoginView, "post", register_post_schema(LoginView.post))
-setattr(ProfileView, "get", register_post_schema(ProfileView.get))
