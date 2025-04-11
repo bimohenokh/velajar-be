@@ -1,4 +1,3 @@
-from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -71,8 +70,3 @@ class ProfileView(APIView):
             message="User profile retrieved successfully",
             status_code=status.HTTP_200_OK
         )
-
-
-setattr(RegisterView, "post", register_post_schema(RegisterView.post))
-setattr(LoginView, "post", register_post_schema(LoginView.post))
-setattr(ProfileView, "get", register_post_schema(ProfileView.get))
