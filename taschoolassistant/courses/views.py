@@ -1,7 +1,6 @@
 from rest_framework.views import APIView
 from .models import Course, CourseParticipant, CourseInstructor
-from .schemas import course_get_schema, course_post_schema, course_by_id_get_schema, course_by_id_put_schema, \
-    course_by_id_delete_schema
+from .schemas import course_schema, course_by_id_schema
 from .serializers import CourseSerializer
 from rest_framework import status
 
@@ -11,6 +10,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.exceptions import NotFound, ValidationError
 
 
+@course_schema
 class CourseView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
@@ -64,6 +64,7 @@ class CourseView(APIView):
             raise ValidationError("Invalid input data type")
 
 
+@course_by_id_schema
 class CourseViewById(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
@@ -108,10 +109,3 @@ class CourseViewById(APIView):
             message="Course successfully deleted",
             status_code=status.HTTP_204_NO_CONTENT
         )
-
-
-setattr(CourseView, "get", course_get_schema(CourseView.get))
-setattr(CourseView, "post", course_post_schema(CourseView.post))
-setattr(CourseViewById, "get", course_by_id_get_schema(CourseViewById.get))
-setattr(CourseViewById, "put", course_by_id_put_schema(CourseViewById.put))
-setattr(CourseViewById, "delete", course_by_id_delete_schema(CourseViewById.delete))
