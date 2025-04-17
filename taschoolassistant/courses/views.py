@@ -1,15 +1,16 @@
 from rest_framework.views import APIView
 from .models import Course, CourseParticipant, CourseInstructor
+from .schemas import course_schema, course_by_id_schema
 from .serializers import CourseSerializer
 from rest_framework import status
-from ..utils.response import ApiResponse
+
+from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.exceptions import NotFound, ValidationError
 
 
-# Create your views here.
-
+@course_schema
 class CourseView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
@@ -22,13 +23,16 @@ class CourseView(APIView):
         user = request.user
         name = request.GET.get('name', None)
         jenjang = request.GET.get('jenjang_kelas', None)
-        courses_instance = Course.objects.get_courses(user, name, jenjang)
+        courses_instance = Course.objects.get_courses(user, name, jenjang)  # TODO kalau gk ada return kosong aja gk sih?
         if not courses_instance.exists():
             raise NotFound("Course not found")
         serializer = self.course_serializer(
             courses_instance, many=True)
 
-        return ApiResponse.success(serializer.data, message="Course succesfully retrieved")
+        return ApiResponse.success(
+            data=serializer.data,
+            message="Course succesfully retrieved"
+        )
 
     def post(self, request):
         user = request.user
@@ -60,6 +64,7 @@ class CourseView(APIView):
             raise ValidationError("Invalid input data type")
 
 
+@course_by_id_schema
 class CourseViewById(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
@@ -82,7 +87,7 @@ class CourseViewById(APIView):
         try:
             selected_course = Course.objects.get(pk=pk)
         except Course.DoesNotExist:
-            raise NotFound("Course not found")
+            raise NotFound("Course not found.")
 
         serializer = self.course_serializer(selected_course, request.data, partial=True)  # TODO jadinya http patch?
         serializer.is_valid(raise_exception=True)
@@ -90,7 +95,8 @@ class CourseViewById(APIView):
 
         return ApiResponse.success(
             data=serializer.data,
-            message="Course successfully updated"
+            message="Course successfully updated",
+            status_code=status.HTTP_200_OK
         )
 
     def delete(self, request, pk):

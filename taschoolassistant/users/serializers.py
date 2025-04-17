@@ -11,7 +11,7 @@ class UserSerializer(ModelSerializer):
         fields = ["id", "username", "email", "role"]
 
 
-class RegisterSerializer(ModelSerializer):
+class RegisterInSerializer(ModelSerializer):
     password = CharField(write_only=True)
 
     class Meta:
@@ -22,6 +22,12 @@ class RegisterSerializer(ModelSerializer):
         return User.objects.create_user(**validated_data)
 
 
-class LoginSerializer(Serializer):
+class LoginInSerializer(Serializer):
     identifier = CharField()
     password = CharField(write_only=True)
+
+
+class LoginOutSerializer(Serializer):
+    refresh = CharField()
+    access = CharField()
+    user = UserSerializer()
