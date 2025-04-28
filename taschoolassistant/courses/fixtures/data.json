@@ -301,6 +301,35 @@
            "course_participant" : 2,
             "is_owner" : true
         }
+    },
+
+
+    {
+        "model": "courses.coursesession",
+        "pk": 1,
+        "fields": {
+            "course": 1,
+            "name": "Sesi 1 Fisika SMA Kelas 10",
+            "description": "Ini sesi 1 yang mempelajari mengenai astronomi dari planet-planet dan hukum gravitasi"
+        }
+    },
+    {
+        "model": "courses.coursesession",
+        "pk": 2,
+        "fields": {
+            "course": 2,
+            "name": "Sesi 1 Kimia SMA Kelas 10",
+            "description": "Ini sesi 1 yang mempelajari mengenai hukum lavoiser"
+        }
+    },
+    {
+        "model": "courses.coursesession",
+        "pk": 3,
+        "fields": {
+            "course": 3,
+            "name": "Sesi 1 Matematika SMA Kelas 10",
+            "description": "Ini sesi 1 matematika yang mempelajari mengenai deret aritmatika dan sistem persamaan linear"
+        }
     }
 
 ]
