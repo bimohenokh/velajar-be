@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path("api/users/", include("taschoolassistant.users.urls")),
     path("api/courses/", include("taschoolassistant.courses.urls")),
+    path("api/quizzes/", include("taschoolassistant.quiz.urls")),
 ]
 
 if settings.DEBUG:
