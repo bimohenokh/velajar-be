@@ -1,0 +1,84 @@
+[
+    {
+    "model": "studycases.studycase",
+    "pk": 1,
+    "fields": {
+        "question": "Jelaskan hubungan antara gaya, massa, dan percepatan berdasarkan kasus ini?",
+        "description": "Sebuah mobil bermassa 1000 kg didorong dengan gaya konstan sebesar 2000 N di jalan datar tanpa gesekan.",
+        "course_session": 1,
+        "total_points": 100,
+        "started_at": null,
+        "time_range": "00:20:00",
+        "status": "Active"
+    }
+    },
+    {
+    "model": "studycases.studycase",
+    "pk": 2,
+    "fields": {
+        "question": "Jelaskan konsep gerak jatuh bebas yang terjadi pada bola tersebut?",
+        "description": "Seorang siswa melepaskan bola dari ketinggian 20 meter tanpa kecepatan awal. Bola tersebut jatuh bebas ke tanah.",
+        "course_session": 1,
+        "total_points": 100,
+        "started_at": "2025-04-29T14:30:00Z",
+        "time_range": "00:20:00",
+        "status": "Draft"
+    }
+    },
+    {
+    "model": "studycases.studycase",
+    "pk": 3,
+    "fields": {
+        "question": "Apakah larutan hasil pencampuran bersifat asam, basa, atau netral? Jelaskan alasannya.",
+        "description": "Seorang siswa mencampurkan 50 ml larutan asam klorida (HCl) 0,1 M dengan 50 ml larutan natrium hidroksida (NaOH) 0,1 M.",
+        "course_session": 2,
+        "total_points": 100,
+        "started_at": "2025-04-29T14:30:00Z",
+        "time_range": "00:25:00",
+        "status": "Draft"
+    }
+    },
+    {
+    "model": "studycases.studycase",
+    "pk": 4,
+    "fields": {
+        "question": "Jelaskan perubahan wujud zat yang terjadi pada es batu tersebut?",
+        "description": "Es batu diletakkan di suhu ruang dan mulai mencair menjadi air.",
+        "course_session": 2,
+        "total_points": 100,
+        "started_at": "2025-04-29T14:30:00Z",
+        "time_range": "00:15:00",
+        "status": "Draft"
+    }
+    },
+
+
+
+    {
+    "model": "studycases.studycaseanswer",
+    "pk": 1,
+    "fields": {
+        "study_case": 3,
+        "student": 3,
+        "answer": "Ini jawaban user 3, basa aja dah mantap",
+        "started_at": "2025-04-29T14:30:00Z",
+        "submitted_at": "2025-04-29T14:50:00Z",
+        "score": 85,
+        "is_submitted": true
+    }
+    },
+    {
+    "model": "studycases.studycaseanswer",
+    "pk": 2,
+    "fields": {
+        "study_case": 3,
+        "student": 4,
+        "answer": "Ini jawaban user 4, basa kayaknya sih dari perhitungan saya",
+        "started_at": "2025-04-29T14:30:00Z",
+        "submitted_at": "2025-04-29T14:50:00Z",
+        "score": 90,
+        "is_submitted": true
+    }
+    }
+]
+  

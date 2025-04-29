@@ -283,6 +283,42 @@
             "is_participating": true
         }
     },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 3,
+        "fields": {
+            "course": 1,
+            "participant": 3,
+            "is_participating": true
+        }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 4,
+        "fields": {
+            "course": 2,
+            "participant": 3,
+            "is_participating": true
+        }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 5,
+        "fields": {
+            "course": 1,
+            "participant": 4,
+            "is_participating": true
+        }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 6,
+        "fields": {
+            "course": 2,
+            "participant": 4,
+            "is_participating": true
+        }
+    },
 
 
 
@@ -302,6 +338,40 @@
             "is_owner" : true
         }
     },
+    {
+        "model": "courses.courseinstructor",
+        "pk": 3,
+        "fields": {
+           "course_participant" : 3,
+            "is_owner" : false
+        }
+    },
+    {
+        "model": "courses.courseinstructor",
+        "pk": 4,
+        "fields": {
+           "course_participant" : 4,
+            "is_owner" : false
+        }
+    },
+    {
+        "model": "courses.courseinstructor",
+        "pk": 5,
+        "fields": {
+           "course_participant" : 5,
+            "is_owner" : false
+        }
+    },
+    {
+        "model": "courses.courseinstructor",
+        "pk": 6,
+        "fields": {
+           "course_participant" : 6,
+            "is_owner" : false
+        }
+    },
+
+
 
 
     {

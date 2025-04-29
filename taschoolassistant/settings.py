@@ -63,7 +63,9 @@ INSTALLED_APPS = [
     'taschoolassistant.core',
     'taschoolassistant.users',
     'taschoolassistant.courses',
-    'taschoolassistant.profiles'
+    'taschoolassistant.profiles',
+    'taschoolassistant.studycases'
+
 ]
 
 MIDDLEWARE = [

@@ -29,6 +29,7 @@ urlpatterns = [
     path("api/users/", include("taschoolassistant.users.urls")),
     path("api/courses/", include("taschoolassistant.courses.urls")),
     path("api/profiles/", include("taschoolassistant.profiles.urls")),
+    path("api/studycases/", include("taschoolassistant.studycases.urls")),
 ]
 
 if settings.DEBUG:

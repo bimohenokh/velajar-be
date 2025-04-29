@@ -24,7 +24,13 @@ class CourseManager(Manager):
 
 
 class CourseInstructorManager(Manager):
-    pass
+    def check_instsructor_for_studycase(self, user, course_session):
+        query = self.filter(
+            course_participant__participant=user,
+            course_participant__course=course_session.course,
+            course_participant__is_participating=True
+        )
+        return 
 
 
 class CourseParticipantManager(Manager):
