@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from .models import Course, CourseParticipant, CourseInstructor, CourseSession, ParticipantPoint
 from .schemas import course_schema, course_by_id_schema
-from .serializers import CourseSerializer, CourseSessionSerializer
+from .serializers import CourseSerializer, CourseSessionSerializer, LeaderboardSerializer
 from rest_framework import status
 
 from taschoolassistant.core.utils.response import ApiResponse
@@ -173,16 +173,15 @@ class CourseSessionViewById(APIView):
         return ApiResponse.success(serializer.data, message="Course session successfully retrieved")
 
     def patch(self, request, course_id, session_id):
-        print(request.data)
+     
         try:
             course_session = CourseSession.objects.get(course=course_id, pk=session_id)
         except CourseSession.DoesNotExist:
             raise NotFound("Course session not found.")
         
-        print(course_session)
+
 
         serializer = self.course_session_serializer(course_session, data=request.data, partial=True)
-        print(request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -204,3 +203,23 @@ class CourseSessionViewById(APIView):
             message="Course session successfully deleted",
             status_code=status.HTTP_204_NO_CONTENT
         )
+    
+
+class LeaderboardView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.course_session_serializer = LeaderboardSerializer
+
+    def get(self, request, course_id):
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            raise NotFound("Course not found.")
+
+        # Filter points by course
+        participant_points = ParticipantPoint.objects.filter(course_participant__course=course).order_by('-point_achieved')
+        serializer = self.course_session_serializer(participant_points, many=True)
+        return ApiResponse.success(serializer.data, message="Course session successfully retrieved")
