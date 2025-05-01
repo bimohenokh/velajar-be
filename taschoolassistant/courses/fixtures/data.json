@@ -371,6 +371,56 @@
         }
     },
 
+    {
+        "model": "courses.participantpoint",
+        "pk": 1,
+        "fields": {
+            "course_participant" : 1,
+            "point_achieved" : 150
+        }
+    },
+    {
+        "model": "courses.participantpoint",
+        "pk": 2,
+        "fields": {
+           "course_participant" : 2,
+            "point_achieved" : 150
+        }
+    },
+    {
+        "model": "courses.participantpoint",
+        "pk": 3,
+        "fields": {
+           "course_participant" : 3,
+            "point_achieved" : 150
+        }
+    },
+    {
+        "model": "courses.participantpoint",
+        "pk": 4,
+        "fields": {
+           "course_participant" : 4,
+            "point_achieved" : 150
+        }
+    },
+    {
+        "model": "courses.participantpoint",
+        "pk": 5,
+        "fields": {
+           "course_participant" : 5,
+            "point_achieved" : 150
+        }
+    },
+    {
+        "model": "courses.participantpoint",
+        "pk": 6,
+        "fields": {
+           "course_participant" : 6,
+            "point_achieved" : 150
+        }
+    },
+
+
 
 
 

@@ -1,10 +1,10 @@
 from enum import Enum
 
 from django.contrib.auth import get_user_model
-from django.db.models import Model, CharField, ImageField, CASCADE, ForeignKey, BooleanField, FileField
+from django.db.models import Model, CharField, ImageField, CASCADE, ForeignKey, BooleanField, FileField, FloatField
 
 from taschoolassistant.courses.managers import CourseManager, CourseInstructorManager, CourseParticipantManager, \
-    CourseSessionManager, CourseSessionResourceManager
+    CourseSessionManager, CourseSessionResourceManager, ParticipantPointManager
 
 # Create your models here.
 User = get_user_model()
@@ -38,6 +38,13 @@ class CourseParticipant(Model):
     objects = CourseParticipantManager()
 
 
+class ParticipantPoint(Model):
+    course_participant = ForeignKey(CourseParticipant, on_delete=CASCADE)
+    point_achieved = FloatField(default=0)
+
+    objects = ParticipantPointManager()
+
+
 class CourseInstructor(Model):
     course_participant = ForeignKey(CourseParticipant, on_delete=CASCADE)
     is_owner = BooleanField(default=False)
@@ -58,3 +65,4 @@ class CourseSessionResource(Model):
     content = FileField(upload_to='courses-resources/')
 
     objects = CourseSessionResourceManager()
+

@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from .models import Course, CourseParticipant, CourseInstructor, CourseSession
+from .models import Course, CourseParticipant, CourseInstructor, CourseSession, ParticipantPoint
 from .schemas import course_schema, course_by_id_schema
 from .serializers import CourseSerializer, CourseSessionSerializer
 from rest_framework import status
@@ -54,6 +54,8 @@ class CourseView(APIView):
                 CourseInstructor.objects.create(
                     course_participant=course_participant, is_owner=False
                 )
+                
+            ParticipantPoint.objects.create(course_participant=course_participant, point=0)
 
             return ApiResponse.success(
                 data=serializer.data,

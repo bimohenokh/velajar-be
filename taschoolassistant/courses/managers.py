@@ -59,5 +59,8 @@ class CourseSessionManager(Manager):
         ).first()
 
 
+class ParticipantPointManager(Manager):
+    pass
+
 class CourseSessionResourceManager(Manager):
     pass
