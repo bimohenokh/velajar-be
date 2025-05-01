@@ -1,0 +1,19 @@
+# bash
+python manage.py loaddata */fixtures/*.json
+
+
+# powershell
+$fixtures = Get-ChildItem -Recurse -Filter *.json | Where-Object { $_.FullName -like "*\fixtures\*" } | ForEach-Object { $_.FullName }
+
+
+# cmd  # blm gw coba tapi
+@echo off
+setlocal enabledelayedexpansion
+set FIXTURES=
+for /R %%f in (*.json) do (
+    echo %%f | findstr /R /C:"\\fixtures\\.*\.json" >nul
+    if not errorlevel 1 (
+        set FIXTURES=!FIXTURES! "%%f"
+    )
+)
+python manage.py loaddata !FIXTURES!

@@ -1,0 +1,18 @@
+[
+  {
+        "model": "courses.courseinstructor",
+        "pk": 1,
+        "fields": {
+            "course_participant" : 1,
+            "is_owner" : true
+        }
+    },
+    {
+        "model": "courses.courseinstructor",
+        "pk": 2,
+        "fields": {
+           "course_participant" : 2,
+            "is_owner" : true
+        }
+    }
+]

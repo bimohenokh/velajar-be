@@ -1,6 +1,5 @@
-
 [
-    {
+  {
         "model": "courses.course",
         "pk": 1,
         "fields": {
@@ -259,48 +258,5 @@
             "image_banner": "courses-banner/biologi_banner.jpg",
             "jenjang_kelas" : "SMA Kelas 2"
         }
-    },
-
-
-
-
-
-    {
-        "model": "courses.courseparticipant",
-        "pk": 1,
-        "fields": {
-            "course": 1,
-            "participant": 1,
-            "is_participating": true
-        }
-    },
-    {
-        "model": "courses.courseparticipant",
-        "pk": 2,
-        "fields": {
-            "course": 2,
-            "participant": 1,
-            "is_participating": true
-        }
-    },
-
-
-
-    {
-        "model": "courses.courseinstructor",
-        "pk": 1,
-        "fields": {
-            "course_participant" : 1,
-            "is_owner" : true
-        }
-    },
-    {
-        "model": "courses.courseinstructor",
-        "pk": 2,
-        "fields": {
-           "course_participant" : 2,
-            "is_owner" : true
-        }
     }
-
 ]
