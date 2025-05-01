@@ -1,9 +1,10 @@
 # bash
-python manage.py loaddata */fixtures/*.json
+python manage.py loaddata taschoolassistant/*/fixtures/*.json
 
 
 # powershell
 $fixtures = Get-ChildItem -Recurse -Filter *.json | Where-Object { $_.FullName -like "*\fixtures\*" } | ForEach-Object { $_.FullName }
+python manage.py loaddata $fixtures
 
 
 # cmd  # blm gw coba tapi
