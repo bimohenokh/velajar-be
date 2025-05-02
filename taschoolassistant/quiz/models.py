@@ -10,7 +10,7 @@ class Quiz(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     total_points = models.FloatField(default=100)
-    started_at = models.DateTimeField(blank=True)
+    started_at = models.DateTimeField(blank=True, null=True)
     time_range = models.DurationField()
     status = models.CharField(max_length=10, choices=[('draft', 'Draft'), ('active', 'Active'), ('finished', 'Finished')], default='draft')
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='quizzes_created')
