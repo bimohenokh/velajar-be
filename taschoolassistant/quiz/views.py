@@ -4,7 +4,7 @@ from django.utils import timezone
 
 # quizzes/views.py
 from .models import Quiz, Question, QuizAttempt, Answer, Option
-from .serializers import QuizSerializer, QuestionSerializer, AnswerSerializer, QuizAttemptSerializer, OptionSerializer
+from .serializers import QuizSerializer, QuestionSerializer, AnswerSerializer, QuizAttemptSerializer, OptionSerializer, StudentQuestionSerializer
 
 from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
@@ -79,6 +79,37 @@ class QuizDetailView(APIView):
             raise ValidationError("Quiz id is required")
         except Quiz.DoesNotExist:
             raise NotFound("Quiz detail not found")
+    
+    def patch(self, request, quiz_id):
+        # Check if quiz_id is provided
+        if quiz_id is None:
+            raise ValidationError("Quiz id is required in the URL")
+        
+        if not request.user.role == "teacher":
+            raise ValidationError("You do not have permission to update a quiz")
+            
+        # Check if request data is empty
+        if not request.data:
+            raise ValidationError("Request body cannot be empty")
+            
+        try:
+            quiz = Quiz.objects.get(id=quiz_id)
+            if quiz.created_by != request.user:
+                raise ValidationError("You do not have permission to update this quiz")
+            
+            serializer = self.quiz_serializer(quiz, data=request.data, partial=True)
+
+            if serializer.is_valid():
+                serializer.save()
+                return ApiResponse.success(
+                    data=serializer.data,
+                    message="Quiz updated successfully",
+                    status_code=status.HTTP_200_OK
+                )
+            else:
+                raise ValidationError(serializer.errors)
+        except Quiz.DoesNotExist:
+            raise NotFound("Quiz not found")
 
 class QuestionByQuizIdView(APIView):
     permission_classes = [IsAuthenticated]
@@ -86,6 +117,7 @@ class QuestionByQuizIdView(APIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.question_serializer = QuestionSerializer
+        self.question_student_serializer = StudentQuestionSerializer
     
     # ADD QUESTION TO QUIZ BY QUIZ ID
     def post(self, request, quiz_id):
@@ -122,7 +154,10 @@ class QuestionByQuizIdView(APIView):
         try:
             quiz = Quiz.objects.get(id=quiz_id)
             questions = Question.objects.filter(quiz=quiz)
-            serializer = self.question_serializer(questions, many=True)
+            if request.user.role == "teacher" and quiz.created_by == request.user:
+                serializer = self.question_serializer(questions, many=True)
+            else:
+                serializer = self.question_student_serializer(questions, many=True)
             return ApiResponse.success(
                 data=serializer.data,
                 message="Quiz questions successfully retrieved"
@@ -138,7 +173,7 @@ class QuestionByQuizIdView(APIView):
             raise ValidationError("Quiz id is required in the URL")
         
         if not request.user.role == "teacher":
-            raise ValidationError("You do not have permission to create a quiz")
+            raise ValidationError("You do not have permission to update a question")
             
         # Check if request data is empty
         if not request.data:
@@ -146,6 +181,9 @@ class QuestionByQuizIdView(APIView):
             
         try:
             quiz = Quiz.objects.get(id=quiz_id)
+            if quiz.created_by != request.user:
+                raise ValidationError("You do not have permission to update this quiz")
+            
             question = Question.objects.get(id=request.data['question_id'], quiz=quiz)
             serializer = self.question_serializer(question, data=request.data, partial=True)
 
@@ -365,13 +403,7 @@ class SubmitQuizView(APIView):
                         'selected_options': [opt.id for opt in answer.selected_options.all()]
                     })
                 except Answer.DoesNotExist:
-                    continue 
-
-            # for ans in answers:
-            #     answers_data.append({
-            #         'question': ans.question.id,
-            #         'selected_options': [opt.id for opt in ans.selected_options.all()]
-            #     })
+                    continue ## siswa tidak menjawab pertanyaan
 
             data = {
                 'quiz': quiz_attempt.quiz.id,
