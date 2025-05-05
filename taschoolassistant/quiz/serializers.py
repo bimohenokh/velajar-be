@@ -8,6 +8,18 @@ class OptionSerializer(serializers.ModelSerializer):
         model = Option
         fields = ['id', 'text', 'is_correct']
 
+class StudentOptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Option
+        fields = ['id', 'text']
+
+class StudentQuestionSerializer(serializers.ModelSerializer):
+    options = StudentOptionSerializer(many=True)
+
+    class Meta:
+        model = Question
+        fields = ['id', 'text', 'type', 'options']
+
 class QuestionSerializer(serializers.ModelSerializer):
     options = OptionSerializer(many=True)
 
@@ -39,11 +51,39 @@ class QuestionSerializer(serializers.ModelSerializer):
         for opt in options_data:
             Option.objects.create(question=question, **opt)
         return question
+    
+    def update(self, instance, validated_data):
+        options_data = validated_data.pop('options', None)
+        instance.text = validated_data.get('text', instance.text)
+        instance.type = validated_data.get('type', instance.type)
+        instance.save()
+
+        if options_data is not None:
+            # Hapus semua option lama
+            instance.options.all().delete()
+            # Buat option baru
+            for opt_data in options_data:
+                Option.objects.create(question=instance, **opt_data)
+
+        return instance
+
 
 class QuizSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quiz
         fields = ['id', 'title', 'description', 'course_session', 'total_points', 'time_range', 'status']
+    
+    def update(self, instance, validated_data):
+
+        instance.title = validated_data.get('title', instance.title)
+        instance.description = validated_data.get('description', instance.description)
+        instance.course_session = validated_data.get('course_session', instance.course_session)
+        instance.total_points = validated_data.get('total_points', instance.total_points)
+        instance.time_range = validated_data.get('time_range', instance.time_range)
+        instance.status = validated_data.get('status', instance.status)
+
+        instance.save()
+        return instance
 
 class AnswerSerializer(serializers.ModelSerializer):
     selected_options = serializers.PrimaryKeyRelatedField(
