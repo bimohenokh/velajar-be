@@ -103,7 +103,11 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
                 question_id = question.id
             else:
                 question_id = question
-            selected_option_ids = set(answer['selected_options'])
+            selected_option_ids = selected_option_ids = set(
+                opt.id if isinstance(opt, Option) else opt
+                for opt in answer['selected_options']
+            )
+
 
             question = Question.objects.get(id=question_id)
             correct_option_ids = set(question.options.filter(is_correct=True).values_list('id', flat=True))

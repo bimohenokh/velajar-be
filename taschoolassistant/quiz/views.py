@@ -354,14 +354,24 @@ class SubmitQuizView(APIView):
             if quiz_attempt.is_submitted:
                 raise ValidationError("Quiz attempt is already submitted")
             
-            answers = Answer.objects.filter(attempt=quiz_attempt)
+            
 
             answers_data = []
-            for ans in answers:
-                answers_data.append({
-                    'question': ans.question.id,
-                    'selected_options': [opt.id for opt in ans.selected_options.all()]
-                })
+            for question in quiz_attempt.quiz.questions.all():
+                try:
+                    answer = Answer.objects.get(attempt=quiz_attempt, question=question)
+                    answers_data.append({
+                        'question': question.id,
+                        'selected_options': [opt.id for opt in answer.selected_options.all()]
+                    })
+                except Answer.DoesNotExist:
+                    continue 
+
+            # for ans in answers:
+            #     answers_data.append({
+            #         'question': ans.question.id,
+            #         'selected_options': [opt.id for opt in ans.selected_options.all()]
+            #     })
 
             data = {
                 'quiz': quiz_attempt.quiz.id,
