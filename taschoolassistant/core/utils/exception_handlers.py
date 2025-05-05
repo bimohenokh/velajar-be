@@ -17,8 +17,7 @@ def custom_exception_handler(exc: APIException, context):
     return Response(
         StandardErrorOutSerializer({
             "status": exc.status_code,
-            "message": exc.default_detail,
-            "errors": exc.detail,
+            "errors": exc.get_full_details(),
         }).data,
         status=exc.status_code
     )
