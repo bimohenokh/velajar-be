@@ -16,5 +16,95 @@
             "participant": 1,
             "is_participating": true
         }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 3,
+        "fields": {
+            "course": 1,
+            "participant": 2,
+            "is_participating": true
+        }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 4,
+        "fields": {
+            "course": 2,
+            "participant": 2,
+            "is_participating": true
+        }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 5,
+        "fields": {
+            "course": 1,
+            "participant": 3,
+            "is_participating": true
+        }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 6,
+        "fields": {
+            "course": 2,
+            "participant": 3,
+            "is_participating": true
+        }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 7,
+        "fields": {
+            "course": 1,
+            "participant": 4,
+            "is_participating": true
+        }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 8,
+        "fields": {
+            "course": 2,
+            "participant": 4,
+            "is_participating": true
+        }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 9,
+        "fields": {
+            "course": 1,
+            "participant": 5,
+            "is_participating": true
+        }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 10,
+        "fields": {
+            "course": 2,
+            "participant": 5,
+            "is_participating": true
+        }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 11,
+        "fields": {
+            "course": 1,
+            "participant": 6,
+            "is_participating": true
+        }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 12,
+        "fields": {
+            "course": 2,
+            "participant": 6,
+            "is_participating": true
+        }
     }
 ]
