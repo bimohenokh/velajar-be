@@ -31,7 +31,6 @@ class StudyCaseView(APIView):
         except Exception as e:
             raise str(e)
 
-
         if not studycase_instance.exists():
             raise NotFound("Study Cases not found")
         serializer = self.studycase_serializer(
@@ -41,7 +40,7 @@ class StudyCaseView(APIView):
             data=serializer.data,
             message="Study Cases succesfully retrieved"
         )
-    
+
     def post(self, request, session_id):
         user = request.user
         data = request.data.copy()  
@@ -58,6 +57,7 @@ class StudyCaseView(APIView):
             )
         else:
             raise ValidationError("Invalid input data type")
+
         
 
 class StudyCaseViewById(APIView):
@@ -114,20 +114,33 @@ class StudyCaseAnswerReadStudentSubmittedView(APIView):
         super().__init__(**kwargs)
         self.studycase_answer_serializer = UserSerializer
 
-    def get(self, request, case_id):
+    def get(self, request, session_id, case_id):
 
+        is_evaluated = request.GET.get('is_evaluated')
+        search = request.GET.get('search')
+        print(is_evaluated)
+        
         answered_students = User.objects.filter(
-            studycaseanswer__study_case_question__study_case=case_id,
+            studycaseanswer__study_case_question__study_case_id=case_id,
             studycaseanswer__is_submitted=True,
-            studycaseanswer__is_evaluated=False
-
+            studycaseanswer__study_case_question__study_case__course_session_id=session_id
         ).distinct()
+
+        if is_evaluated:
+            answered_students = answered_students.filter(studycaseanswer__is_evaluated=True) if is_evaluated == "Sudah Dievaluasi" else answered_students.filter(studycaseanswer__is_evaluated=False)
+
+        if search:
+            answered_students = answered_students.filter(nama_lengkap__icontains=search)
+
+        if not answered_students.exists():
+            raise NotFound("Student has't submitted yet")
+
     
         serializer = self.studycase_answer_serializer(answered_students, many=True)
 
         return ApiResponse.success(
             data=serializer.data,
-            message="Study Case Answers successfully retrieved"
+            message="Study Case Answers Submitted successfully retrieved"
         )
 
 class StudyCaseAnswerReadView(APIView):
@@ -138,17 +151,13 @@ class StudyCaseAnswerReadView(APIView):
         super().__init__(**kwargs)
         self.studycase_answer_serializer = StudyCaseAnswerReadSerializers
 
-    def get(self, request, session_id, case_id, check_id):
+    def get(self, request, session_id, case_id, student_id):
         user = request.user
 
         try:
-            student = User.objects.get(id=check_id)
+            student = User.objects.get(id=student_id)
         except User.DoesNotExist:
             raise NotFound("Student not found")
-
-        is_evaluated = request.GET.get('is_evaluated')
-        if is_evaluated is not None:
-            is_evaluated = is_evaluated.lower() == 'true'
         
 
         try:
@@ -156,8 +165,7 @@ class StudyCaseAnswerReadView(APIView):
                 requester=user,
                 session_id=session_id,
                 case_id=case_id,
-                target_student=student,
-                is_evaluated=is_evaluated
+                target_student=student
             )
         except Exception as e:
             traceback.print_exc()
@@ -176,7 +184,7 @@ class StudyCaseAnswerReadView(APIView):
 
 
 class StudyCaseAnswerWriteView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsStudent]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def __init__(self, **kwargs):
@@ -236,13 +244,15 @@ class StudyCaseAnswerPatchView(APIView):
         self.studycase_answer_serializer = StudyCaseAnswerReadSerializers
 
 
-    def patch(self, request, session_id, check_id, question_id):
+    # per question
+    def patch(self, request, session_id, student_id, question_id):
         data = request.data.copy()  
 
         try:
-            student = User.objects.get(id=check_id)
+            student = User.objects.get(id=student_id)
         except User.DoesNotExist:
             raise NotFound("Student not found")
+        print(student)
 
         try:
             study_case = StudyCaseAnswer.objects.get(student=student, study_case_question=question_id)
@@ -254,8 +264,14 @@ class StudyCaseAnswerPatchView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        session = CourseSession.objects.get(id=session_id)
+        try:
+            session = CourseSession.objects.get(id=session_id)
+        except CourseSession.DoesNotExist:
+            raise NotFound("Course session not found.")
+        
         course = session.course
+        print(course)
+        print(student)
        
         try:
             participant_point = ParticipantPoint.objects.get(
@@ -271,6 +287,6 @@ class StudyCaseAnswerPatchView(APIView):
     
         return ApiResponse.success(
             data=serializer.data,
-            message="Study Case successfully updated",
+            message="Evaluation successfully updated",
             status_code=status.HTTP_200_OK
         )

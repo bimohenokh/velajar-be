@@ -1,0 +1,53 @@
+[
+    {
+        "model": "resources.resource",
+        "pk": 1,
+        "fields": {
+            "link": "https://example.com/introduction-to-python",
+            "file": null,
+            "resource_type": "Link",
+            "course_session": 1
+        }
+    },
+    {
+        "model": "resources.resource",
+        "pk": 2,
+        "fields": {
+            "link":null,
+            "file": "resource-file/lecture1-notes.pdf",
+            "resource_type": "File",
+            "course_session": 1
+        }
+    },
+    {
+        "model": "resources.resource",
+        "pk": 3,
+        "fields": {
+            "link": "https://example.com/introduction-to-python",
+            "file": null,
+            "resource_type": "Link",
+            "course_session": 2
+        }
+    },
+    {
+        "model": "resources.resource",
+        "pk": 4,
+        "fields": {
+            "link": "https://youtube.com",
+            "file": null,
+            "resource_type": "Link",
+            "course_session": 2
+        }
+    },
+    {
+        "model": "resources.resource",
+        "pk": 5,
+        "fields": {
+            "link": null,
+            "file": "resource-file/lecture1-notes.pdf",
+            "resource_type": "File",
+            "course_session": 2
+        }
+    }
+    
+]

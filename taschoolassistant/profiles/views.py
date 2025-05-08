@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.exceptions import NotFound, ValidationError
 from .serializers import StudentProfileSerializer, TeacherProfileSerializer
 from .models import StudentProfile, TeacherProfile
@@ -14,7 +14,7 @@ from .schemas import profile_schema
 @profile_schema
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

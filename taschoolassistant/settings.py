@@ -64,7 +64,8 @@ INSTALLED_APPS = [
     'taschoolassistant.users',
     'taschoolassistant.courses',
     'taschoolassistant.profiles',
-    'taschoolassistant.studycases'
+    'taschoolassistant.studycases',
+    'taschoolassistant.resources'
 
 ]
 

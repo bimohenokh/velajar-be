@@ -319,6 +319,42 @@
             "is_participating": true
         }
     },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 7,
+        "fields": {
+            "course": 1,
+            "participant": 5,
+            "is_participating": true
+        }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 8,
+        "fields": {
+            "course": 2,
+            "participant": 5,
+            "is_participating": true
+        }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 9,
+        "fields": {
+            "course": 1,
+            "participant": 6,
+            "is_participating": true
+        }
+    },
+    {
+        "model": "courses.courseparticipant",
+        "pk": 10,
+        "fields": {
+            "course": 2,
+            "participant": 6,
+            "is_participating": true
+        }
+    },
 
 
 
@@ -370,6 +406,38 @@
             "is_owner" : false
         }
     },
+    {
+        "model": "courses.courseinstructor",
+        "pk": 7,
+        "fields": {
+           "course_participant" : 7,
+            "is_owner" : false
+        }
+    },
+    {
+        "model": "courses.courseinstructor",
+        "pk": 8,
+        "fields": {
+           "course_participant" : 8,
+            "is_owner" : false
+        }
+    },
+    {
+        "model": "courses.courseinstructor",
+        "pk": 9,
+        "fields": {
+           "course_participant" : 9,
+            "is_owner" : false
+        }
+    },
+    {
+        "model": "courses.courseinstructor",
+        "pk": 10,
+        "fields": {
+           "course_participant" : 10,
+            "is_owner" : false
+        }
+    },
 
     {
         "model": "courses.participantpoint",
@@ -417,6 +485,38 @@
         "fields": {
            "course_participant" : 6,
             "point_achieved" : 150
+        }
+    },
+    {
+        "model": "courses.participantpoint",
+        "pk": 7,
+        "fields": {
+           "course_participant" : 7,
+            "point_achieved" : 20
+        }
+    },
+    {
+        "model": "courses.participantpoint",
+        "pk": 8,
+        "fields": {
+           "course_participant" : 8,
+            "point_achieved" : 150
+        }
+    },
+    {
+        "model": "courses.participantpoint",
+        "pk": 9,
+        "fields": {
+           "course_participant" : 9,
+            "point_achieved" : 100
+        }
+    },
+    {
+        "model": "courses.participantpoint",
+        "pk": 10,
+        "fields": {
+           "course_participant" : 10,
+            "point_achieved" : 200
         }
     },
 

@@ -19,7 +19,7 @@
     "fields": {
         "title": "Sesi 2 Fisika",
         "description": "Seorang siswa melepaskan bola dari ketinggian 20 meter tanpa kecepatan awal. Bola tersebut jatuh bebas ke tanah.",
-        "course_session": 1,
+        "course_session": 3,
         "total_point": 100,
         "started_at": "2025-04-29T14:30:00Z",
         "time_range": "00:20:00",
@@ -30,7 +30,7 @@
     "model": "studycases.studycase",
     "pk": 3,
     "fields": {
-        "title": "Sesi 1 Kimia",
+        "title": "Sesi 2 Kimia",
         "description": "Seorang siswa mencampurkan 50 ml larutan asam klorida (HCl) 0,1 M dengan 50 ml larutan natrium hidroksida (NaOH) 0,1 M.",
         "course_session": 2,
         "total_point": 100,
@@ -45,7 +45,7 @@
     "fields": {
         "title": "Sesi 2 Kimia",
         "description": "Es batu diletakkan di suhu ruang dan mulai mencair menjadi air.",
-        "course_session": 2,
+        "course_session": 3,
         "total_point": 100,
         "started_at": "2025-04-29T14:30:00Z",
         "time_range": "00:15:00",
@@ -139,6 +139,6 @@
             "is_submitted": true,
             "is_evaluated" : true
         }
-        }
+    }
 ]
   

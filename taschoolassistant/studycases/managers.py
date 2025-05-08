@@ -29,7 +29,7 @@ class StudyCaseQuestionManager(Manager):
 
 class StudyCaseAnswerManager(Manager):
 
-   def get_studycase_answer(self, requester, session_id, case_id, target_student, is_evaluated):
+   def get_studycase_answer(self, requester, session_id, case_id, target_student):
       query = self.filter(
          study_case_question__study_case__course_session__course__courseparticipant__participant=requester,
          study_case_question__study_case__course_session__course__courseparticipant__is_participating=True,
@@ -38,9 +38,6 @@ class StudyCaseAnswerManager(Manager):
          is_submitted=True,
          student=target_student,
       )
-
-      if is_evaluated is not None:
-         query = query.filter(is_evaluated=is_evaluated)
 
       return query
    

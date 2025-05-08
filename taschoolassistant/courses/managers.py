@@ -30,7 +30,7 @@ class CourseInstructorManager(Manager):
             course_participant__course=course_session.course,
             course_participant__is_participating=True
         )
-        return 
+        return query
 
 
 class CourseParticipantManager(Manager):
@@ -60,7 +60,9 @@ class CourseSessionManager(Manager):
 
 
 class ParticipantPointManager(Manager):
-    pass
+    def get_user_in_course(self):
+        
+        pass
 
 class CourseSessionResourceManager(Manager):
     pass

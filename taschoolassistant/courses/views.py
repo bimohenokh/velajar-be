@@ -222,4 +222,5 @@ class LeaderboardView(APIView):
         # Filter points by course
         participant_points = ParticipantPoint.objects.filter(course_participant__course=course).order_by('-point_achieved')
         serializer = self.course_session_serializer(participant_points, many=True)
-        return ApiResponse.success(serializer.data, message="Course session successfully retrieved")
+
+        return ApiResponse.success(serializer.data, message="Leaderboard successfully retrieved")
