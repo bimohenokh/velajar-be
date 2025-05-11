@@ -23,7 +23,7 @@ class CourseView(APIView):
         user = request.user
         name = request.GET.get('name', None)
         jenjang = request.GET.get('jenjang_kelas', None)
-        courses_instance = Course.objects.get_courses(user, name, jenjang)
+        courses_instance = Course.objects.get_courses(user, name, jenjang)  # TODO kalau gk ada return kosong aja gk sih?
         if not courses_instance.exists():
             raise NotFound("Course not found")
         serializer = self.course_serializer(
