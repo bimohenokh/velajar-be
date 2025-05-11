@@ -5,9 +5,10 @@ from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.exceptions import NotFound, ValidationError
-from .serializers import StudentProfileSerializer, TeacherProfileSerializer
+from .serializers import StudentProfileSerializer, TeacherProfileSerializer, StudentPostProfileSerializer, TeacherPostProfileSerializer
 from .models import StudentProfile, TeacherProfile
 from .schemas import profile_schema
+from taschoolassistant.users.models import User
 
 # Create your views here.
 
@@ -52,7 +53,28 @@ class ProfileView(APIView):
             status_code=status.HTTP_200_OK
         )
 
+class ProfilePostView(APIView):
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def post(self, request, user_id):
+        user = User.objects.get(id=user_id)
+        role = user.role
+        data = request.data.copy()  
+
+        serializer = StudentPostProfileSerializer(data=data, context={"user": user}) if role == "student" else TeacherPostProfileSerializer(data=data, context={"user": user}) 
+    
+        if serializer.is_valid():
+            serializer.save()
+            return ApiResponse.success(
+                data=serializer.data,
+                message="Profile successfully created",
+                status_code=status.HTTP_201_CREATED
+            )
+        else:
+            raise ValidationError("Invalid input data type")
 
 
 

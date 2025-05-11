@@ -60,3 +60,23 @@ class TeacherProfileSerializer(serializers.ModelSerializer):
             else:
                 raise serializers.ValidationError(user_serializer.errors)
         return super().update(instance, validated_data)
+    
+
+class StudentPostProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentProfile
+        fields = ["id", "image_profile", "dateOfBirth", "school", "student_class"]
+
+    def create(self, validated_data):
+        user = self.context.get("user")
+        return StudentProfile.objects.create(user=user, **validated_data)
+
+
+class TeacherPostProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherProfile
+        fields = ["id", "image_profile", "dateOfBirth", "school"]
+
+    def create(self, validated_data):
+        user = self.context.get("user")
+        return TeacherProfile.objects.create(user=user, **validated_data)
