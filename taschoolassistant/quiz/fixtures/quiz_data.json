@@ -1,0 +1,88 @@
+[
+  {
+    "model": "quizzes.quiz",
+    "pk": 1,
+    "fields": {
+      "course_session": 1,
+      "title": "Kuis Matematika 1",
+      "description": "Aljabar Dasar dan Algoritma",
+      "total_points": 100.0,
+      "time_range": "00:30:00",
+      "status": "draft",
+      "created_by": 1,
+      "started_at": null
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 1,
+    "fields": {
+      "quiz": 1,
+      "text": "What is 2 + 2?",
+      "type": "single"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1,
+    "fields": {
+      "question": 1,
+      "text": "3",
+      "is_correct": false
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2,
+    "fields": {
+      "question": 1,
+      "text": "4",
+      "is_correct": true
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 3,
+    "fields": {
+      "question": 1,
+      "text": "5",
+      "is_correct": false
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 2,
+    "fields": {
+      "quiz": 1,
+      "text": "Which of the following are prime numbers?",
+      "type": "multiple"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 4,
+    "fields": {
+      "question": 2,
+      "text": "2",
+      "is_correct": true
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 5,
+    "fields": {
+      "question": 2,
+      "text": "4",
+      "is_correct": false
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 6,
+    "fields": {
+      "question": 2,
+      "text": "5",
+      "is_correct": true
+    }
+  }
+]
