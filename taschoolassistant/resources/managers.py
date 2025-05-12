@@ -5,7 +5,7 @@ from taschoolassistant.courses.models import CourseParticipant
 class ResourceManager(Manager):
     def get_resources(self, user, session_id):
         query = self.filter(
-         course_session__course__courseparticipant__participant=user,
+         course_session__course__courseparticipant__participant=user,  # FIXME ini query user buat apa dah, ntar tanya
          course_session__course__courseparticipant__is_participating=True,
          course_session=session_id)
 

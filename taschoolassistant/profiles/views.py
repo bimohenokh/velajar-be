@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.views import APIView
 from taschoolassistant.core.utils.response import ApiResponse
@@ -31,8 +30,25 @@ class ProfileView(APIView):
         serializer = TeacherProfileSerializer(profile_instance) if role == "teacher" else StudentProfileSerializer(profile_instance)
 
         return ApiResponse.success(
+            data=serializer.data, message="Profile succesfully retrieved"
+        )
+
+    def post(self, request):
+        user = request.user
+        role = user.role
+
+        serializer = (
+            StudentPostProfileSerializer(data=request.data, context={"user": user})
+            if role == "student"
+            else TeacherPostProfileSerializer(data=request.data, context={"user": user})
+        )
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return ApiResponse.success(
             data=serializer.data,
-            message="Profile succesfully retrieved"
+            message="Profile successfully created",
+            status_code=status.HTTP_201_CREATED,
         )
 
     def patch(self, request):
@@ -52,34 +68,4 @@ class ProfileView(APIView):
             message="Profile successfully updated",
             status_code=status.HTTP_200_OK
         )
-
-class ProfilePostView(APIView):
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def post(self, request, user_id):
-        user = User.objects.get(id=user_id)
-        role = user.role
-        data = request.data.copy()  
-
-        serializer = StudentPostProfileSerializer(data=data, context={"user": user}) if role == "student" else TeacherPostProfileSerializer(data=data, context={"user": user}) 
-    
-        if serializer.is_valid():
-            serializer.save()
-            return ApiResponse.success(
-                data=serializer.data,
-                message="Profile successfully created",
-                status_code=status.HTTP_201_CREATED
-            )
-        else:
-            raise ValidationError("Invalid input data type")
-
-
-
-        
-
-    
-
 

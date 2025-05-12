@@ -26,11 +26,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path("api/users/", include("taschoolassistant.users.urls")),
-    path("api/courses/", include("taschoolassistant.courses.urls")),
-    path("api/profiles/", include("taschoolassistant.profiles.urls")),
-    path("api/studycases/", include("taschoolassistant.studycases.urls")),
-    path("api/resources/", include("taschoolassistant.resources.urls")),
+    path("users/", include("taschoolassistant.users.urls")),
+    path("courses/", include("taschoolassistant.courses.urls")),
+    path("profiles/", include("taschoolassistant.profiles.urls")),
+    path("studycases/", include("taschoolassistant.studycases.urls")),
+    path("resources/", include("taschoolassistant.resources.urls")),
 ]
 
 if settings.DEBUG:

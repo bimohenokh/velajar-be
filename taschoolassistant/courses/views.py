@@ -39,31 +39,29 @@ class CourseView(APIView):
         role = user.role
         serializer = self.course_serializer(data=request.data)
 
-        if serializer.is_valid():
-            course = serializer.save()
+        serializer.is_valid(raise_exception=True)
+        course = serializer.save()
 
-            course_participant = CourseParticipant.objects.create(
-                course=course, participant=user, is_participating=True
-            )
+        course_participant = CourseParticipant.objects.create(
+            course=course, participant=user, is_participating=True
+        )
 
-            if role == "teacher":
-                CourseInstructor.objects.create(
-                    course_participant=course_participant, is_owner=True
-                )
-            else:
-                CourseInstructor.objects.create(
-                    course_participant=course_participant, is_owner=False
-                )
-                
-            ParticipantPoint.objects.create(course_participant=course_participant, point=0)
-
-            return ApiResponse.success(
-                data=serializer.data,
-                message="Course successfully created",
-                status_code=status.HTTP_201_CREATED
+        if role == "teacher":
+            CourseInstructor.objects.create(
+                course_participant=course_participant, is_owner=True
             )
         else:
-            raise ValidationError("Invalid input data type")
+            CourseInstructor.objects.create(
+                course_participant=course_participant, is_owner=False
+            )
+
+        ParticipantPoint.objects.create(course_participant=course_participant, point=0)
+
+        return ApiResponse.success(
+            data=serializer.data,
+            message="Course successfully created",
+            status_code=status.HTTP_201_CREATED
+        )
 
 
 @course_by_id_schema

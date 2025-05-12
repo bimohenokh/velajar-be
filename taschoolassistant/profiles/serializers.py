@@ -1,12 +1,9 @@
-
-
-from django.core.files.storage import default_storage
+from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from .models import StudentProfile, TeacherProfile
-from taschoolassistant.users.models import User
 from rest_framework import serializers
 
-
+User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -65,7 +62,7 @@ class TeacherProfileSerializer(serializers.ModelSerializer):
 class StudentPostProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentProfile
-        fields = ["id", "image_profile", "dateOfBirth", "school", "student_class"]
+        read_only_fields = ["user"]
 
     def create(self, validated_data):
         user = self.context.get("user")
@@ -75,7 +72,7 @@ class StudentPostProfileSerializer(serializers.ModelSerializer):
 class TeacherPostProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherProfile
-        fields = ["id", "image_profile", "dateOfBirth", "school"]
+        read_only_fields = ["user"]
 
     def create(self, validated_data):
         user = self.context.get("user")

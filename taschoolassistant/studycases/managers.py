@@ -19,7 +19,7 @@ class StudyCaseManager(Manager):
          course_session__course__courseparticipant__participant=user,
          course_session__course__courseparticipant__is_participating=True,
          course_session=session_id,
-         id=case_id
+         id=case_id  # FIXME: ada id tapi ada filter lain?
       ).first()
       return query
    

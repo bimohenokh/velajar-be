@@ -34,12 +34,14 @@ class LeaderboardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ParticipantPoint
-        fields = ['name', 'student_class', 'point_achieved']
+        fields = ["name", "student_class", "point_achieved"]
 
     def get_name(self, obj):
+        # FIXME N+1 query problem kalau dipakai
         return obj.course_participant.participant.nama_lengkap
 
     def get_student_class(self, obj):
+        # FIXME N+1 query problem kalau dipakai
         user = obj.course_participant.participant
         try:
             profile = StudentProfile.objects.get(user=user)

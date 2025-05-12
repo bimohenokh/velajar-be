@@ -14,6 +14,8 @@ from taschoolassistant.users.models import User
 from rest_framework.exceptions import APIException
 from rest_framework.exceptions import PermissionDenied
 
+# FIXME
+
 class StudyCaseView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
@@ -112,7 +114,7 @@ class StudyCaseAnswerReadStudentSubmittedView(APIView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.studycase_answer_serializer = UserSerializer
+        self.studycase_answer_serializer = UserSerializer  # FIXME kenapa jadi user serializer
 
     def get(self, request, session_id, case_id):
 
@@ -169,7 +171,7 @@ class StudyCaseAnswerReadView(APIView):
             )
         except Exception as e:
             traceback.print_exc()
-            raise APIException(f"Error in manager: {str(e)}")
+            raise APIException(f"Error in manager: {str(e)}")  # FIXME tambahin status
 
         if not answers_qs.exists():
             raise NotFound("Study case answer not found")
