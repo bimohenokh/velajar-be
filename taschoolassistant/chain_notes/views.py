@@ -31,15 +31,13 @@ class ChainNoteView(APIView):
             param_serializer = ChainNoteParamSerializer(data=request.query_params)
             param_serializer.is_valid(raise_exception=True)
 
-            # TODO check if user is participant of the course
-
             course_session_id = param_serializer.validated_data.get("course_session_id")
             chain_note = get_object_or_404(
                 ChainNote.objects.select_related("course_session"), course_session_id=course_session_id
             )
 
             try:
-                # check if user is instructor of the course
+                # check if user is participant of the course
                 course_instructor = (
                     CourseParticipant.objects.get_by_course_id_and_user_teacher_id(
                         chain_note.course_session.course_id, request.user.id
