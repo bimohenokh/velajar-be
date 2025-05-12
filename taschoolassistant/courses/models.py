@@ -1,7 +1,7 @@
 from enum import Enum
 
 from django.contrib.auth import get_user_model
-from django.db.models import Model, CharField, ImageField, CASCADE, ForeignKey, BooleanField, FileField
+from django.db.models import Model, CharField, ImageField, CASCADE, ForeignKey, BooleanField, FileField, OneToOneField
 
 from taschoolassistant.courses.managers import CourseManager, CourseInstructorManager, CourseParticipantManager, \
     CourseSessionManager, CourseSessionResourceManager
@@ -37,9 +37,13 @@ class CourseParticipant(Model):
 
     objects = CourseParticipantManager()
 
+    @property
+    def is_teacher(self):
+        return hasattr(self, 'courseinstructor')
+
 
 class CourseInstructor(Model):
-    course_participant = ForeignKey(CourseParticipant, on_delete=CASCADE)
+    course_participant = OneToOneField(CourseParticipant, on_delete=CASCADE)
     is_owner = BooleanField(default=False)
 
     objects = CourseInstructorManager()

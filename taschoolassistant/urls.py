@@ -26,6 +26,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('coba/', include('taschoolassistant.coba.urls')),  # TODO production apus
     path("api/users/", include("taschoolassistant.users.urls")),
     path("api/courses/", include("taschoolassistant.courses.urls")),
     path("chain-notes/", include("taschoolassistant.chain_notes.urls")),

@@ -6,3 +6,8 @@ pillow
 django-environ
 drf-spectacular
 drf-spectacular-sidecar
+channels # apus
+daphne # apus
+uvicorn
+adrf
+django-cors-headers

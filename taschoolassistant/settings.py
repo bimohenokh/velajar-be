@@ -50,23 +50,28 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = "users.User"  # Custom user model
 
 INSTALLED_APPS = [
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',  # required for Django collectstatic discovery
+    'daphne',
+    'adrf',
+    "corsheaders",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'drf_spectacular',
-    'drf_spectacular_sidecar',  # required for Django collectstatic discovery
     'taschoolassistant.core',
     'taschoolassistant.users',
     'taschoolassistant.courses',
-    'taschoolassistant.chain_notes'
+    'taschoolassistant.chain_notes',
+    'taschoolassistant.coba',  # TODO production apus
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -94,8 +99,15 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = 'taschoolassistant.asgi.application'
 WSGI_APPLICATION = 'taschoolassistant.wsgi.application'
 
+# Websocket channel
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels.layers.InMemoryChannelLayer',  # For dev only
+#     },
+# }
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -132,6 +144,21 @@ MEDIA_ROOT = BASE_DIR / "media"
 FILE_UPLOAD_HANDLERS = [
     "django.core.files.uploadhandler.MemoryFileUploadHandler",
     "django.core.files.uploadhandler.TemporaryFileUploadHandler",
+]
+
+
+CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS")
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization', # Make sure 'authorization' is allowed
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
 ]
 
 
