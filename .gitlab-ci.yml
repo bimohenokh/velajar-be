@@ -36,6 +36,7 @@ docker-push:
   before_script:
     - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
     - echo "Environment is $CI_ENVIRONMENT_NAME"
+    - ls -la $CI_PROJECT_DIR  # <-- THIS IS THE MOST IMPORTANT DEBUG LINE
     - chmod +x $CI_PROJECT_DIR/generate-env.sh
     - $CI_PROJECT_DIR/generate-env.sh
   script:
