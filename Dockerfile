@@ -13,7 +13,7 @@ COPY . /app
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN python manage.py collectstatic --noinput
+#RUN python manage.py collectstatic --noinput
 
 # Expose the application port
 EXPOSE 8000
@@ -21,5 +21,4 @@ EXPOSE 8000
 # runs the production server
 RUN pip install --no-cache-dir gunicorn
 RUN chmod +x ./entrypoint.sh
-#ENTRYPOINT ["./entrypoint.sh"]  # TODO balikkin lagi
-ENTRYPOINT ["/bin/sh"]
+ENTRYPOINT ["./entrypoint.sh"]
