@@ -14,7 +14,7 @@ case "$CI_ENVIRONMENT_NAME" in
     cat >> .env <<EOF
 SECRET_KEY=${PROD_SECRET_KEY}
 DEBUG=False
-ALLOWED_HOSTS=velajar.cs.ui.ac.id
+ALLOWED_HOSTS=api.velajar.cs.ui.ac.id,localhost,127.0.0.1
 
 DATABASE_NAME=$DATABASE_NAME
 DATABASE_USER=$DATABASE_USER
