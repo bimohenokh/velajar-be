@@ -6,4 +6,4 @@ pillow
 django-environ
 drf-spectacular
 drf-spectacular-sidecar
-uvicorn
+uvicorn[standard]
