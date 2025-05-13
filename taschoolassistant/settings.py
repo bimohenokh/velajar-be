@@ -95,6 +95,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'taschoolassistant.wsgi.application'
+ASGI_APPLICATION = 'taschoolassistant.asgi.application'
 
 
 # Database
