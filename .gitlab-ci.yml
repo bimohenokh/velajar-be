@@ -38,7 +38,7 @@ docker-push:
     - echo "Environment is $CI_ENVIRONMENT_NAME"
     - ls -la $CI_PROJECT_DIR  # <-- THIS IS THE MOST IMPORTANT DEBUG LINE
     - chmod +x $CI_PROJECT_DIR/generate-env.sh
-    - /bin/sh $CI_PROJECT_DIR/generate-env.sh
+    - $CI_PROJECT_DIR/generate-env.sh
   script:
     - docker build -t "${IMAGE_FULL_NAME_BACKEND}:latest" .
     - docker push "$IMAGE_FULL_NAME_BACKEND:latest"
