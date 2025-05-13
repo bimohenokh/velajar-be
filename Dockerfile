@@ -21,4 +21,5 @@ EXPOSE 8000
 # runs the production server
 RUN pip install --no-cache-dir gunicorn
 RUN chmod +x ./entrypoint.sh
-ENTRYPOINT ["./entrypoint.sh"]
+#ENTRYPOINT ["./entrypoint.sh"]  # TODO balikkin lagi
+ENTRYPOINT ["/bin/sh"]
