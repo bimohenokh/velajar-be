@@ -1,0 +1,42 @@
+[
+    {
+        "model": "users.user",
+        "pk": 1,
+        "fields": {
+            "username": "guru1",
+            "password": "pbkdf2_sha256$870000$HYl3TKaDNbmuxg4LwRBKi2$iaqNbChryqPmb1cWvjf+nTmGpkjL99RFkMsMJsHAFV8=",
+            "email" : "guru1@gmail.com",
+            "role" : "teacher"
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 2,
+        "fields": {
+            "username": "guru2",
+            "password": "pbkdf2_sha256$870000$sxEM3roayyp2Ch4IrvoiZn$OtroECDJzCq0Lkivq5F2jak8wDXx+a37Gfsq1oxBr1g=",
+            "email" : "guru2@gmail.com",
+            "role" : "teacher"
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 3,
+        "fields": {
+            "username": "siswa1",
+            "password": "pbkdf2_sha256$870000$NBnC6foTGWb2lReEHlRpJk$c4gxEvze70klmUHQIOpK27+yza+2p9RBecVTaG+nC3w=",
+            "email" : "siswa1@gmail.com",
+            "role" : "student"
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 4,
+        "fields": {
+            "username": "siswa2",
+            "password": "pbkdf2_sha256$870000$uP5oNKRRLrzYVuaXsvRPWc$A3eJItUf5NJ/p6w3HkOLrju8puSivk3u5ysu0JBI/KE=",
+            "email" : "siswa2@gmail.com",
+            "role" : "student"
+        }
+    }
+]

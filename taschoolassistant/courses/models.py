@@ -1,3 +1,5 @@
+from enum import Enum
+
 from django.contrib.auth import get_user_model
 from django.db.models import Model, CharField, ImageField, CASCADE, ForeignKey, BooleanField, FileField
 
@@ -8,10 +10,22 @@ from taschoolassistant.courses.managers import CourseManager, CourseInstructorMa
 User = get_user_model()
 
 
+class JenjangKelas(Enum):
+    SMA_KELAS_1 = "SMA Kelas 1"
+    SMA_KELAS_2 = "SMA Kelas 2"
+    SMA_KELAS_3 = "SMA Kelas 3"
+
+
 class Course(Model):
     name = CharField(max_length=255)
     description = CharField(max_length=255, null=True, blank=True)
-    image_banner = ImageField(upload_to='courses-banner/', null=True, blank=True)
+    image_banner = ImageField(
+        upload_to='courses-banner/', null=True, blank=True)
+    jenjang_kelas = CharField(
+        max_length=50,
+        choices=[(role.value, role.name) for role in JenjangKelas],
+        default=JenjangKelas.SMA_KELAS_1.value,
+    )
 
     objects = CourseManager()
 
@@ -44,4 +58,3 @@ class CourseSessionResource(Model):
     content = FileField(upload_to='courses-resources/')
 
     objects = CourseSessionResourceManager()
-

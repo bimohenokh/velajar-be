@@ -1,0 +1,54 @@
+stages:
+  - test
+  - docker-push
+#  - deploy
+
+variables:
+  IMAGE_FULL_NAME_BACKEND: "$CI_REGISTRY_IMAGE/${DOCKERHUB_USERNAME}/${IMAGE_NAME_BACKEND}"
+
+unit-test:
+  stage: test
+  image: python:3.12
+  environment:
+    name: test
+  before_script:
+    - echo "Environment is $CI_ENVIRONMENT_NAME"
+    - chmod +x $CI_PROJECT_DIR/generate-env.sh
+    - $CI_PROJECT_DIR/generate-env.sh
+  script:
+    - pip install -r requirements.txt
+    - python manage.py collectstatic
+    - python manage.py makemigrations
+    - python manage.py migrate
+    - python manage.py test
+
+docker-push:
+  stage: docker-push
+  image: docker:latest
+#  services:
+#    - name: docker:dind
+#      alias: thedockerhost
+#  variables:
+#    DOCKER_DRIVER: overlay2
+#    DOCKER_TLS_CERTDIR: ""
+  environment:
+    name: production
+  before_script:
+    - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+    - echo "Environment is $CI_ENVIRONMENT_NAME"
+    - ls -la $CI_PROJECT_DIR  # <-- THIS IS THE MOST IMPORTANT DEBUG LINE
+    - chmod +x $CI_PROJECT_DIR/generate-env.sh
+    - $CI_PROJECT_DIR/generate-env.sh
+  script:
+    - docker build -t "${IMAGE_FULL_NAME_BACKEND}:latest" .
+    - docker push "$IMAGE_FULL_NAME_BACKEND:latest"
+  only:
+    - main
+    - staging
+
+#deploy:
+#    stage: deploy
+#    before_script:
+#        - apk update && apk add openssh-client expect
+#    script:
+#        - chmod 600 "$SSH_KEY_KAWUNG"

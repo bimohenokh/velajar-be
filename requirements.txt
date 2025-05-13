@@ -3,3 +3,6 @@ djangorestframework-simplejwt
 psycopg2-binary
 Django
 pillow
+django-environ
+drf-spectacular
+drf-spectacular-sidecar

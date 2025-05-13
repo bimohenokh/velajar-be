@@ -24,20 +24,10 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='CourseParticipant',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_participating', models.BooleanField(default=True)),
-                ('course', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='courses.course')),
-                ('participant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-            ],
-        ),
-        migrations.CreateModel(
             name='CourseInstructor',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('is_owner', models.BooleanField(default=False)),
-                ('course_participant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='courses.courseparticipant')),
             ],
         ),
         migrations.CreateModel(
@@ -46,7 +36,6 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255)),
                 ('description', models.CharField(blank=True, max_length=255, null=True)),
-                ('course', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='courses.course')),
             ],
         ),
         migrations.CreateModel(
@@ -54,7 +43,14 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('content', models.FileField(upload_to='courses-resources/')),
-                ('course_session', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='courses.coursesession')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='CourseParticipant',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('is_participating', models.BooleanField(default=True)),
+                ('course', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='courses.course')),
             ],
         ),
     ]
