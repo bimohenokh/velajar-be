@@ -1,6 +1,6 @@
 stages:
   - test
-  - docker-build
+  - docker-push
 #  - deploy
 
 variables:
@@ -21,7 +21,7 @@ unit-test:
     - python manage.py migrate
     - python manage.py test
 
-docker-build:
+docker-push:
   stage: docker-push
   image: docker:latest
 #  services:
