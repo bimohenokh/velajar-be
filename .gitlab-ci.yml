@@ -13,6 +13,7 @@ unit-test:
     name: test
   before_script:
     - echo "Environment is $CI_ENVIRONMENT_NAME"
+    - chmod +x generate-env.sh
     - ./generate-env.sh
   script:
     - pip install -r requirements.txt
@@ -35,6 +36,7 @@ docker-push:
   before_script:
     - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
     - echo "Environment is $CI_ENVIRONMENT_NAME"
+    - chmod +x generate-env.sh
     - ./generate-env.sh
   script:
     - docker build -t "${IMAGE_FULL_NAME_BACKEND}:latest" .
