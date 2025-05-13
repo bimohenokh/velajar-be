@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # generate-env.sh
 
 set -e
