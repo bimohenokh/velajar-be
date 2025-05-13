@@ -101,7 +101,7 @@ WSGI_APPLICATION = 'taschoolassistant.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # Use SQLite for testing
-if "test" in sys.argv:
+if not os.environ.get('DB_NAME') or "test" in sys.argv:
     DATABASES = {
         'default': {
             "ENGINE": "django.db.backends.sqlite3",
