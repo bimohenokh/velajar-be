@@ -121,9 +121,9 @@ else:
         }
     }
 
-STATIC_URL = '/static/'
+STATIC_URL = '/static/'  # static file url for dev
 STATICFILES_DIRS = [BASE_DIR / "static"]  # Local static files
-STATIC_ROOT = BASE_DIR / "staticfiles"  # For `collectstatic` in production
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Static file folder location` in production
 
 # Media files (User uploads)
 MEDIA_URL = '/media/'
