@@ -1,0 +1,45 @@
+[
+    {
+        "model": "profiles.teacherprofile",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "image_profile" : "teacher-profile/teacher1.jpg", 
+            "dateOfBirth" : "1991-04-24",
+            "school" : "SMAN 33 Jakarta"
+        }
+    },
+    {
+        "model": "profiles.teacherprofile",
+        "pk": 2,
+        "fields": {
+            "user": 2,
+            "image_profile" : "teacher-profile/teacher2.jpg", 
+            "dateOfBirth" : "1992-04-24",
+            "school" : "SMAN 33 Jakarta"
+        }
+    },
+
+    {
+        "model": "profiles.studentprofile",
+        "pk": 3,
+        "fields": {
+            "user": 3,
+            "image_profile" : "student-profile/student1.jpg", 
+            "dateOfBirth" : "2007-04-24",
+            "school" : "SMAN 33 Jakarta",
+            "student_class" : "SMA Kelas 1"
+        }
+    },
+    {
+        "model": "profiles.studentprofile",
+        "pk": 4,
+        "fields": {
+            "user": 4,
+            "image_profile" : "student-profile/student2.jpg", 
+            "dateOfBirth" : "2008-04-24",
+            "school" : "SMAN 33 Jakarta",
+            "student_class" : "SMA Kelas 2"
+        }
+    }
+]

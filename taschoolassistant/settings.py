@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'taschoolassistant.core',
     'taschoolassistant.users',
     'taschoolassistant.courses',
+    'taschoolassistant.profiles'
     'taschoolassistant.chain_notes',
     'taschoolassistant.coba',  # TODO production apus
 ]
@@ -99,8 +100,8 @@ TEMPLATES = [
     },
 ]
 
-ASGI_APPLICATION = 'taschoolassistant.asgi.application'
 WSGI_APPLICATION = 'taschoolassistant.wsgi.application'
+ASGI_APPLICATION = 'taschoolassistant.asgi.application'
 
 # Websocket channel
 # CHANNEL_LAYERS = {
@@ -113,7 +114,7 @@ WSGI_APPLICATION = 'taschoolassistant.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # Use SQLite for testing
-if "test" in sys.argv:
+if "test" in sys.argv or not env('DATABASE_NAME', default=""):
     DATABASES = {
         'default': {
             "ENGINE": "django.db.backends.sqlite3",
@@ -132,9 +133,9 @@ else:
         }
     }
 
-STATIC_URL = '/static/'
+STATIC_URL = '/static/'  # static file url for dev
 STATICFILES_DIRS = [BASE_DIR / "static"]  # Local static files
-STATIC_ROOT = BASE_DIR / "staticfiles"  # For `collectstatic` in production
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Static file folder location` in production
 
 # Media files (User uploads)
 MEDIA_URL = '/media/'

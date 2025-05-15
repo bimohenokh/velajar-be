@@ -58,7 +58,21 @@ class CourseParticipantManager(Manager):
         return sync_to_async(self.get_by_course_id_and_user_teacher_id)(course_id, user_teacher_id)
 
 class CourseSessionManager(Manager):
-    pass
+    def get_course_session(self, user, course_id):
+        query = self.filter(
+            course__courseparticipant__participant=user,
+            course__courseparticipant__is_participating=True,
+            course__id=course_id
+        )
+        return query
+    
+    def get_detail_course_session_by_id(self, user, course_id, session_id):
+        return self.filter(
+            course__courseparticipant__participant=user,
+            course__courseparticipant__is_participating=True,
+            course__id=course_id,
+            id=session_id
+        ).first()
 
 
 class CourseSessionResourceManager(Manager):
