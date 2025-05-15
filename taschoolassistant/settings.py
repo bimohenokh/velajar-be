@@ -102,7 +102,7 @@ ASGI_APPLICATION = 'taschoolassistant.asgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # Use SQLite for testing
-if "test" in sys.argv or not env('DATABASE_NAME', default='') :
+if "test" in sys.argv:
     DATABASES = {
         'default': {
             "ENGINE": "django.db.backends.sqlite3",

@@ -17,8 +17,6 @@ unit-test:
     - $CI_PROJECT_DIR/generate-env.sh
   script:
     - pip install -r requirements.txt
-    - python manage.py collectstatic
-    - python manage.py migrate
     - python manage.py test
 
 docker-push:
