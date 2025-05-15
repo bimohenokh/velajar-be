@@ -38,5 +38,25 @@
             "email" : "siswa2@gmail.com",
             "role" : "student"
         }
+    },
+    {
+        "model": "users.user",
+        "pk": 5,
+        "fields": {
+            "username": "siswa3",
+            "password": "pbkdf2_sha256$870000$uP5oNKRRLrzYVuaXsvRPWc$A3eJItUf5NJ/p6w3HkOLrju8puSivk3u5ysu0JBI/KE=",
+            "email" : "siswa3@gmail.com",
+            "role" : "student"
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 6,
+        "fields": {
+            "username": "siswa4",
+            "password": "pbkdf2_sha256$870000$uP5oNKRRLrzYVuaXsvRPWc$A3eJItUf5NJ/p6w3HkOLrju8puSivk3u5ysu0JBI/KE=",
+            "email" : "siswa4@gmail.com",
+            "role" : "student"
+        }
     }
 ]

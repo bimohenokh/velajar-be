@@ -26,20 +26,21 @@ class StandardOutSerializer(Serializer):
 
 class StandardErrorOutSerializer(Serializer):
     status = IntegerField(default=400)
-    message = CharField(default="An error occurred")
+    # message = CharField(default="An error occurred")
     errors = JSONField(default=dict)
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-
-        # Normalize 'errors' so it is always a dictionary
-        errors = instance.get("errors", {})
-
-        if isinstance(errors, str):
-            representation["errors"] = {"detail": [errors]}  # Convert string to list inside a dictionary
-        elif isinstance(errors, list):
-            representation["errors"] = {"detail": errors}  # Wrap list inside a dictionary
-        else:
-            representation["errors"] = errors  # Keep as-is if already a dictionary
-
-        return representation
+    # TODO apus kalo gk pake lg
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #
+    #     # Normalize 'errors' so it is always a dictionary
+    #     errors = instance.get("errors", {})
+    #
+    #     if isinstance(errors, str):
+    #         representation["errors"] = {"detail": [errors]}  # Convert string to list inside a dictionary
+    #     elif isinstance(errors, list):
+    #         representation["errors"] = {"detail": errors}  # Wrap list inside a dictionary
+    #     else:
+    #         representation["errors"] = errors  # Keep as-is if already a dictionary
+    #
+    #     return representation

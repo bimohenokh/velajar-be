@@ -50,23 +50,29 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = "users.User"  # Custom user model
 
 INSTALLED_APPS = [
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',  # required for Django collectstatic discovery
+    'daphne',
+    'adrf',
+    "corsheaders",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'drf_spectacular',
-    'drf_spectacular_sidecar',  # required for Django collectstatic discovery
     'taschoolassistant.core',
     'taschoolassistant.users',
     'taschoolassistant.courses',
-    'taschoolassistant.profiles'
+    'taschoolassistant.profiles',
+    'taschoolassistant.chain_notes',
+    'taschoolassistant.coba',  # TODO production apus
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -97,12 +103,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'taschoolassistant.wsgi.application'
 ASGI_APPLICATION = 'taschoolassistant.asgi.application'
 
+# Websocket channel
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels.layers.InMemoryChannelLayer',  # For dev only
+#     },
+# }
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # Use SQLite for testing
-if not os.environ.get('DB_NAME') or "test" in sys.argv:
+if "test" in sys.argv or not env('DATABASE_NAME', default=""):
     DATABASES = {
         'default': {
             "ENGINE": "django.db.backends.sqlite3",
@@ -134,6 +146,21 @@ FILE_UPLOAD_HANDLERS = [
     "django.core.files.uploadhandler.MemoryFileUploadHandler",
     "django.core.files.uploadhandler.TemporaryFileUploadHandler",
 ]
+
+# TODO kalau mau pake
+# CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=)
+#
+# CORS_ALLOW_HEADERS = [
+#     'accept',
+#     'accept-encoding',
+#     'authorization', # Make sure 'authorization' is allowed
+#     'content-type',
+#     'dnt',
+#     'origin',
+#     'user-agent',
+#     'x-csrftoken',
+#     'x-requested-with',
+# ]
 
 
 # Password validation
