@@ -48,9 +48,13 @@ class CourseParticipant(Model):
 
     objects = CourseParticipantManager()
 
+    @property
+    def is_teacher(self):
+        return hasattr(self, 'courseinstructor')
+
 
 class CourseInstructor(Model):
-    course_participant = ForeignKey(CourseParticipant, on_delete=CASCADE)
+    course_participant = OneToOneField(CourseParticipant, on_delete=CASCADE)
     is_owner = BooleanField(default=False)
 
     objects = CourseInstructorManager()

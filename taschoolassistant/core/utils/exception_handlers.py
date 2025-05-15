@@ -5,7 +5,7 @@ from rest_framework.views import exception_handler
 from taschoolassistant.core.serializers import StandardErrorOutSerializer
 
 
-def custom_exception_handler(exc: APIException, context):
+def custom_exception_handler(exc, context):
     """Customize all DRF error responses"""
     response = exception_handler(exc, context)
 
@@ -17,8 +17,7 @@ def custom_exception_handler(exc: APIException, context):
     return Response(
         StandardErrorOutSerializer({
             "status": exc.status_code,
-            "message": exc.default_detail,
-            "errors": exc.detail,
+            "errors": exc.get_full_details(),
         }).data,
         status=exc.status_code
     )
