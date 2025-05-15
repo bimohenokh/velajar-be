@@ -66,7 +66,7 @@ INSTALLED_APPS = [
     'taschoolassistant.core',
     'taschoolassistant.users',
     'taschoolassistant.courses',
-    'taschoolassistant.profiles'
+    'taschoolassistant.profiles',
     'taschoolassistant.chain_notes',
     'taschoolassistant.coba',  # TODO production apus
 ]
