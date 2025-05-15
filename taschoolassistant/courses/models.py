@@ -10,7 +10,9 @@ from django.db.models import (
     BooleanField,
     FileField,
     DateTimeField,
-    IntegerField, TextField,
+    IntegerField,
+    TextField,
+    OneToOneField,
 )
 
 from taschoolassistant.courses.managers import CourseManager, CourseInstructorManager, CourseParticipantManager, \
