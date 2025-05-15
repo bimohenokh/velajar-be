@@ -1,13 +1,28 @@
+import uuid
+from datetime import timedelta
+
+from django.utils import timezone
 from rest_framework.views import APIView
-from .models import Course, CourseParticipant, CourseInstructor, CourseSession
+from .models import (
+    Course,
+    CourseParticipant,
+    CourseInstructor,
+    CourseSession,
+    CourseInviteToken,
+)
 from .schemas import course_schema, course_by_id_schema
-from .serializers import CourseSerializer, CourseSessionSerializer
+from .serializers import (
+    CourseSerializer,
+    CourseSessionSerializer,
+    CreateCourseInviteTokenSerializerIn,
+    CourseInviteTokenSerializer,
+)
 from rest_framework import status
 
 from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import NotFound, ValidationError, PermissionDenied
 
 
 @course_schema
@@ -201,4 +216,41 @@ class CourseSessionViewById(APIView):
         return ApiResponse.success(
             message="Course session successfully deleted",
             status_code=status.HTTP_204_NO_CONTENT
+        )
+
+class InviteCourseWithLink(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, course_id):
+        course_instance = Course.objects.get(id=course_id)
+        if not course_instance:
+            raise NotFound("Course not found")
+
+        # check if user is the course instructor
+        try:
+            user_instructor = CourseInstructor.objects.get(
+                course_participant__course=course_instance, course_participant__participant=request.user
+            )
+        except CourseParticipant.DoesNotExist:
+            raise PermissionDenied(detail="User is not authorized to invite to this course")
+
+        # create a link with a token that can be used to join the course
+        valid_request = CreateCourseInviteTokenSerializerIn(data=request.data)
+        valid_request.is_valid(raise_exception=True)
+
+        generated_token = uuid.uuid4().hex
+        expired_at = timezone.now() + timedelta(hours=1)
+        new_course_invite_token = CourseInviteToken.objects.create(
+            course=course_instance,
+            token=generated_token,
+            role=valid_request.validated_data["role"],
+            expired_at=expired_at
+        )
+
+        out_serializer = CourseInviteTokenSerializer(new_course_invite_token)
+
+        return ApiResponse.success(
+            data=out_serializer.data,
+            message="Course invitation link successfully sent",
+            status_code=status.HTTP_200_OK
         )

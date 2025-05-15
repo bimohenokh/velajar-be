@@ -1,10 +1,21 @@
 from enum import Enum
 
 from django.contrib.auth import get_user_model
-from django.db.models import Model, CharField, ImageField, CASCADE, ForeignKey, BooleanField, FileField
+from django.db.models import (
+    Model,
+    CharField,
+    ImageField,
+    CASCADE,
+    ForeignKey,
+    BooleanField,
+    FileField,
+    DateTimeField,
+    IntegerField, TextField,
+)
 
 from taschoolassistant.courses.managers import CourseManager, CourseInstructorManager, CourseParticipantManager, \
     CourseSessionManager, CourseSessionResourceManager
+from taschoolassistant.users.models import Role
 
 # Create your models here.
 User = get_user_model()
@@ -58,3 +69,10 @@ class CourseSessionResource(Model):
     content = FileField(upload_to='courses-resources/')
 
     objects = CourseSessionResourceManager()
+
+
+class CourseInviteToken(Model):
+    course = ForeignKey(Course, on_delete=CASCADE)
+    token = CharField(max_length=255, unique=True)
+    role = CharField(choices=Role.choices, max_length=20)
+    expired_at = DateTimeField()

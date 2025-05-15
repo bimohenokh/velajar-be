@@ -1,10 +1,14 @@
 from django.db import transaction
+from rest_framework.fields import ChoiceField
+from rest_framework.serializers import Serializer, ModelSerializer
 from typing_extensions import override
 
 from django.core.files.storage import default_storage
 
-from .models import Course, CourseParticipant, CourseSession
+from .models import Course, CourseParticipant, CourseSession, CourseInviteToken
 from rest_framework import serializers
+
+from ..users.models import Role
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -45,3 +49,12 @@ class CourseSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseSession
         fields = "__all__"
+
+
+class CourseInviteTokenSerializer(ModelSerializer):
+    class Meta:
+        model = CourseInviteToken
+        fields = "__all__"
+
+class CreateCourseInviteTokenSerializerIn(Serializer):
+    role = ChoiceField(choices=Role.choices)

@@ -63,7 +63,7 @@ INSTALLED_APPS = [
     'taschoolassistant.core',
     'taschoolassistant.users',
     'taschoolassistant.courses',
-    'taschoolassistant.profiles'
+    'taschoolassistant.profiles',
 ]
 
 MIDDLEWARE = [
@@ -102,7 +102,7 @@ ASGI_APPLICATION = 'taschoolassistant.asgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # Use SQLite for testing
-if not os.environ.get('DB_NAME') or "test" in sys.argv:
+if "test" in sys.argv or not env('DATABASE_NAME') :
     DATABASES = {
         'default': {
             "ENGINE": "django.db.backends.sqlite3",
