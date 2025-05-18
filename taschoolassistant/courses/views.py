@@ -264,6 +264,8 @@ class SubmitCourseInviteToken(APIView):
     def post(self, request):
 
         role = request.query_params.get("role", None)
+        if not role:
+            raise ValidationError("Role is required")
 
         try:
             course_invite_token = CourseInviteToken.objects.get(token=request.data["token"], role=role)
