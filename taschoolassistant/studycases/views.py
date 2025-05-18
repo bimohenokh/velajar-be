@@ -31,7 +31,7 @@ class StudyCaseView(APIView):
         try:
             studycase_instance = StudyCase.objects.get_studycases(user, session_id, status)
         except Exception as e:
-            raise str(e)
+            raise e
 
         if not studycase_instance.exists():
             raise NotFound("Study Cases not found")

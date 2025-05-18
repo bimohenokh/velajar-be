@@ -1,13 +1,22 @@
 from django.db import transaction
+from rest_framework.fields import ChoiceField
+from rest_framework.serializers import Serializer, ModelSerializer
 from typing_extensions import override
 
 from django.core.files.storage import default_storage
 
-from .models import Course, CourseParticipant, CourseSession, ParticipantPoint
-from taschoolassistant.users.serializers import UserSerializer
-from taschoolassistant.profiles.models import StudentProfile
+from .models import (
+    Course,
+    CourseParticipant,
+    CourseSession,
+    CourseInviteToken,
+    ParticipantPoint,
+)
 from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
+
+from ..profiles.models import StudentProfile
+from ..users.models import Role
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -48,3 +57,11 @@ class LeaderboardSerializer(serializers.ModelSerializer):
             return profile.student_class
         except StudentProfile.DoesNotExist:
             return "-"
+
+class CourseInviteTokenSerializer(ModelSerializer):
+    class Meta:
+        model = CourseInviteToken
+        fields = "__all__"
+
+class CreateCourseInviteTokenSerializerIn(Serializer):
+    role = ChoiceField(choices=Role.choices)

@@ -1,0 +1,21 @@
+[
+  {
+    "model": "courses.coursesession",
+    "pk": 1,
+    "fields": {
+      "course": 1,
+      "name": "Fisika BAB 1",
+      "description": "Ini adalah bab1 untuk pelajaran Fisika Kelas 10"
+    }
+  },
+  {
+    "model": "courses.coursesession",
+    "pk": 2,
+    "fields": {
+      "course": 1,
+      "name": "Fisika BAB 2",
+      "description": "Ini adalah bab2 untuk pelajaran Fisika Kelas 10"
+    }
+  }
+
+]
