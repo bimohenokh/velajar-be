@@ -1,10 +1,29 @@
 from enum import Enum
 
 from django.contrib.auth import get_user_model
-from django.db.models import Model, CharField, ImageField, CASCADE, ForeignKey, BooleanField, FileField, OneToOneField
+from django.db.models import (
+    Model,
+    CharField,
+    ImageField,
+    CASCADE,
+    ForeignKey,
+    BooleanField,
+    FileField,
+    DateTimeField,
+    IntegerField,
+    TextField,
+    OneToOneField,
+)
 
-from taschoolassistant.courses.managers import CourseManager, CourseInstructorManager, CourseParticipantManager, \
-    CourseSessionManager, CourseSessionResourceManager
+from taschoolassistant.courses.managers import (
+    CourseManager,
+    CourseInstructorManager,
+    CourseParticipantManager,
+    CourseSessionManager,
+    CourseSessionResourceManager,
+    CourseInviteTokenManager,
+)
+from taschoolassistant.users.models import Role
 
 # Create your models here.
 User = get_user_model()
@@ -62,3 +81,25 @@ class CourseSessionResource(Model):
     content = FileField(upload_to='courses-resources/')
 
     objects = CourseSessionResourceManager()
+
+
+class CourseInviteToken(Model):
+    course = ForeignKey(Course, on_delete=CASCADE)
+    token = CharField(max_length=255, unique=True)
+    role = CharField(choices=Role.choices, max_length=20)
+    expired_at = DateTimeField()
+
+    objects = CourseInviteTokenManager()
+
+    @property
+    def is_for_student(self):
+        return self.role == Role.STUDENT
+
+    @property
+    def is_for_teacher(self):
+        return self.role == Role.TEACHER
+
+    def is_user_and_token_role_same(self, user):
+        return self.role == user.role
+
+

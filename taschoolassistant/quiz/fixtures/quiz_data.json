@@ -1,6 +1,6 @@
 [
   {
-    "model": "quizzes.quiz",
+    "model": "quiz.quiz",
     "pk": 1,
     "fields": {
       "course_session": 1,
@@ -14,7 +14,7 @@
     }
   },
   {
-    "model": "quizzes.question",
+    "model": "quiz.question",
     "pk": 1,
     "fields": {
       "quiz": 1,
@@ -23,7 +23,7 @@
     }
   },
   {
-    "model": "quizzes.option",
+    "model": "quiz.option",
     "pk": 1,
     "fields": {
       "question": 1,
@@ -32,7 +32,7 @@
     }
   },
   {
-    "model": "quizzes.option",
+    "model": "quiz.option",
     "pk": 2,
     "fields": {
       "question": 1,
@@ -41,7 +41,7 @@
     }
   },
   {
-    "model": "quizzes.option",
+    "model": "quiz.option",
     "pk": 3,
     "fields": {
       "question": 1,
@@ -50,7 +50,7 @@
     }
   },
   {
-    "model": "quizzes.question",
+    "model": "quiz.question",
     "pk": 2,
     "fields": {
       "quiz": 1,
@@ -59,7 +59,7 @@
     }
   },
   {
-    "model": "quizzes.option",
+    "model": "quiz.option",
     "pk": 4,
     "fields": {
       "question": 2,
@@ -68,7 +68,7 @@
     }
   },
   {
-    "model": "quizzes.option",
+    "model": "quiz.option",
     "pk": 5,
     "fields": {
       "question": 2,
@@ -77,7 +77,7 @@
     }
   },
   {
-    "model": "quizzes.option",
+    "model": "quiz.option",
     "pk": 6,
     "fields": {
       "question": 2,

@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'taschoolassistant.profiles',
     'taschoolassistant.chain_notes',
     'taschoolassistant.coba',  # TODO production apus
+    'taschoolassistant.quiz',
 ]
 
 MIDDLEWARE = [
