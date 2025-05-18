@@ -77,3 +77,8 @@ class CourseSessionManager(Manager):
 
 class CourseSessionResourceManager(Manager):
     pass
+
+
+class CourseInviteTokenManager(Manager):
+    def get_queryset(self):
+        return super().get_queryset()

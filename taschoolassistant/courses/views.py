@@ -1,6 +1,7 @@
 import uuid
 from datetime import timedelta
 
+from django.db import transaction
 from django.utils import timezone
 from rest_framework.views import APIView
 from .models import (
@@ -16,6 +17,7 @@ from .serializers import (
     CourseSessionSerializer,
     CreateCourseInviteTokenSerializerIn,
     CourseInviteTokenSerializer,
+    CourseParticipantSerializer,
 )
 from rest_framework import status
 
@@ -252,5 +254,81 @@ class InviteCourseWithLink(APIView):
         return ApiResponse.success(
             data=out_serializer.data,
             message="Course invitation link successfully sent",
+            status_code=status.HTTP_200_OK
+        )
+
+
+class SubmitCourseInviteToken(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        role = request.query_params.get("role", None)
+
+        try:
+            course_invite_token = CourseInviteToken.objects.get(token=request.data["token"], role=role)
+        except CourseInviteToken.DoesNotExist:
+            raise NotFound("Course invite token not found")
+
+        # check if token is expired
+        if course_invite_token.expired_at < timezone.now():
+            raise PermissionDenied("Course invite token is expired", code="url_link_expired")
+
+        # check if token role and user role same
+        if not course_invite_token.is_user_and_token_role_same(request.user):
+            raise PermissionDenied("Course invite token is not valid", code="url_link_invalid")
+
+        # check if user already joined the course
+        # if not create course participant
+        if course_invite_token.is_for_student:
+            try:
+                course_participant = CourseParticipant.objects.get(
+                    course_id=course_invite_token.course_id,
+                    participant_id=request.user.id
+                )
+                if course_participant.is_participating:
+                    pass
+                else:
+                    course_participant.is_participating = True
+                    course_participant.save()
+            except CourseParticipant.DoesNotExist:
+                course_participant = CourseParticipant.objects.create(
+                    course_id=course_invite_token.course_id,
+                    participant_id=request.user.id,
+                    is_participating=True
+                )
+
+        elif course_invite_token.is_for_teacher:
+            try:
+                course_participant = CourseParticipant.objects.get(
+                    course_id=course_invite_token.course_id,
+                    participant_id=request.user.id
+                )
+                if course_participant.is_participating:
+                    pass
+                else:
+                    course_participant.is_participating = True
+                    course_participant.save()
+
+            except CourseParticipant.DoesNotExist:
+                with transaction.atomic():
+                    course_participant = CourseParticipant.objects.create(
+                        course_id=course_invite_token.course_id,
+                        participant_id=request.user.id,
+                        is_participating=True
+                    )
+                    CourseInstructor.objects.create(
+                        course_participant=course_participant,
+                        is_owner=False
+                    )
+
+        else:
+            raise ValidationError("Invalid role")
+
+        out_serializer = CourseParticipantSerializer(course_participant)
+
+        return ApiResponse.success(
+            data=out_serializer.data,
+            message="Course invite token successfully retrieved",
             status_code=status.HTTP_200_OK
         )
