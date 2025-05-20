@@ -1,0 +1,144 @@
+[
+    {
+    "model": "studycases.studycase",
+    "pk": 1,
+    "fields": {
+        "title": "Sesi 1 Fisika",
+        "description": "Sebuah mobil bermassa 1000 kg didorong dengan gaya konstan sebesar 2000 N di jalan datar tanpa gesekan.",
+        "image_study_case": null,
+        "course_session": 1,
+        "total_point": 100,
+        "started_at": null,
+        "time_range": "00:20:00",
+        "status": "Draft"
+    }
+    },
+    {
+    "model": "studycases.studycase",
+    "pk": 2,
+    "fields": {
+        "title": "Sesi 2 Fisika",
+        "description": "Seorang siswa melepaskan bola dari ketinggian 20 meter tanpa kecepatan awal. Bola tersebut jatuh bebas ke tanah.",
+        "course_session": 3,
+        "total_point": 100,
+        "started_at": "2025-04-29T14:30:00Z",
+        "time_range": "00:20:00",
+        "status": "Active"
+    }
+    },
+    {
+    "model": "studycases.studycase",
+    "pk": 3,
+    "fields": {
+        "title": "Sesi 2 Kimia",
+        "description": "Seorang siswa mencampurkan 50 ml larutan asam klorida (HCl) 0,1 M dengan 50 ml larutan natrium hidroksida (NaOH) 0,1 M.",
+        "course_session": 2,
+        "total_point": 100,
+        "started_at": "2025-04-29T14:30:00Z",
+        "time_range": "00:25:00",
+        "status": "Draft"
+    }
+    },
+    {
+    "model": "studycases.studycase",
+    "pk": 4,
+    "fields": {
+        "title": "Sesi 2 Kimia",
+        "description": "Es batu diletakkan di suhu ruang dan mulai mencair menjadi air.",
+        "course_session": 3,
+        "total_point": 100,
+        "started_at": "2025-04-29T14:30:00Z",
+        "time_range": "00:15:00",
+        "status": "Draft"
+    }
+    },
+
+
+
+
+    
+
+    {
+        "model": "studycases.studycasequestion",
+        "pk": 1,
+        "fields": {
+            "study_case": 1,
+            "question": "jelaskan bagaimana gaya tersebut bekerja?"
+            
+        }
+    },
+    {
+        "model": "studycases.studycasequestion",
+        "pk": 2,
+        "fields": {
+            "study_case": 2,
+            "question": "Jelaskan gaya apa saja yang beraksi saat gerakan tersebut?"
+        }
+    },
+    {
+        "model": "studycases.studycasequestion",
+        "pk": 3,
+        "fields": {
+            "study_case": 3,
+            "question": "Jelaskan perubahan wujud zat yang terjadi pada es batu tersebut?"
+            
+        }
+    },
+    {
+        "model": "studycases.studycasequestion",
+        "pk": 4,
+        "fields": {
+            "study_case": 3,
+            "question": "Jelaskan apakah termasuk perubahan wujud tersebut termasuk perubahan fisika?"
+        }
+    },
+    {
+        "model": "studycases.studycasequestion",
+        "pk": 5,
+        "fields": {
+            "study_case": 4,
+            "question": "Jelaskan fenomena tersebut?"
+            
+        }
+    },
+    {
+        "model": "studycases.studycasequestion",
+        "pk": 6,
+        "fields": {
+            "study_case": 4,
+            "question": "Adakah contoh lain yang menyerupai fenomena tersebut?"
+        }
+    },
+
+
+
+    {
+    "model": "studycases.studycaseanswer",
+    "pk": 1,
+    "fields": {
+        "study_case_question": 3,
+        "student": 3,
+        "answer": "Ini jawaban user 3, basa aja dah mantap",
+        "started_at": "2025-04-29T14:30:00Z",
+        "submitted_at": "2025-04-29T14:50:00Z",
+        "point": 85,
+        "is_submitted": true,
+        "is_evaluated" : true
+    }
+    },
+    {
+        "model": "studycases.studycaseanswer",
+        "pk": 3,
+        "fields": {
+            "study_case_question": 4,
+            "student": 3,
+            "answer": "Ini jawaban user 3, harusnya perubahan fisika sih",
+            "started_at": "2025-04-29T14:30:00Z",
+            "submitted_at": "2025-04-29T14:50:00Z",
+            "point": 85,
+            "is_submitted": true,
+            "is_evaluated" : true
+        }
+    }
+]
+  

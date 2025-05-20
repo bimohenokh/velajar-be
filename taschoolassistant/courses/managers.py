@@ -25,7 +25,13 @@ class CourseManager(Manager):
 
 
 class CourseInstructorManager(Manager):
-    pass
+    def check_instsructor_for_studycase(self, user, course_session):
+        query = self.filter(
+            course_participant__participant=user,
+            course_participant__course=course_session.course,
+            course_participant__is_participating=True
+        )
+        return query
 
 
 class CourseParticipantManager(Manager):
@@ -74,6 +80,11 @@ class CourseSessionManager(Manager):
             id=session_id
         ).first()
 
+
+class ParticipantPointManager(Manager):
+    def get_user_in_course(self):
+        
+        pass
 
 class CourseSessionResourceManager(Manager):
     pass

@@ -13,6 +13,7 @@ from django.db.models import (
     IntegerField,
     TextField,
     OneToOneField,
+    FloatField,
 )
 
 from taschoolassistant.courses.managers import (
@@ -22,6 +23,7 @@ from taschoolassistant.courses.managers import (
     CourseSessionManager,
     CourseSessionResourceManager,
     CourseInviteTokenManager,
+    ParticipantPointManager,
 )
 from taschoolassistant.users.models import Role
 
@@ -59,6 +61,13 @@ class CourseParticipant(Model):
     @property
     def is_teacher(self):
         return hasattr(self, 'courseinstructor')
+
+
+class ParticipantPoint(Model):
+    course_participant = ForeignKey(CourseParticipant, on_delete=CASCADE)
+    point_achieved = FloatField(default=0)
+
+    objects = ParticipantPointManager()
 
 
 class CourseInstructor(Model):

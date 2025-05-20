@@ -5,9 +5,17 @@ from typing_extensions import override
 
 from django.core.files.storage import default_storage
 
-from .models import Course, CourseParticipant, CourseSession, CourseInviteToken
+from .models import (
+    Course,
+    CourseParticipant,
+    CourseSession,
+    CourseInviteToken,
+    ParticipantPoint,
+)
 from rest_framework import serializers
+from django.core.exceptions import ObjectDoesNotExist
 
+from ..profiles.models import StudentProfile
 from ..users.models import Role
 
 
@@ -16,27 +24,6 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = "__all__"
 
-    @override
-    def update(self, instance, validated_data):
-        """Update instance and delete old image file if a new one is provided"""
-        # TODO misal kalau user upload gambar tapi nama file sama dengan yang udah ada
-        # TODO kalau bulk_update kgk bakal diexecute
-        # TODO handle transaction
-        old_image_path = instance.image_banner.path if instance.image_banner else None
-        new_image = validated_data.get("image_banner", None)
-
-        with transaction.atomic():  # Ensure database update is atomic
-            updated_instance = super().update(instance, validated_data)
-
-            # Only delete the old image if a new one is uploaded and is different
-            if new_image and old_image_path and old_image_path != updated_instance.image_banner.path:
-                if default_storage.exists(old_image_path):
-                    try:
-                        default_storage.delete(old_image_path)
-                    except Exception as e:
-                        print(f"Failed to delete old image: {e}")
-
-        return updated_instance
 
 
 class CourseParticipantSerializer(serializers.ModelSerializer):
@@ -50,6 +37,26 @@ class CourseSessionSerializer(serializers.ModelSerializer):
         model = CourseSession
         fields = "__all__"
 
+class LeaderboardSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    student_class = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ParticipantPoint
+        fields = ["name", "student_class", "point_achieved"]
+
+    def get_name(self, obj):
+        # FIXME N+1 query problem kalau dipakai
+        return obj.course_participant.participant.nama_lengkap
+
+    def get_student_class(self, obj):
+        # FIXME N+1 query problem kalau dipakai
+        user = obj.course_participant.participant
+        try:
+            profile = StudentProfile.objects.get(user=user)
+            return profile.student_class
+        except StudentProfile.DoesNotExist:
+            return "-"
 
 class CourseInviteTokenSerializer(ModelSerializer):
     class Meta:

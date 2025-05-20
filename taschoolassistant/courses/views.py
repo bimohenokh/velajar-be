@@ -10,6 +10,7 @@ from .models import (
     CourseInstructor,
     CourseSession,
     CourseInviteToken,
+    ParticipantPoint,
 )
 from .schemas import course_schema, course_by_id_schema
 from .serializers import (
@@ -18,6 +19,7 @@ from .serializers import (
     CreateCourseInviteTokenSerializerIn,
     CourseInviteTokenSerializer,
     CourseParticipantSerializer,
+    LeaderboardSerializer,
 )
 from rest_framework import status
 
@@ -40,7 +42,7 @@ class CourseView(APIView):
         user = request.user
         name = request.GET.get('name', None)
         jenjang = request.GET.get('jenjang_kelas', None)
-        courses_instance = Course.objects.get_courses(user, name, jenjang)  # TODO kalau gk ada return kosong aja gk sih?
+        courses_instance = Course.objects.get_courses(user, name, jenjang)
         if not courses_instance.exists():
             raise NotFound("Course not found")
         serializer = self.course_serializer(
@@ -56,29 +58,29 @@ class CourseView(APIView):
         role = user.role
         serializer = self.course_serializer(data=request.data)
 
-        if serializer.is_valid():
-            course = serializer.save()
+        serializer.is_valid(raise_exception=True)
+        course = serializer.save()
 
-            course_participant = CourseParticipant.objects.create(
-                course=course, participant=user, is_participating=True
-            )
+        course_participant = CourseParticipant.objects.create(
+            course=course, participant=user, is_participating=True
+        )
 
-            if role == "teacher":
-                CourseInstructor.objects.create(
-                    course_participant=course_participant, is_owner=True
-                )
-            else:
-                CourseInstructor.objects.create(
-                    course_participant=course_participant, is_owner=False
-                )
-
-            return ApiResponse.success(
-                data=serializer.data,
-                message="Course successfully created",
-                status_code=status.HTTP_201_CREATED
+        if role == "teacher":
+            CourseInstructor.objects.create(
+                course_participant=course_participant, is_owner=True
             )
         else:
-            raise ValidationError("Invalid input data type")
+            CourseInstructor.objects.create(
+                course_participant=course_participant, is_owner=False
+            )
+
+        ParticipantPoint.objects.create(course_participant=course_participant, point=0)
+
+        return ApiResponse.success(
+            data=serializer.data,
+            message="Course successfully created",
+            status_code=status.HTTP_201_CREATED
+        )
 
 
 @course_by_id_schema
@@ -141,7 +143,7 @@ class CourseSessionView(APIView):
             course_session_instance = CourseSession.objects.get_course_session(user, course_id)
         except Exception as e:
             raise e
-        print(course_session_instance)
+
         if not course_session_instance.exists():
             raise NotFound("Course Sessions not found")
         serializer = self.course_session_serializer(
@@ -188,16 +190,15 @@ class CourseSessionViewById(APIView):
         return ApiResponse.success(serializer.data, message="Course session successfully retrieved")
 
     def patch(self, request, course_id, session_id):
-        print(request.data)
+
         try:
             course_session = CourseSession.objects.get(course=course_id, pk=session_id)
         except CourseSession.DoesNotExist:
             raise NotFound("Course session not found.")
         
-        print(course_session)
+
 
         serializer = self.course_session_serializer(course_session, data=request.data, partial=True)
-        print(request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -219,6 +220,28 @@ class CourseSessionViewById(APIView):
             message="Course session successfully deleted",
             status_code=status.HTTP_204_NO_CONTENT
         )
+
+
+class LeaderboardView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.course_session_serializer = LeaderboardSerializer
+
+    def get(self, request, course_id):
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            raise NotFound("Course not found.")
+
+        # Filter points by course
+        participant_points = ParticipantPoint.objects.filter(course_participant__course=course).order_by('-point_achieved')
+        serializer = self.course_session_serializer(participant_points, many=True)
+
+        return ApiResponse.success(serializer.data, message="Leaderboard successfully retrieved")
+
 
 class InviteCourseWithLink(APIView):
     permission_classes = [IsAuthenticated]
@@ -263,9 +286,10 @@ class SubmitCourseInviteToken(APIView):
 
     def post(self, request):
 
-        role = request.query_params.get("role", None)
-        if not role:
-            raise ValidationError("Role is required")
+        # FIXME perlu param gk ya
+        # role = request.query_params.get("role", None)
+        # if not role:
+        #     raise ValidationError("Role is required")
 
         try:
             course_invite_token = CourseInviteToken.objects.get(token=request.data["token"], role=role)

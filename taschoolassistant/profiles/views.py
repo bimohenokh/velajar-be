@@ -1,20 +1,20 @@
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.views import APIView
 from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.exceptions import NotFound, ValidationError
-from .serializers import StudentProfileSerializer, TeacherProfileSerializer
+from .serializers import StudentProfileSerializer, TeacherProfileSerializer, StudentPostProfileSerializer, TeacherPostProfileSerializer
 from .models import StudentProfile, TeacherProfile
 from .schemas import profile_schema
+from taschoolassistant.users.models import User
 
 # Create your views here.
 
 @profile_schema
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -30,8 +30,25 @@ class ProfileView(APIView):
         serializer = TeacherProfileSerializer(profile_instance) if role == "teacher" else StudentProfileSerializer(profile_instance)
 
         return ApiResponse.success(
+            data=serializer.data, message="Profile succesfully retrieved"
+        )
+
+    def post(self, request):
+        user = request.user
+        role = user.role
+
+        serializer = (
+            StudentPostProfileSerializer(data=request.data, context={"user": user})
+            if role == "student"
+            else TeacherPostProfileSerializer(data=request.data, context={"user": user})
+        )
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return ApiResponse.success(
             data=serializer.data,
-            message="Profile succesfully retrieved"
+            message="Profile successfully created",
+            status_code=status.HTTP_201_CREATED,
         )
 
     def patch(self, request):
@@ -51,13 +68,4 @@ class ProfileView(APIView):
             message="Profile successfully updated",
             status_code=status.HTTP_200_OK
         )
-
-
-
-
-
-        
-
-    
-
 

@@ -11,6 +11,7 @@ class Role(TextChoices):
 class User(AbstractUser):
     email = EmailField(unique=True)
     role = CharField(max_length=20, choices=Role.choices)
+    nama_lengkap = CharField(max_length=255)
 
 
 class Permission(Model):

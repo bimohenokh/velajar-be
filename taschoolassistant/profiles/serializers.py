@@ -1,32 +1,27 @@
-
-
-from django.core.files.storage import default_storage
+from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from .models import StudentProfile, TeacherProfile
-from taschoolassistant.users.models import User
 from rest_framework import serializers
 
-
+User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["username", "first_name", "last_name", "email", "password"]
+        fields = ["username", "nama_lengkap", "email", "password"]
 
         extra_kwargs = {
             'password': {'write_only': True}
         }
 
     def update(self, instance, validated_data):
-        first_name = validated_data.pop('first_name', None)
-        last_name = validated_data.pop('last_name', None)
+        nama_lengkap = validated_data.pop('nama_lengkap', None)
         password = validated_data.pop('password', None)
         
         if password:
             instance.password = make_password(password)
 
-        instance.first_name = first_name
-        instance.last_name = last_name
+        instance.nama_lengkap = nama_lengkap
         return super().update(instance, validated_data)
 
 
@@ -62,3 +57,23 @@ class TeacherProfileSerializer(serializers.ModelSerializer):
             else:
                 raise serializers.ValidationError(user_serializer.errors)
         return super().update(instance, validated_data)
+    
+
+class StudentPostProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentProfile
+        read_only_fields = ["user"]
+
+    def create(self, validated_data):
+        user = self.context.get("user")
+        return StudentProfile.objects.create(user=user, **validated_data)
+
+
+class TeacherPostProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherProfile
+        read_only_fields = ["user"]
+
+    def create(self, validated_data):
+        user = self.context.get("user")
+        return TeacherProfile.objects.create(user=user, **validated_data)

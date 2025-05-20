@@ -1,8 +1,8 @@
 from enum import Enum
 from django.db import models
 from django.contrib.auth import get_user_model
-from taschoolassistant.users.models import User
-from django.db.models import Model, CharField, ImageField, DateField, CASCADE, ForeignKey, BooleanField, FileField
+from django.db.models import Model, CharField, ImageField, DateField, CASCADE, ForeignKey, BooleanField, FileField, \
+    OneToOneField
 from .managers import StudentProfileManager, TeacherProfileManager
 
 # Create your models here.
@@ -14,7 +14,7 @@ class JenjangKelas(Enum):
     SMA_KELAS_3 = "SMA Kelas 3"
 
 class TeacherProfile(Model):
-    user = ForeignKey(User, on_delete=CASCADE)
+    user = OneToOneField(User, on_delete=CASCADE)
     image_profile = ImageField(
         upload_to='teacher-profile/', null=True, blank=True)
     dateOfBirth = DateField(null=True, blank=True)
@@ -24,7 +24,7 @@ class TeacherProfile(Model):
 
 
 class StudentProfile(Model):
-    user = ForeignKey(User, on_delete=CASCADE)
+    user = OneToOneField(User, on_delete=CASCADE)
     image_profile = ImageField(
         upload_to='teacher-profile/', null=True, blank=True)
     dateOfBirth = DateField(null=True, blank=True)
