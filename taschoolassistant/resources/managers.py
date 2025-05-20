@@ -3,14 +3,17 @@ from django.db.models import OuterRef, Exists
 from taschoolassistant.courses.models import CourseParticipant
 
 class ResourceManager(Manager):
-    def get_resources(self, user, session_id):
-        query = self.filter(
-         course_session__course__courseparticipant__participant=user,  # FIXME ini query user buat apa dah, ntar tanya
-         course_session__course__courseparticipant__is_participating=True,
-         course_session=session_id)
+    def get_queryset(self):
+        return super().get_queryset()
 
-
-        return query
+    # def get_resources(self, user, session_id):
+    #     query = self.filter(
+    #      course_session__course__courseparticipant__participant=user,  # FIXME ini query user buat apa dah, ntar tanya
+    #      course_session__course__courseparticipant__is_participating=True,
+    #      course_session=session_id)
+    #
+    #
+    #     return query
         # valid_participant = CourseParticipant.objects.filter(
         #     participant=user.id,
         #     is_participating=True,

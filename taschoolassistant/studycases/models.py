@@ -1,5 +1,6 @@
 from enum import Enum
-from django.db.models import Model, CharField, ImageField, CASCADE, ForeignKey, BooleanField, FileField, TextField, FloatField, DateField, DurationField, DateTimeField
+from django.db.models import Model, CharField, ImageField, CASCADE, ForeignKey, BooleanField, FileField, TextField, FloatField, DateField, DurationField, DateTimeField, \
+    TextChoices
 from taschoolassistant.courses.models import CourseSession
 from taschoolassistant.users.models import User
 from taschoolassistant.studycases.managers import StudyCaseManager, StudyCaseAnswerManager, StudyCaseQuestionManager
@@ -9,10 +10,10 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-class StatusStudyCases(Enum):
-    DRAF = 'Draft'
-    ACTIVE =  'Active'
-    FINISHED = 'Finished'
+class StatusStudyCases(TextChoices):
+    DRAF = "Draft"
+    ACTIVE = "Active"
+    FINISHED = "Finished"
 
 class StudyCase(Model):
     title = CharField(max_length=255, null=True, blank=True)
@@ -25,8 +26,8 @@ class StudyCase(Model):
     time_range= DurationField(blank=True, null=True)
     status = CharField(
         max_length=50,
-        choices=[(status.value, status.name) for status in StatusStudyCases],
-        default=StatusStudyCases.DRAF.value,
+        choices=StatusStudyCases,
+        default=StatusStudyCases.DRAF,
     )
 
     objects = StudyCaseManager()

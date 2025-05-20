@@ -1,6 +1,8 @@
 import traceback
+from django.utils import timezone
+
 from rest_framework.views import APIView
-from .models import StudyCase, StudyCaseAnswer
+from .models import StudyCase, StudyCaseAnswer, StatusStudyCases
 from .serializers import StudyCaseSerializer, StudyCaseAnswerReadSerializers, StudyCaseAnswerWriteSerializer
 from rest_framework import status
 from taschoolassistant.core.utils.response import ApiResponse
@@ -9,7 +11,11 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.exceptions import NotFound, ValidationError
 from taschoolassistant.core.permisssions import IsStudent, IsTeacher
 from taschoolassistant.users.serializers import UserSerializer
-from taschoolassistant.courses.models import ParticipantPoint, CourseSession
+from taschoolassistant.courses.models import (
+    ParticipantPoint,
+    CourseSession,
+    CourseParticipant,
+)
 from taschoolassistant.users.models import User
 from rest_framework.exceptions import APIException
 from rest_framework.exceptions import PermissionDenied
@@ -290,5 +296,35 @@ class StudyCaseAnswerPatchView(APIView):
         return ApiResponse.success(
             data=serializer.data,
             message="Evaluation successfully updated",
+            status_code=status.HTTP_200_OK
+        )
+
+
+class StartStudyCaseView(APIView):
+    permission_classes = [IsAuthenticated, IsTeacher]
+
+    def put(self, request, case_id):
+        try:
+            study_case = StudyCase.objects.get(id=case_id)
+        except StudyCase.DoesNotExist:
+            raise NotFound("Study Case not found.")
+
+        # check if user is allowed
+        try:
+            course_participant = CourseParticipant.objects.get(
+                course_id=study_case.course_session.course_id,
+                participant=request.user.id,
+            )
+            if not course_participant.is_teacher:
+                raise PermissionDenied("You do not have permission to start this study case.")
+        except:
+            raise PermissionDenied("You do not have permission to start this study case.")
+
+        study_case.status = StatusStudyCases.ACTIVE
+        study_case.started_at = timezone.now()
+        study_case.save()
+
+        return ApiResponse.success(
+            message="Study Case successfully started",
             status_code=status.HTTP_200_OK
         )
