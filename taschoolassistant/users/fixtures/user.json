@@ -4,7 +4,7 @@
         "pk": 1,
         "fields": {
             "username": "guru1",
-            "password": "pbkdf2_sha256$870000$HYl3TKaDNbmuxg4LwRBKi2$iaqNbChryqPmb1cWvjf+nTmGpkjL99RFkMsMJsHAFV8=",
+            "password": "pbkdf2_sha256$870000$dFctuNMfBjQcIvJxtuEiKr$YRyHMita4c4rYjwc4bfEAjtbQFFdy0kFNIc8C/xZEvU=",
             "email" : "guru1@gmail.com",
             "nama_lengkap" : "Joko Samudera",
             "role" : "teacher"
@@ -15,7 +15,7 @@
         "pk": 2,
         "fields": {
             "username": "guru2",
-            "password": "pbkdf2_sha256$870000$sxEM3roayyp2Ch4IrvoiZn$OtroECDJzCq0Lkivq5F2jak8wDXx+a37Gfsq1oxBr1g=",
+            "password": "pbkdf2_sha256$870000$dFctuNMfBjQcIvJxtuEiKr$YRyHMita4c4rYjwc4bfEAjtbQFFdy0kFNIc8C/xZEvU=",
             "email" : "guru2@gmail.com",
             "nama_lengkap": "Mega Kilimanjaro",
             "role" : "teacher"
@@ -26,7 +26,7 @@
         "pk": 3,
         "fields": {
             "username": "siswa1",
-            "password": "pbkdf2_sha256$870000$NBnC6foTGWb2lReEHlRpJk$c4gxEvze70klmUHQIOpK27+yza+2p9RBecVTaG+nC3w=",
+            "password": "pbkdf2_sha256$870000$dFctuNMfBjQcIvJxtuEiKr$YRyHMita4c4rYjwc4bfEAjtbQFFdy0kFNIc8C/xZEvU=",
             "email" : "siswa1@gmail.com",
             "nama_lengkap": "Prabs Sampurangan",
             "role" : "student"
@@ -37,7 +37,7 @@
         "pk": 4,
         "fields": {
             "username": "siswa2",
-            "password": "pbkdf2_sha256$870000$uP5oNKRRLrzYVuaXsvRPWc$A3eJItUf5NJ/p6w3HkOLrju8puSivk3u5ysu0JBI/KE=",
+            "password": "pbkdf2_sha256$870000$dFctuNMfBjQcIvJxtuEiKr$YRyHMita4c4rYjwc4bfEAjtbQFFdy0kFNIc8C/xZEvU=",
             "email" : "siswa2@gmail.com",
             "nama_lengkap": "Daffa Maulana H",
             "role" : "student"
@@ -48,7 +48,7 @@
         "pk": 5,
         "fields": {
             "username": "siswa3",
-            "password": "pbkdf2_sha256$870000$uP5oNKRRLrzYVuaXsvRPWc$A3eJItUf5NJ/p6w3HkOLrju8puSivk3u5ysu0JBI/KE=",
+            "password": "pbkdf2_sha256$870000$dFctuNMfBjQcIvJxtuEiKr$YRyHMita4c4rYjwc4bfEAjtbQFFdy0kFNIc8C/xZEvU=",
             "email" : "siswa3@gmail.com",
             "nama_lengkap": "Maulana Bayu Risma",
             "role" : "student"
@@ -59,7 +59,7 @@
         "pk": 6,
         "fields": {
             "username": "siswa4",
-            "password": "pbkdf2_sha256$870000$uP5oNKRRLrzYVuaXsvRPWc$A3eJItUf5NJ/p6w3HkOLrju8puSivk3u5ysu0JBI/KE=",
+            "password": "pbkdf2_sha256$870000$dFctuNMfBjQcIvJxtuEiKr$YRyHMita4c4rYjwc4bfEAjtbQFFdy0kFNIc8C/xZEvU=",
             "email" : "siswa4@gmail.com",
             "nama_lengkap": "Bimo Henokh B",
             "role" : "student"
@@ -70,7 +70,7 @@
         "pk": 5,
         "fields": {
             "username": "siswa3",
-            "password": "pbkdf2_sha256$870000$uP5oNKRRLrzYVuaXsvRPWc$A3eJItUf5NJ/p6w3HkOLrju8puSivk3u5ysu0JBI/KE=",
+            "password": "pbkdf2_sha256$870000$dFctuNMfBjQcIvJxtuEiKr$YRyHMita4c4rYjwc4bfEAjtbQFFdy0kFNIc8C/xZEvU=",
             "email" : "siswa3@gmail.com",
             "role" : "student"
         }
@@ -80,7 +80,7 @@
         "pk": 6,
         "fields": {
             "username": "siswa4",
-            "password": "pbkdf2_sha256$870000$uP5oNKRRLrzYVuaXsvRPWc$A3eJItUf5NJ/p6w3HkOLrju8puSivk3u5ysu0JBI/KE=",
+            "password": "pbkdf2_sha256$870000$dFctuNMfBjQcIvJxtuEiKr$YRyHMita4c4rYjwc4bfEAjtbQFFdy0kFNIc8C/xZEvU=",
             "email" : "siswa4@gmail.com",
             "role" : "student"
         }

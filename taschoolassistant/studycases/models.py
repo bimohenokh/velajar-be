@@ -1,16 +1,10 @@
-from enum import Enum
 from django.db.models import Model, CharField, ImageField, CASCADE, ForeignKey, BooleanField, FileField, TextField, FloatField, DateField, DurationField, DateTimeField, \
     TextChoices
-from taschoolassistant.courses.models import CourseSession
-from taschoolassistant.users.models import User
+from taschoolassistant.courses.models import CourseSession, CourseParticipant
 from taschoolassistant.studycases.managers import StudyCaseManager, StudyCaseAnswerManager, StudyCaseQuestionManager
-from django.contrib.auth import get_user_model
 
 
-User = get_user_model()
-
-
-class StatusStudyCases(TextChoices):
+class StudyCaseStatus(TextChoices):
     DRAF = "Draft"
     ACTIVE = "Active"
     FINISHED = "Finished"
@@ -26,29 +20,30 @@ class StudyCase(Model):
     time_range= DurationField(blank=True, null=True)
     status = CharField(
         max_length=50,
-        choices=StatusStudyCases,
-        default=StatusStudyCases.DRAF,
+        choices=StudyCaseStatus,
+        default=StudyCaseStatus.DRAF,
     )
 
     objects = StudyCaseManager()
 
 
 class StudyCaseQuestion(Model):
-    study_case = ForeignKey(StudyCase, on_delete=CASCADE)
+    study_case = ForeignKey(StudyCase, on_delete=CASCADE, related_name="questions")
     question = CharField(max_length=255, null=True, blank=True)
 
     objects = StudyCaseQuestionManager()
 
 
 class StudyCaseAnswer(Model):
-    student = ForeignKey(User, on_delete=CASCADE)
+    # TODO ubah view
+    student = ForeignKey(
+        CourseParticipant, on_delete=CASCADE)
+    study_case_question = ForeignKey(StudyCaseQuestion, on_delete=CASCADE)
     answer = TextField(blank=True, null=True)
     started_at = DateTimeField(blank=True, null=True)
     submitted_at = DateTimeField(blank=True, null=True)
     point = FloatField(default=0)
     is_submitted = BooleanField(default=False)
     is_evaluated = BooleanField(default=False)
-    study_case_question = ForeignKey(StudyCaseQuestion, on_delete=CASCADE)
-
 
     objects = StudyCaseAnswerManager()

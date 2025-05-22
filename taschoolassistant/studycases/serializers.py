@@ -1,59 +1,58 @@
 from django.db import transaction
-from typing_extensions import override
-
-from django.core.files.storage import default_storage
+from rest_framework.fields import IntegerField
+from rest_framework.serializers import Serializer, ModelSerializer
 
 from .models import StudyCase, StudyCaseQuestion, StudyCaseAnswer
 from rest_framework import serializers
+
+class StudyCaseParamSerializer(Serializer):
+    course_session_id = IntegerField(required=True)
 
 
 # Serializers for read and post studycase and question 
 class StudyCaseQuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudyCaseQuestion
-        fields = ['id', 'question']
-class StudyCaseSerializer(serializers.ModelSerializer):
-    studycasequestion_set = StudyCaseQuestionSerializer(many=True)
+        exclude = ['study_case']
+
+
+class StudyCaseWithQuestionsSerializer(serializers.ModelSerializer):
+    questions = StudyCaseQuestionSerializer(many=True)
     class Meta:
         model = StudyCase
-        fields = ['id', 'title', 'description', 'image_study_case', 'course_session', 'total_point', 'started_at', 'time_range', 'status', 'studycasequestion_set']
+        fields = '__all__'
 
+    @transaction.atomic
     def create(self, validated_data):
-        questions_data = validated_data.pop('studycasequestion_set')
+        questions_data = validated_data.pop('questions', [])
         study_case = StudyCase.objects.create(**validated_data)
-        for question_data in questions_data:
-            StudyCaseQuestion.objects.create(study_case=study_case, **question_data)
+
+        question_objs = [
+            StudyCaseQuestion(study_case=study_case, **q) for q in questions_data
+        ]
+        StudyCaseQuestion.objects.bulk_create(question_objs)
+
         return study_case
-    
+
+    @transaction.atomic
     def update(self, instance, validated_data):
-        questions_data = validated_data.pop('studycasequestion_set', [])
+        questions_data = validated_data.pop('questions', None)
 
         # Update StudyCase fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
-        # Handle nested update for studycasequestion_set
-        existing_ids = [q.id for q in instance.studycasequestion_set.all()]
-        sent_ids = [q.get('id') for q in questions_data if q.get('id')]
-
-        # Delete questions not in request
-        for q in instance.studycasequestion_set.all():
-            if q.id not in sent_ids:
-                q.delete()
-
-        # Create or update
-        for question_data in questions_data:
-            question_id = question_data.get('id', None)
-            if question_id and question_id in existing_ids:
-                question = StudyCaseQuestion.objects.get(id=question_id, study_case=instance)
-                question.question = question_data['question']
-                question.save()
-            else:
-                StudyCaseQuestion.objects.create(study_case=instance, **question_data)
+        # Handle nested update for questions
+        if questions_data is not None:
+            instance.questions.all().delete()
+            question_objs = [
+                StudyCaseQuestion(study_case=instance, **q)
+                for q in questions_data
+            ]
+            StudyCaseQuestion.objects.bulk_create(question_objs)
 
         return instance
-
 
 
 # Serializers for read studycase, question, and answer 
@@ -61,19 +60,22 @@ class StudyCaseSerializerForAnswer(serializers.ModelSerializer):
     class Meta:
         model = StudyCase
         fields = ['id', 'title', 'description', 'image_study_case', 'course_session', 'total_point', 'started_at', 'time_range', 'status']
+
+
 class StudyCaseQuestionSerializerForAnswer(serializers.ModelSerializer):
     study_case = StudyCaseSerializerForAnswer()
 
     class Meta:
         model = StudyCaseQuestion
         fields = ['id', 'question', 'study_case']
+
+
 class StudyCaseAnswerReadSerializers(serializers.ModelSerializer):
     study_case_question = StudyCaseQuestionSerializerForAnswer()
 
     class Meta:
         model = StudyCaseAnswer
         fields = '__all__'
-
 
 
 #Serializers for post answer

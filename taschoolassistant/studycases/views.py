@@ -2,8 +2,9 @@ import traceback
 from django.utils import timezone
 
 from rest_framework.views import APIView
-from .models import StudyCase, StudyCaseAnswer, StatusStudyCases
-from .serializers import StudyCaseSerializer, StudyCaseAnswerReadSerializers, StudyCaseAnswerWriteSerializer
+from .models import StudyCase, StudyCaseAnswer, StudyCaseStatus
+from .serializers import StudyCaseWithQuestionsSerializer, StudyCaseAnswerReadSerializers, StudyCaseAnswerWriteSerializer, \
+    StudyCaseParamSerializer
 from rest_framework import status
 from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
@@ -20,61 +21,54 @@ from taschoolassistant.users.models import User
 from rest_framework.exceptions import APIException
 from rest_framework.exceptions import PermissionDenied
 
-# FIXME
 
 class StudyCaseView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.studycase_serializer = StudyCaseSerializer
+    def get(self, request):
+        param_serializer = StudyCaseParamSerializer(data=request.query_params)
+        param_serializer.is_valid(raise_exception=True)
 
-    def get(self, request, session_id):
-        user = request.user
-        status = request.GET.get('status', None)
+        course_session_id = param_serializer.data['course_session_id']
+
+        # TODO check if user is course participant of the course
 
         try:
-            studycase_instance = StudyCase.objects.get_studycases(user, session_id, status)
-        except Exception as e:
-            raise e
+            studycase = StudyCase.objects.get(course_session_id=course_session_id)
+        except StudyCase.DoesNotExist:
+            raise NotFound("StudyCase not found")
 
-        if not studycase_instance.exists():
-            raise NotFound("Study Cases not found")
-        serializer = self.studycase_serializer(
-            studycase_instance, many=True)
+        out_serializer = StudyCaseWithQuestionsSerializer(studycase)
+
+        return ApiResponse.success(
+            data=out_serializer.data,
+            status_code=status.HTTP_200_OK
+        )
+
+    def post(self, request):
+        data = request.data
+        # TODO check if user is course instructor of the course
+
+        serializer = StudyCaseWithQuestionsSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
         return ApiResponse.success(
             data=serializer.data,
-            message="Study Cases succesfully retrieved"
+            message="Study Case successfully created",
+            status_code=status.HTTP_201_CREATED
         )
 
-    def post(self, request, session_id):
-        user = request.user
-        data = request.data.copy()  
-        data['course_session'] = session_id 
 
-        serializer = StudyCaseSerializer(data=data)
-
-        if serializer.is_valid():
-            serializer.save()
-            return ApiResponse.success(
-                data=serializer.data,
-                message="Study Case successfully created",
-                status_code=status.HTTP_201_CREATED
-            )
-        else:
-            raise ValidationError("Invalid input data type")
-
-        
-
+# FIXME
 class StudyCaseViewById(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.studycase_serializer = StudyCaseSerializer
+        self.studycase_serializer = StudyCaseWithQuestionsSerializer
 
     def get(self, request, session_id, case_id):
         user = request.user
@@ -320,7 +314,7 @@ class StartStudyCaseView(APIView):
         except:
             raise PermissionDenied("You do not have permission to start this study case.")
 
-        study_case.status = StatusStudyCases.ACTIVE
+        study_case.status = StudyCaseStatus.ACTIVE
         study_case.started_at = timezone.now()
         study_case.save()
 

@@ -2,17 +2,21 @@ from django.db.models import Manager
 
 
 class StudyCaseManager(Manager):
-   def get_studycases(self, user, session_id, status):
-      query = self.filter(
-         course_session__course__courseparticipant__participant=user,
-         course_session__course__courseparticipant__is_participating=True,
-         course_session=session_id
-      )
+   def get_queryset(self):
+        return super().get_queryset().prefetch_related('questions')
 
-      if status:
-         query = query.filter(status=status)
-
-      return query
+   # FIXME ntar apus
+   # def get_studycases(self, user, session_id, status):
+   #    query = self.filter(
+   #       course_session__course__courseparticipant__participant=user,
+   #       course_session__course__courseparticipant__is_participating=True,
+   #       course_session=session_id
+   #    )
+   #
+   #    if status:
+   #       query = query.filter(status=status)
+   #
+   #    return query
    
    def get_studycases_id(self, user, session_id, case_id):
       query = self.filter(

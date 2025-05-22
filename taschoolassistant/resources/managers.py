@@ -6,6 +6,7 @@ class ResourceManager(Manager):
     def get_queryset(self):
         return super().get_queryset()
 
+    # FIXME hapus kalau gk pake
     # def get_resources(self, user, session_id):
     #     query = self.filter(
     #      course_session__course__courseparticipant__participant=user,  # FIXME ini query user buat apa dah, ntar tanya
