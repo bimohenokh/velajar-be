@@ -16,6 +16,15 @@
       "name": "Fisika BAB 2",
       "description": "Ini adalah bab2 untuk pelajaran Fisika Kelas 10"
     }
+  },
+    {
+    "model": "courses.coursesession",
+    "pk": 3,
+    "fields": {
+      "course": 1,
+      "name": "Fisika BAB 3",
+      "description": "Ini adalah bab3 untuk pelajaran Fisika Kelas 10"
+    }
   }
 
 ]

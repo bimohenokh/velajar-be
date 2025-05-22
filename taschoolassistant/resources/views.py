@@ -1,7 +1,5 @@
 from copy import deepcopy
 
-from django.shortcuts import render
-
 from rest_framework import status
 from rest_framework.views import APIView
 from taschoolassistant.core.utils.response import ApiResponse
@@ -20,15 +18,16 @@ class ResourceView(APIView):
 
     def get(self, request):
         request_param = ResourceParamSerializer(data=request.query_params)
+        request_param.is_valid(raise_exception=True)
 
-        course_session_id = request_param.data.get('course_session')
+        course_session_id = request_param.data.get('course_session_id')
 
         resources = list(Resource.objects.filter(course_session_id=course_session_id))
 
         course_session = CourseSession.objects.get(id=course_session_id)
         # check if user is participant of the course
         try:
-            participant = CourseParticipant.objects.get(user=request.user, course_id=course_session.course_id)
+            participant = CourseParticipant.objects.get(participant=request.user, course_id=course_session.course_id)
         except CourseParticipant.DoesNotExist:
             raise PermissionDenied("Participant not found.")
 
@@ -43,23 +42,24 @@ class ResourceView(APIView):
     def post(self, request):
         param_serializer = ResourceParamSerializer(data=request.query_params)
         param_serializer.is_valid(raise_exception=True)
-        course_session_id = param_serializer.validated_data.get('session_id')
+        course_session_id = param_serializer.validated_data.get('course_session_id')
+
+        course_session = CourseSession.objects.get(id=course_session_id)
 
         serializer = ResourceSerializer(
             data=request.data,
-            context={'course_session': course_session_id},
+            context={'course_session': course_session},
             many=True
         )
         serializer.is_valid(raise_exception=True)
 
         # check if user is course instructor of the course
-        CourseSession.objects.get(id=course_session_id)
         try:
             participant = CourseParticipant.objects.get(
-                user=request.user, course_session_id=course_session_id, courseinstructor__isnull=False
+                participant=request.user, course_id=course_session.course_id, courseinstructor__isnull=False
             )
         except CourseParticipant.DoesNotExist:
-            raise PermissionDenied("Participant not found.")
+            raise PermissionDenied("Participant not allowed to create resources.")
 
         serializer.save()
 
@@ -83,7 +83,7 @@ class ResourceViewById(APIView):
         course_id = resource_instance.course_session.course_id
         # check if user is participant of the course
         try:
-            participant = CourseParticipant.objects.get(user=request.user, course_id=course_id)
+            participant = CourseParticipant.objects.get(participant=request.user, course_id=course_id)
         except CourseParticipant.DoesNotExist:
             raise PermissionDenied("Participant not found.")
 
@@ -105,7 +105,7 @@ class ResourceViewById(APIView):
         # check if user is participant of the course
         try:
             participant = CourseParticipant.objects.get(
-                user=request.user, course_id=course_id, courseinstructor__isnull=False
+                participant=request.user, course_id=course_id, courseinstructor__isnull=False
             )
         except CourseParticipant.DoesNotExist:
             raise PermissionDenied("Participant not found.")
@@ -138,7 +138,7 @@ class ResourceViewById(APIView):
         # check if user is participant of the course
         try:
             participant = CourseParticipant.objects.get(
-                user=request.user, course_id=course_id, courseinstructor__isnull=False
+                participant=request.user, course_id=course_id, courseinstructor__isnull=False
             )
         except CourseParticipant.DoesNotExist:
             raise PermissionDenied("Participant not found.")
