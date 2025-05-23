@@ -5,6 +5,7 @@ stages:
 
 variables:
   IMAGE_FULL_NAME_BACKEND: "$CI_REGISTRY_IMAGE/${DOCKERHUB_USERNAME}/${IMAGE_NAME_BACKEND}"
+  IMAGE_FULL_NAME_BACKEND_TASK: "$CI_REGISTRY_IMAGE/${DOCKERHUB_USERNAME}/${IMAGE_NAME_BACKEND_TASK}"
 
 unit-test:
   stage: test
@@ -39,7 +40,7 @@ docker-push:
   script:
     - docker build -t "${IMAGE_FULL_NAME_BACKEND}:latest" .
     - docker push "$IMAGE_FULL_NAME_BACKEND:latest"
-    - docker build -t "$IMAGE_FULL_NAME_BACKEND_TASK:latest" -f Dockerfile.task .
+    - docker build -t "${IMAGE_FULL_NAME_BACKEND_TASK}:latest" -f Dockerfile.task .
     - docker push "$IMAGE_FULL_NAME_BACKEND_TASK:latest"
   only:
     - main
