@@ -38,6 +38,9 @@ docker-push:
     - chmod +x $CI_PROJECT_DIR/generate-env.sh
     - $CI_PROJECT_DIR/generate-env.sh
   script:
+    - echo "Backend image ${IMAGE_FULL_NAME_BACKEND}"
+    - echo "Task image ${IMAGE_FULL_NAME_BACKEND_TASK}"
+    - echo "Docker username ${DOCKERHUB_USERNAME}"
     - docker build -t "${IMAGE_FULL_NAME_BACKEND}:latest" .
     - docker push "$IMAGE_FULL_NAME_BACKEND:latest"
     - docker build -t "${IMAGE_FULL_NAME_BACKEND_TASK}:latest" -f Dockerfile.task .
