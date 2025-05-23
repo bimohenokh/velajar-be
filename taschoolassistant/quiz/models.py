@@ -8,9 +8,9 @@ from taschoolassistant.courses.models import CourseSession
 User = get_user_model()
 
 class QuizStatus(TextChoices):
-    DRAFT = 'draft', 'Draft'
-    ACTIVE = 'active', 'Active'
-    FINISHED = 'finished', 'Finished'
+    DRAFT = 'Draft', 'Draft'
+    ACTIVE = 'Active', 'Active'
+    FINISHED = 'Finished', 'Finished'
 
 
 class Quiz(models.Model):
