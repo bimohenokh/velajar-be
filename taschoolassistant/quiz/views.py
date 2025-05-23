@@ -283,7 +283,7 @@ class StopQuizView(APIView):
                 quiz.save()
 
                 submit_attempts_by_quiz_id(quiz_id)
-
+                # TODO should i stop the scheduller?
                 return ApiResponse.success(
                     message="Quiz successfully stopped",
                     status_code=status.HTTP_201_CREATED

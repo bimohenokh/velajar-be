@@ -1,5 +1,7 @@
 import traceback
 from django.utils import timezone
+from django_q.tasks import schedule
+from rest_framework.generics import get_object_or_404
 
 from rest_framework.views import APIView
 from .models import StudyCase, StudyCaseAnswer, StudyCaseStatus
@@ -21,6 +23,8 @@ from taschoolassistant.courses.models import (
 from taschoolassistant.users.models import User
 from rest_framework.exceptions import APIException
 from rest_framework.exceptions import PermissionDenied
+
+from .tasks import finish_study_case
 
 
 class StudyCaseView(APIView):
@@ -306,7 +310,7 @@ class StudyCaseAnswerPatchView(APIView):
 class StartStudyCaseView(APIView):
     permission_classes = [IsAuthenticated, IsTeacher]
 
-    def put(self, request, case_id):
+    def post(self, request, case_id):
         try:
             study_case = StudyCase.objects.get(id=case_id)
         except StudyCase.DoesNotExist:
@@ -323,11 +327,47 @@ class StartStudyCaseView(APIView):
         except:
             raise PermissionDenied("You do not have permission to start this study case.")
 
+        if study_case.status == StudyCaseStatus.ACTIVE:
+            raise ValidationError("Quiz has already started")
+        if study_case.status == StudyCaseStatus.FINISHED:
+            raise ValidationError("Quiz was already finished")
+
         study_case.status = StudyCaseStatus.ACTIVE
         study_case.started_at = timezone.now()
         study_case.save()
+
+        schedule(
+            f'{finish_study_case.__module__}.{finish_study_case.__name__}',
+            case_id,
+            next_run=study_case.started_at + study_case.time_range,
+            schedule_type='O',
+        )
 
         return ApiResponse.success(
             message="Study Case successfully started",
             status_code=status.HTTP_200_OK
         )
+
+
+class StopStudyCaseView(APIView):
+    def post(self, request, case_id):
+
+        study_case = get_object_or_404(StudyCase, id=case_id)
+
+        # TODO check if user is course instructor of the course
+
+        if study_case.status == StudyCaseStatus.DRAF:
+            raise ValidationError("Study Case is still in draft mode")
+        if study_case.status == StudyCaseStatus.FINISHED:
+            raise ValidationError("Study Case has already finished")
+
+        study_case.status = StudyCaseStatus.FINISHED
+        study_case.save()
+
+        # TODO should i stop the scheduller?
+
+        return ApiResponse.success(
+            message="Study Case successfully stopped",
+            status_code=status.HTTP_200_OK
+        )
+
