@@ -9,4 +9,5 @@ COPY . /app
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-ENTRYPOINT ["python", "manage.py", "qcluster"]
+RUN chmod +x ./entrypoint-task.sh
+ENTRYPOINT ["./entrypoint-task.sh"]
