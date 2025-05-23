@@ -3,8 +3,9 @@ from django.utils import timezone
 
 from rest_framework.views import APIView
 from .models import StudyCase, StudyCaseAnswer, StudyCaseStatus
-from .serializers import StudyCaseWithQuestionsSerializer, StudyCaseAnswerReadSerializers, StudyCaseAnswerWriteSerializer, \
-    StudyCaseParamSerializer
+from .serializers import StudyCaseWithQuestionsSerializer, StudyCaseAnswerReadSerializers, \
+    StudyCaseAnswerWriteSerializer, \
+    StudyCaseParamSerializer, StudyCaseSerializer
 from rest_framework import status
 from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
@@ -39,7 +40,7 @@ class StudyCaseView(APIView):
         except StudyCase.DoesNotExist:
             raise NotFound("StudyCase not found")
 
-        out_serializer = StudyCaseWithQuestionsSerializer(studycase)
+        out_serializer = StudyCaseSerializer(studycase)
 
         return ApiResponse.success(
             data=out_serializer.data,
@@ -61,31 +62,35 @@ class StudyCaseView(APIView):
         )
 
 
-# FIXME
 class StudyCaseViewById(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.studycase_serializer = StudyCaseWithQuestionsSerializer
-
-    def get(self, request, session_id, case_id):
-        user = request.user
-        studycase_instance = StudyCase.objects.get_studycases_id(user, session_id, case_id)
-        if not studycase_instance:
-            raise NotFound("Study Case not found")
-
-        serializer = self.studycase_serializer(studycase_instance)
-        return ApiResponse.success(serializer.data, message="Study Case successfully retrieved")
-
-    def patch(self, request, session_id, case_id):
+    def get(self, request, case_id):
         try:
-            study_case = StudyCase.objects.get(course_session=session_id, id=case_id)
+            study_case = StudyCase.objects.get(id=case_id)
         except StudyCase.DoesNotExist:
             raise NotFound("Study Case not found.")
 
-        serializer = self.studycase_serializer(study_case, data=request.data, partial=True)
+        # TODO check if user is course participant of the course
+
+        serializer = StudyCaseWithQuestionsSerializer(study_case)
+
+        return ApiResponse.success(
+            data=serializer.data,
+            message="Study Case successfully retrieved",
+            status_code=status.HTTP_200_OK
+        )
+
+    def patch(self, request, case_id):
+        try:
+            study_case = StudyCase.objects.get(id=case_id)
+        except StudyCase.DoesNotExist:
+            raise NotFound("Study Case not found.")
+
+        # TODO check if user is course instructor of the course
+
+        serializer = StudyCaseWithQuestionsSerializer(study_case, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -95,11 +100,13 @@ class StudyCaseViewById(APIView):
             status_code=status.HTTP_200_OK
         )
 
-    def delete(self, request, session_id, case_id):
+    def delete(self, request, case_id):
         try:
-            study_case = StudyCase.objects.get(course_session=session_id, id=case_id)
+            study_case = StudyCase.objects.get(id=case_id)
         except StudyCase.DoesNotExist:
             raise NotFound("Study Case not found.")
+
+        # TODO check if user is course instructor of the course
 
         study_case.delete()
 
@@ -108,6 +115,8 @@ class StudyCaseViewById(APIView):
             status_code=status.HTTP_204_NO_CONTENT
         )
 
+
+# FIXME
 class StudyCaseAnswerReadStudentSubmittedView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]

@@ -9,15 +9,24 @@ class StudyCaseParamSerializer(Serializer):
     course_session_id = IntegerField(required=True)
 
 
+class StudyCaseSerializer(ModelSerializer):
+    class Meta:
+        model = StudyCase
+        fields = '__all__'
+        read_only_fields = ('id', 'course_session')
+
 # Serializers for read and post studycase and question 
-class StudyCaseQuestionSerializer(serializers.ModelSerializer):
+class NestedStudyCaseQuestionSerializer(ModelSerializer):
+    """
+    Serializer for nested StudyCaseQuestion within StudyCaseWithQuestionsSerializer.
+    """
     class Meta:
         model = StudyCaseQuestion
         exclude = ['study_case']
 
 
-class StudyCaseWithQuestionsSerializer(serializers.ModelSerializer):
-    questions = StudyCaseQuestionSerializer(many=True)
+class StudyCaseWithQuestionsSerializer(ModelSerializer):
+    questions = NestedStudyCaseQuestionSerializer(many=True)
     class Meta:
         model = StudyCase
         fields = '__all__'
@@ -56,13 +65,13 @@ class StudyCaseWithQuestionsSerializer(serializers.ModelSerializer):
 
 
 # Serializers for read studycase, question, and answer 
-class StudyCaseSerializerForAnswer(serializers.ModelSerializer):
+class StudyCaseSerializerForAnswer(ModelSerializer):
     class Meta:
         model = StudyCase
         fields = ['id', 'title', 'description', 'image_study_case', 'course_session', 'total_point', 'started_at', 'time_range', 'status']
 
 
-class StudyCaseQuestionSerializerForAnswer(serializers.ModelSerializer):
+class StudyCaseQuestionSerializerForAnswer(ModelSerializer):
     study_case = StudyCaseSerializerForAnswer()
 
     class Meta:
@@ -70,7 +79,7 @@ class StudyCaseQuestionSerializerForAnswer(serializers.ModelSerializer):
         fields = ['id', 'question', 'study_case']
 
 
-class StudyCaseAnswerReadSerializers(serializers.ModelSerializer):
+class StudyCaseAnswerReadSerializers(ModelSerializer):
     study_case_question = StudyCaseQuestionSerializerForAnswer()
 
     class Meta:
@@ -79,7 +88,7 @@ class StudyCaseAnswerReadSerializers(serializers.ModelSerializer):
 
 
 #Serializers for post answer
-class StudyCaseAnswerWriteSerializer(serializers.ModelSerializer):
+class StudyCaseAnswerWriteSerializer(ModelSerializer):
     class Meta:
         model = StudyCaseAnswer
         fields = '__all__'
