@@ -35,7 +35,6 @@ DEBUG = env.bool("DEBUG", default=False)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost"])
 
-
 # Application definition
 
 REST_FRAMEWORK = {
@@ -45,7 +44,6 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'taschoolassistant.core.utils.exception_handlers.custom_exception_handler',
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
-
 
 AUTH_USER_MODEL = "users.User"  # Custom user model
 
@@ -57,6 +55,7 @@ INSTALLED_APPS = [
     'daphne',
     'adrf',
     "corsheaders",
+    'django_q',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -165,7 +164,6 @@ FILE_UPLOAD_HANDLERS = [
 #     'x-requested-with',
 # ]
 
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -183,7 +181,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # JWT Configuration
 SIMPLE_JWT = {
@@ -204,6 +201,17 @@ SPECTACULAR_SETTINGS = {
     # OTHER SETTINGS
 }
 
+# Django-Q settings
+Q_CLUSTER = {
+    'name': 'DjangoQ',
+    'workers': 2,
+    'timeout': 10,   # max seconds a worker can block waiting for a task (lower means more frequent polling)
+    'retry': 20,     # retry failed tasks after 3 seconds
+    'queue_limit': 50,
+    'bulk': 10,
+    'poll': 1,
+    'orm': 'default',
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

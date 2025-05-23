@@ -55,7 +55,7 @@ class ChainNoteView(APIView):
                 data=chain_note_serializer_out.data,
                 message="Chain Note successfully retrieved",
             )
-        return sync_to_async(_)()
+        return await sync_to_async(_)()
 
     async def post(self, request):
         def logic():
@@ -85,7 +85,7 @@ class ChainNoteView(APIView):
                 status_code=status.HTTP_201_CREATED,
             )
 
-        return sync_to_async(logic)()
+        return await sync_to_async(logic)()
 
 
 class ChainNoteViewById(APIView):
@@ -116,7 +116,7 @@ class ChainNoteViewById(APIView):
                 message="Chain Note successfully retrieved",
             )
 
-        return sync_to_async(logic)()
+        return await sync_to_async(logic)()
 
     async def put(self, request, pk):
         def logic():
@@ -152,7 +152,7 @@ class ChainNoteViewById(APIView):
                 message="Chain Note successfully updated",
             )
 
-        return sync_to_async(logic)()
+        return await sync_to_async(logic)()
 
 
 class StartChainNoteView(APIView):

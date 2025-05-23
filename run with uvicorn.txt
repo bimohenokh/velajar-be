@@ -1,1 +1,1 @@
-python -m uvicorn taschoolassistant.asgi:application
+python -m uvicorn taschoolassistant.asgi:application --reload
