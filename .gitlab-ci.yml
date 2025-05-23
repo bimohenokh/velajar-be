@@ -39,6 +39,8 @@ docker-push:
   script:
     - docker build -t "${IMAGE_FULL_NAME_BACKEND}:latest" .
     - docker push "$IMAGE_FULL_NAME_BACKEND:latest"
+    - docker push -t "$IMAGE_FULL_NAME_BACKEND_TASK:latest" -f Dockerfile.task .
+    - docker push "$IMAGE_FULL_NAME_BACKEND_TASK:latest" -f Dockerfile.task .
   only:
     - main
     - staging
