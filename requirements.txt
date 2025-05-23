@@ -11,3 +11,4 @@ daphne # apus
 uvicorn
 adrf
 django-cors-headers
+django-q2

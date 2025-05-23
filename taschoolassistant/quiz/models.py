@@ -1,9 +1,17 @@
 from django.db import models
 
 from django.contrib.auth import get_user_model
+from django.db.models import TextChoices
+
 from taschoolassistant.courses.models import CourseSession
 
 User = get_user_model()
+
+class QuizStatus(TextChoices):
+    DRAFT = 'draft', 'Draft'
+    ACTIVE = 'active', 'Active'
+    FINISHED = 'finished', 'Finished'
+
 
 class Quiz(models.Model):
     course_session = models.ForeignKey(CourseSession, on_delete=models.CASCADE, related_name='quizzes')
@@ -12,7 +20,7 @@ class Quiz(models.Model):
     total_points = models.FloatField(default=100)
     started_at = models.DateTimeField(blank=True, null=True)
     time_range = models.DurationField()
-    status = models.CharField(max_length=10, choices=[('draft', 'Draft'), ('active', 'Active'), ('finished', 'Finished')], default='draft')
+    status = models.CharField(max_length=10, choices=QuizStatus.choices, default=QuizStatus.DRAFT)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='quizzes_created')
 
 class Question(models.Model):

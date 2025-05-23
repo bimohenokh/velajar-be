@@ -37,6 +37,7 @@ urlpatterns = [
     path("studycases/", include("taschoolassistant.studycases.urls")),
     path("resources/", include("taschoolassistant.resources.urls")),
     path("chain-notes/", include("taschoolassistant.chain_notes.urls")),
+    path("quizzes/", include("taschoolassistant.quiz.urls")),
 ]
 
 if settings.DEBUG:

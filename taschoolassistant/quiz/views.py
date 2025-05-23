@@ -1,14 +1,20 @@
+from django.db import transaction
+from django_q.tasks import schedule
 from rest_framework.views import APIView
 from rest_framework import status
 from django.utils import timezone
 
+from .helpers import submit_attempts_by_quiz_id
 # quizzes/views.py
-from .models import Quiz, Question, QuizAttempt, Answer, Option
+from .models import Quiz, Question, QuizAttempt, Answer, Option, QuizStatus
 from .serializers import QuizSerializer, QuestionSerializer, AnswerSerializer, QuizAttemptSerializer, OptionSerializer, StudentQuestionSerializer
 
 from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound, ValidationError
+
+from .tasks import finish_quiz
+
 
 class QuizView(APIView):
     permission_classes = [IsAuthenticated]
@@ -21,7 +27,7 @@ class QuizView(APIView):
     # GET ALL QUIZZES BY COURSE SESSION
     def get(self, request):
         try:
-            course_session = request.data['course_session']
+            course_session = request.query_params['course_session']
             quizzes = Quiz.objects.filter(course_session=course_session)
             serializer = self.quiz_serializer(quizzes, many=True)
 
@@ -99,15 +105,13 @@ class QuizDetailView(APIView):
             
             serializer = self.quiz_serializer(quiz, data=request.data, partial=True)
 
-            if serializer.is_valid():
-                serializer.save()
-                return ApiResponse.success(
-                    data=serializer.data,
-                    message="Quiz updated successfully",
-                    status_code=status.HTTP_200_OK
-                )
-            else:
-                raise ValidationError(serializer.errors)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return ApiResponse.success(
+                data=serializer.data,
+                message="Quiz updated successfully",
+                status_code=status.HTTP_200_OK
+            )
         except Quiz.DoesNotExist:
             raise NotFound("Quiz not found")
 
@@ -239,14 +243,21 @@ class StartQuizView(APIView):
         
         try:
             quiz = Quiz.objects.get(id=quiz_id)
-            if quiz.status == 'active':
+            if quiz.status == QuizStatus.ACTIVE:
                 raise ValidationError("Quiz has already started")
-            if quiz.status == 'finished':
+            if quiz.status == QuizStatus.FINISHED:
                 raise ValidationError("Quiz was already finished")
             
-            quiz.status = 'active'
+            quiz.status = QuizStatus.ACTIVE
             quiz.started_at = timezone.now()
             quiz.save()
+
+            schedule(
+                f'{finish_quiz.__module__}.{finish_quiz.__name__}',  # Task path
+                quiz_id,
+                next_run=quiz.started_at + quiz.time_range,
+                schedule_type='O'  # One-off
+            )
 
             return ApiResponse.success(
                 message="Quiz successfully started",
@@ -264,16 +275,19 @@ class StopQuizView(APIView):
         # Check if quiz_id is provided
         if quiz_id is None:
             raise ValidationError("Quiz id is required in the URL")
-        
-        try:
-            quiz = Quiz.objects.get(id=quiz_id)
-            quiz.status = 'finished'
-            quiz.save()
 
-            return ApiResponse.success(
-                message="Quiz successfully stopped",
-                status_code=status.HTTP_201_CREATED
-            )
+        try:
+            with transaction.atomic():
+                quiz = Quiz.objects.get(id=quiz_id)
+                quiz.status = QuizStatus.FINISHED
+                quiz.save()
+
+                submit_attempts_by_quiz_id(quiz_id)
+
+                return ApiResponse.success(
+                    message="Quiz successfully stopped",
+                    status_code=status.HTTP_201_CREATED
+                )
         except Quiz.DoesNotExist:
             raise NotFound("Quiz not found")
         
@@ -292,9 +306,9 @@ class StartAttemptView(APIView):
         
         try:
             quiz = Quiz.objects.get(id=quiz_id)
-            if quiz.status == 'draft':
+            if quiz.status == QuizStatus.DRAFT:
                 raise ValidationError("Quiz has not started yet.")
-            if quiz.status == 'finished':
+            if quiz.status == QuizStatus.FINISHED:
                 raise ValidationError("Quiz was already finished")
             
                     
@@ -388,11 +402,9 @@ class SubmitQuizView(APIView):
     def post(self, request):
         
         try:
-            quiz_attempt = QuizAttempt.objects.get(id=request.data['quiz_attempt'], student=request.user)
+            quiz_attempt = QuizAttempt.objects.get(id=request.data['quiz_attempt'], student=request.user)  # FIXME, ini bisa dioptimasi
             if quiz_attempt.is_submitted:
                 raise ValidationError("Quiz attempt is already submitted")
-            
-            
 
             answers_data = []
             for question in quiz_attempt.quiz.questions.all():
