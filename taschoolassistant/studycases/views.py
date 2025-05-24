@@ -158,6 +158,7 @@ class StudyCaseAnswerReadStudentSubmittedView(APIView):
             message="Study Case Answers Submitted successfully retrieved"
         )
 
+
 class StudyCaseAnswerReadView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
@@ -195,7 +196,6 @@ class StudyCaseAnswerReadView(APIView):
             data=serializer.data,
             message="Study Case Answers successfully retrieved"
         )
-
 
 
 class StudyCaseAnswerWriteView(APIView):
@@ -247,7 +247,6 @@ class StudyCaseAnswerWriteView(APIView):
             )
         else:
             raise ValidationError(serializer.errors)
-
 
 
 class StudyCaseAnswerPatchView(APIView):
