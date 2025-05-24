@@ -1,10 +1,9 @@
 from django.db import transaction
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField
 from rest_framework.serializers import Serializer, ModelSerializer
 
 from .models import StudyCase, StudyCaseQuestion, StudyCaseAnswer, StudyCaseAttempt
-from rest_framework import serializers
-
 from ..courses.serializers import CourseParticipantSerializer
 
 
@@ -103,3 +102,72 @@ class StudyCaseAttemptSerializer(ModelSerializer):
     class Meta:
         model = StudyCaseAttempt
         fields = '__all__'
+
+
+class NestedStudyCaseAnswerSerializer(ModelSerializer):
+    """
+    Serializer for nested StudyCaseAnswer within StudyCaseAttemptWithAnswersSerializer.
+    """
+    class Meta:
+        model = StudyCaseAnswer
+        exclude = ["study_case_attempt", "point"]
+
+
+class StudyCaseAttemptWithAnswersSerializer(ModelSerializer):
+    participant_user = CourseParticipantSerializer(read_only=True, source="student.participant")
+    answers = NestedStudyCaseAnswerSerializer(many=True)
+
+    class Meta:
+        model = StudyCaseAttempt
+        fields = '__all__'
+        read_only_fields = ('id', 'study_case', 'student', 'submitted_at')
+
+    @transaction.atomic
+    def create(self, validated_data):
+        study_case = self.context.get('study_case')
+        answers_data = validated_data.pop('answers', [])
+        study_case_attempt = StudyCaseAttempt.objects.create(study_case=study_case, **validated_data)
+
+        answer_objs = [
+            StudyCaseAnswer(study_case_attempt=study_case_attempt, **answer) for answer in answers_data
+        ]
+        StudyCaseAnswer.objects.bulk_create(answer_objs)
+
+        return study_case_attempt
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        answers_data = validated_data.pop('answers', None)
+
+        # Update StudyCaseAttempt fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        # Handle nested update for answers
+        if answers_data is not None:
+            instance.answers.all().delete()
+            answer_objs = [
+                StudyCaseAnswer(study_case_attempt=instance, **answer)
+                for answer in answers_data
+            ]
+            StudyCaseAnswer.objects.bulk_create(answer_objs)
+
+        return instance
+
+
+class EvaluateStudyCaseAnswerSerializer(ModelSerializer):
+    """
+    Serializer for evaluating StudyCaseAnswer.
+    """
+    class Meta:
+        model = StudyCaseAnswer
+        fields = ['id', 'point']
+        read_only_fields = ['id']
+
+    def validate_point(self, value):
+        if value is None:
+            return value
+        if value < 0:
+            raise ValidationError("Point cannot be negative.")
+        return value

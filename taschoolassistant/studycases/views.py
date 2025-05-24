@@ -10,6 +10,8 @@ from .serializers import (
     StudyCaseParamSerializer,
     StudyCaseSerializer,
     StudyCaseAttemptSerializer,
+    StudyCaseAttemptWithAnswersSerializer,
+    EvaluateStudyCaseAnswerSerializer,
 )
 from rest_framework import status
 from taschoolassistant.core.utils.response import ApiResponse
@@ -417,3 +419,98 @@ class StudyCaseAttemptView(APIView):
             data=out_serializer.data,
             message="Study Case successfully retrieved"
         )
+
+    def post(self, request, case_id):
+        user = request.user
+        study_case = get_object_or_404(StudyCase, id=case_id)
+
+        try:
+            course_student = CourseParticipant.objects.get(
+                participant=user.id, course_id=study_case.course_session.course_id,
+                courseinstructor__isnull=True
+            )
+        except CourseParticipant.DoesNotExist:
+            raise PermissionDenied("You are not a student of this course.")
+
+        if study_case.status == StudyCaseStatus.FINISHED:
+            raise ValidationError("Study Case has already finished.")
+
+        if study_case.status == StudyCaseStatus.DRAF:
+            raise ValidationError("Study Case has not started.")
+
+        serializer = StudyCaseAttemptWithAnswersSerializer(
+            data=request.data,
+            context={'study_case': study_case}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return ApiResponse.success(
+            data=serializer.data,
+            message="Study Case Attempt successfully created",
+            status_code=status.HTTP_201_CREATED
+        )
+
+
+class StudyCaseAttemptByIdView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get(self, request, attempt_id):
+        study_case_attempt = get_object_or_404(StudyCaseAttempt, id=attempt_id)
+
+        # TODO Check if user is course participant of the course
+
+        serializer = StudyCaseAttemptWithAnswersSerializer(study_case_attempt)
+
+        return ApiResponse.success(
+            data=serializer.data,
+            message="Study Case Attempt successfully retrieved",
+            status_code=status.HTTP_200_OK
+        )
+
+    def put(self, request, attempt_id):
+        study_case_attempt = get_object_or_404(StudyCaseAttempt, id=attempt_id)
+
+        # TODO Check if user is course participant of the course
+
+        serializer = StudyCaseAttemptWithAnswersSerializer(
+            study_case_attempt, data=request.data
+        )
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return ApiResponse.success(
+            data=serializer.data,
+            message="Study Case Attempt successfully updated",
+            status_code=status.HTTP_200_OK
+        )
+
+
+class EvaluateStudyCaseAnswerView(APIView):
+    permission_classes = [IsAuthenticated, IsTeacher]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def put(self, request):
+
+        # TODO Check if user can evaluate study case answers cause no course id
+
+        serializer = EvaluateStudyCaseAnswerSerializer(
+            data=request.data,
+            many=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        # TODO penambahan point ke student
+
+        return ApiResponse.success(
+            data=serializer.data,
+            message="Study Case Attempt successfully evaluated",
+            status_code=status.HTTP_200_OK
+        )
+
+
+
+

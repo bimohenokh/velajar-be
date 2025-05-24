@@ -64,6 +64,8 @@ class StudyCaseAttempt(Model):
             return True
         return False
 
+    # TODO tambahin property total point
+
 
 class StudyCaseAnswer(Model):
     study_case_question = ForeignKey(StudyCaseQuestion, on_delete=CASCADE)
