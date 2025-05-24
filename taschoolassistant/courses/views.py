@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from django.db import transaction
 from django.utils import timezone
+from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 from .models import (
     Course,
@@ -19,7 +20,7 @@ from .serializers import (
     CreateCourseInviteTokenSerializerIn,
     CourseInviteTokenSerializer,
     CourseParticipantSerializer,
-    LeaderboardSerializer,
+    LeaderboardSerializer, CourseSessionFeatureSerializer,
 )
 from rest_framework import status
 
@@ -27,6 +28,11 @@ from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.exceptions import NotFound, ValidationError, PermissionDenied
+
+from ..chain_notes.models import ChainNote
+from ..quiz.models import Quiz
+from ..resources.models import Resource
+from ..studycases.models import StudyCase
 
 
 @course_schema
@@ -220,6 +226,51 @@ class CourseSessionViewById(APIView):
             message="Course session successfully deleted",
             status_code=status.HTTP_204_NO_CONTENT
         )
+
+
+class CourseSessionFeatureViewById(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, course_id, session_id):
+
+        course_session = get_object_or_404(CourseSession, pk=session_id)
+
+        # TODO check if user is participant of the course
+
+        try:
+            chan_note = ChainNote.objects.get(course_session=course_session)
+            chain_note_id = chan_note.id
+        except ChainNote.DoesNotExist:
+            chain_note_id = None
+
+        try:
+            study_cases = StudyCase.objects.get(course_session=course_session)
+            study_case_id = study_cases.id
+        except StudyCase.DoesNotExist:
+            study_case_id = None
+
+        try:
+            quiz = Quiz.objects.get(course_session=course_session)
+            quiz_id = quiz.id
+        except Quiz.DoesNotExist:
+            quiz_id = None
+
+        resources = list(Resource.objects.filter(course_session=course_session))
+        if len(resources) != 0:
+            resource_ids = True
+        else:
+            resource_ids = False
+
+        out_serializer = CourseSessionFeatureSerializer(
+            {
+                "chain_note_id": chain_note_id,
+                "study_case_id": study_case_id,
+                "quiz_id": quiz_id,
+                "resource_ids": resource_ids
+            }
+        )
+
+        return ApiResponse.success(out_serializer.data, message="Course session features successfully retrieved")
 
 
 class LeaderboardView(APIView):

@@ -14,7 +14,7 @@ class QuizStatus(TextChoices):
 
 
 class Quiz(models.Model):
-    course_session = models.ForeignKey(CourseSession, on_delete=models.CASCADE, related_name='quizzes')
+    course_session = models.OneToOneField(CourseSession, on_delete=models.CASCADE, related_name='quizzes')
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     total_points = models.FloatField(default=100)

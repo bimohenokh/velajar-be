@@ -1,5 +1,19 @@
-from django.db.models import Model, CharField, ImageField, CASCADE, ForeignKey, BooleanField, FileField, TextField, FloatField, DateField, DurationField, DateTimeField, \
-    TextChoices
+from django.db.models import (
+    Model,
+    CharField,
+    ImageField,
+    CASCADE,
+    ForeignKey,
+    BooleanField,
+    FileField,
+    TextField,
+    FloatField,
+    DateField,
+    DurationField,
+    DateTimeField,
+    TextChoices,
+    OneToOneField,
+)
 from taschoolassistant.courses.models import CourseSession, CourseParticipant
 from taschoolassistant.studycases.managers import StudyCaseManager, StudyCaseAnswerManager, StudyCaseQuestionManager
 
@@ -14,7 +28,7 @@ class StudyCase(Model):
     description = TextField(null=True, blank=True)
     image_study_case = ImageField(
         upload_to='study-case-image/', null=True, blank=True)
-    course_session = ForeignKey(CourseSession, on_delete=CASCADE)
+    course_session = OneToOneField(CourseSession, on_delete=CASCADE)
     total_point = FloatField(default=100)
     started_at = DateTimeField(blank=True, null=True)
     time_range= DurationField(blank=True, null=True)
