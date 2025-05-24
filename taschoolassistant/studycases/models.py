@@ -14,6 +14,8 @@ from django.db.models import (
     TextChoices,
     OneToOneField,
 )
+from django.utils import timezone
+
 from taschoolassistant.courses.models import CourseSession, CourseParticipant
 from taschoolassistant.studycases.managers import StudyCaseManager, StudyCaseAnswerManager, StudyCaseQuestionManager, \
     StudyCaseAttemptManager
@@ -65,6 +67,7 @@ class StudyCaseAttempt(Model):
 
 class StudyCaseAnswer(Model):
     study_case_question = ForeignKey(StudyCaseQuestion, on_delete=CASCADE)
+    study_case_attempt = ForeignKey(StudyCaseAttempt, on_delete=CASCADE, related_name="answers")
     answer = TextField(blank=True, null=True)
     point = FloatField(blank=True, null=True)
 
