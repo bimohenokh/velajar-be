@@ -1,4 +1,3 @@
-from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
@@ -16,8 +15,8 @@ def custom_exception_handler(exc, context):
     # ✅ Customize only non-500 errors
     return Response(
         StandardErrorOutSerializer({
-            "status": exc.status_code,
-            "errors": exc.get_full_details(),
+            "status": response.status_code,
+            "errors": response.data,
         }).data,
-        status=exc.status_code
+        status=response.status_code
     )

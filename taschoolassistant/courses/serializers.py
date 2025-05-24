@@ -1,5 +1,5 @@
 from django.db import transaction
-from rest_framework.fields import ChoiceField
+from rest_framework.fields import ChoiceField, IntegerField, BooleanField
 from rest_framework.serializers import Serializer, ModelSerializer
 from typing_extensions import override
 
@@ -36,6 +36,14 @@ class CourseSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseSession
         fields = "__all__"
+
+
+class CourseSessionFeatureSerializer(Serializer):
+    chain_note_id = IntegerField(required=True)
+    study_case_id = IntegerField(required=True)
+    quiz_id = IntegerField(required=True)
+    resource_ids = BooleanField(required=True)
+
 
 class LeaderboardSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
