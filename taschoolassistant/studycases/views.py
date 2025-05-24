@@ -4,10 +4,13 @@ from django_q.tasks import schedule
 from rest_framework.generics import get_object_or_404
 
 from rest_framework.views import APIView
-from .models import StudyCase, StudyCaseAnswer, StudyCaseStatus
-from .serializers import StudyCaseWithQuestionsSerializer, StudyCaseAnswerReadSerializers, \
-    StudyCaseAnswerWriteSerializer, \
-    StudyCaseParamSerializer, StudyCaseSerializer
+from .models import StudyCase, StudyCaseAnswer, StudyCaseStatus, StudyCaseAttempt
+from .serializers import (
+    StudyCaseWithQuestionsSerializer,
+    StudyCaseParamSerializer,
+    StudyCaseSerializer,
+    StudyCaseAttemptSerializer,
+)
 from rest_framework import status
 from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
@@ -121,189 +124,213 @@ class StudyCaseViewById(APIView):
 
 
 # FIXME
-class StudyCaseAnswerReadStudentSubmittedView(APIView):
-    permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.studycase_answer_serializer = UserSerializer  # FIXME kenapa jadi user serializer
-
-    def get(self, request, session_id, case_id):
-
-        is_evaluated = request.GET.get('is_evaluated')
-        search = request.GET.get('search')
-        print(is_evaluated)
-        
-        answered_students = User.objects.filter(
-            studycaseanswer__study_case_question__study_case_id=case_id,
-            studycaseanswer__is_submitted=True,
-            studycaseanswer__study_case_question__study_case__course_session_id=session_id
-        ).distinct()
-
-        if is_evaluated:
-            answered_students = answered_students.filter(studycaseanswer__is_evaluated=True) if is_evaluated == "Sudah Dievaluasi" else answered_students.filter(studycaseanswer__is_evaluated=False)
-
-        if search:
-            answered_students = answered_students.filter(nama_lengkap__icontains=search)
-
-        if not answered_students.exists():
-            raise NotFound("Student has't submitted yet")
-
-    
-        serializer = self.studycase_answer_serializer(answered_students, many=True)
-
-        return ApiResponse.success(
-            data=serializer.data,
-            message="Study Case Answers Submitted successfully retrieved"
-        )
-
-
-class StudyCaseAnswerReadView(APIView):
-    permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.studycase_answer_serializer = StudyCaseAnswerReadSerializers
-
-    def get(self, request, session_id, case_id, student_id):
-        user = request.user
-
-        try:
-            student = User.objects.get(id=student_id)
-        except User.DoesNotExist:
-            raise NotFound("Student not found")
-        
-
-        try:
-            answers_qs = StudyCaseAnswer.objects.get_studycase_answer(
-                requester=user,
-                session_id=session_id,
-                case_id=case_id,
-                target_student=student
-            )
-        except Exception as e:
-            traceback.print_exc()
-            raise APIException(f"Error in manager: {str(e)}")  # FIXME tambahin status
-
-        if not answers_qs.exists():
-            raise NotFound("Study case answer not found")
-
-        serializer = StudyCaseAnswerReadSerializers(answers_qs, many=True)
-
-        return ApiResponse.success(
-            data=serializer.data,
-            message="Study Case Answers successfully retrieved"
-        )
+# class StudyCaseAnswerReadStudentSubmittedView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     parser_classes = [MultiPartParser, FormParser, JSONParser]
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(**kwargs)
+#         self.studycase_answer_serializer = UserSerializer  # FIXME kenapa jadi user serializer
+#
+#     def get(self, request, session_id, case_id):
+#
+#         is_evaluated = request.GET.get('is_evaluated')
+#         search = request.GET.get('search')
+#         print(is_evaluated)
+#
+#         answered_students = User.objects.filter(
+#             studycaseanswer__study_case_question__study_case_id=case_id,
+#             studycaseanswer__is_submitted=True,
+#             studycaseanswer__study_case_question__study_case__course_session_id=session_id
+#         ).distinct()
+#
+#         if is_evaluated:
+#             answered_students = answered_students.filter(studycaseanswer__is_evaluated=True) if is_evaluated == "Sudah Dievaluasi" else answered_students.filter(studycaseanswer__is_evaluated=False)
+#
+#         if search:
+#             answered_students = answered_students.filter(nama_lengkap__icontains=search)
+#
+#         if not answered_students.exists():
+#             raise NotFound("Student has't submitted yet")
+#
+#
+#         serializer = self.studycase_answer_serializer(answered_students, many=True)
+#
+#         return ApiResponse.success(
+#             data=serializer.data,
+#             message="Study Case Answers Submitted successfully retrieved"
+#         )
 
 
-class StudyCaseAnswerWriteView(APIView):
-    permission_classes = [IsAuthenticated, IsStudent]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.studycase_answer_serializer = StudyCaseAnswerWriteSerializer
-
-    def post(self, request):
-        user = request.user
-        incoming_data = request.data
-
-        if isinstance(incoming_data, list):
-            for item in incoming_data:
-                # Check if this answer already exists and is submitted
-                exists = StudyCaseAnswer.objects.filter(
-                    student=user,
-                    is_submitted=True
-                ).exists()
-                if exists:
-                    raise PermissionDenied("You have already submitted an answer for one or more questions.")
-
-                item['student'] = user.id
-                item['is_submitted'] = True
-                item['is_evaluated'] = False
-        else:
-            # Check for single input
-            if StudyCaseAnswer.objects.filter(
-                student=user,
-                is_submitted=True
-            ).exists():
-                raise PermissionDenied("You have already submitted an answer for this question.")
-
-            incoming_data['student'] = user.id
-            incoming_data['is_submitted'] = True
-            incoming_data['is_evaluated'] = False
-
-        many = isinstance(incoming_data, list)
-        serializer = self.studycase_answer_serializer(data=incoming_data, many=many)
-
-        if serializer.is_valid():
-            serializer.save()
-            return ApiResponse.success(
-                data=serializer.data,
-                message="Study Case answer(s) successfully created",
-                status_code=status.HTTP_201_CREATED
-            )
-        else:
-            raise ValidationError(serializer.errors)
 
 
-class StudyCaseAnswerPatchView(APIView):
-    permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.studycase_answer_serializer = StudyCaseAnswerReadSerializers
 
 
-    # per question
-    def patch(self, request, session_id, student_id, question_id):
-        data = request.data.copy()  
 
-        try:
-            student = User.objects.get(id=student_id)
-        except User.DoesNotExist:
-            raise NotFound("Student not found")
-        print(student)
 
-        try:
-            study_case = StudyCaseAnswer.objects.get(student=student, study_case_question=question_id)
-        except StudyCaseAnswer.DoesNotExist:
-            raise NotFound("Study Case not found.")
- 
-        data['is_evaluated'] = True 
-        serializer = StudyCaseAnswerWriteSerializer(study_case, data=data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        try:
-            session = CourseSession.objects.get(id=session_id)
-        except CourseSession.DoesNotExist:
-            raise NotFound("Course session not found.")
-        
-        course = session.course
-        print(course)
-        print(student)
-       
-        try:
-            participant_point = ParticipantPoint.objects.get(
-                course_participant__participant=student, 
-                course_participant__course=course
-            )
-        except ParticipantPoint.DoesNotExist:
-            raise NotFound("Participant point not found")
-        
-        
-        participant_point.point_achieved += float(data['point'])
-        participant_point.save()
-    
-        return ApiResponse.success(
-            data=serializer.data,
-            message="Evaluation successfully updated",
-            status_code=status.HTTP_200_OK
-        )
+# class StudyCaseAnswerView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     parser_classes = [MultiPartParser, FormParser, JSONParser]
+#
+#     def get(self, request, case_id):
+#         study_case = get_object_or_404(StudyCase, id=case_id)
+#
+#         # TODO Check if user is course participant of the course
+#
+#
+#
+#
+#         return ApiResponse.success(
+#             data=serializer.data,
+#             message="Study Case Answers successfully retrieved"
+#         )
+#
+#
+# class StudyCaseAnswerReadView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     parser_classes = [MultiPartParser, FormParser, JSONParser]
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(**kwargs)
+#         self.studycase_answer_serializer = StudyCaseAnswerReadSerializers
+#
+#     def get(self, request, session_id, case_id, student_id):
+#         user = request.user
+#
+#         try:
+#             student = User.objects.get(id=student_id)
+#         except User.DoesNotExist:
+#             raise NotFound("Student not found")
+#
+#
+#         try:
+#             answers_qs = StudyCaseAnswer.objects.get_studycase_answer(
+#                 requester=user,
+#                 session_id=session_id,
+#                 case_id=case_id,
+#                 target_student=student
+#             )
+#         except Exception as e:
+#             traceback.print_exc()
+#             raise APIException(f"Error in manager: {str(e)}")  # FIXME tambahin status
+#
+#         if not answers_qs.exists():
+#             raise NotFound("Study case answer not found")
+#
+#         serializer = StudyCaseAnswerReadSerializers(answers_qs, many=True)
+#
+#         return ApiResponse.success(
+#             data=serializer.data,
+#             message="Study Case Answers successfully retrieved"
+#         )
+#
+#
+# class StudyCaseAnswerWriteView(APIView):
+#     permission_classes = [IsAuthenticated, IsStudent]
+#     parser_classes = [MultiPartParser, FormParser, JSONParser]
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(**kwargs)
+#         self.studycase_answer_serializer = StudyCaseAnswerWriteSerializer
+#
+#     def post(self, request):
+#         user = request.user
+#         incoming_data = request.data
+#
+#         if isinstance(incoming_data, list):
+#             for item in incoming_data:
+#                 # Check if this answer already exists and is submitted
+#                 exists = StudyCaseAnswer.objects.filter(
+#                     student=user,
+#                     is_submitted=True
+#                 ).exists()
+#                 if exists:
+#                     raise PermissionDenied("You have already submitted an answer for one or more questions.")
+#
+#                 item['student'] = user.id
+#                 item['is_submitted'] = True
+#                 item['is_evaluated'] = False
+#         else:
+#             # Check for single input
+#             if StudyCaseAnswer.objects.filter(
+#                 student=user,
+#                 is_submitted=True
+#             ).exists():
+#                 raise PermissionDenied("You have already submitted an answer for this question.")
+#
+#             incoming_data['student'] = user.id
+#             incoming_data['is_submitted'] = True
+#             incoming_data['is_evaluated'] = False
+#
+#         many = isinstance(incoming_data, list)
+#         serializer = self.studycase_answer_serializer(data=incoming_data, many=many)
+#
+#         if serializer.is_valid():
+#             serializer.save()
+#             return ApiResponse.success(
+#                 data=serializer.data,
+#                 message="Study Case answer(s) successfully created",
+#                 status_code=status.HTTP_201_CREATED
+#             )
+#         else:
+#             raise ValidationError(serializer.errors)
+#
+#
+# class StudyCaseAnswerPatchView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     parser_classes = [MultiPartParser, FormParser, JSONParser]
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(**kwargs)
+#         self.studycase_answer_serializer = StudyCaseAnswerReadSerializers
+#
+#
+#     # per question
+#     def patch(self, request, session_id, student_id, question_id):
+#         data = request.data.copy()
+#
+#         try:
+#             student = User.objects.get(id=student_id)
+#         except User.DoesNotExist:
+#             raise NotFound("Student not found")
+#         print(student)
+#
+#         try:
+#             study_case = StudyCaseAnswer.objects.get(student=student, study_case_question=question_id)
+#         except StudyCaseAnswer.DoesNotExist:
+#             raise NotFound("Study Case not found.")
+#
+#         data['is_evaluated'] = True
+#         serializer = StudyCaseAnswerWriteSerializer(study_case, data=data, partial=True)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#
+#         try:
+#             session = CourseSession.objects.get(id=session_id)
+#         except CourseSession.DoesNotExist:
+#             raise NotFound("Course session not found.")
+#
+#         course = session.course
+#         print(course)
+#         print(student)
+#
+#         try:
+#             participant_point = ParticipantPoint.objects.get(
+#                 course_participant__participant=student,
+#                 course_participant__course=course
+#             )
+#         except ParticipantPoint.DoesNotExist:
+#             raise NotFound("Participant point not found")
+#
+#
+#         participant_point.point_achieved += float(data['point'])
+#         participant_point.save()
+#
+#         return ApiResponse.success(
+#             data=serializer.data,
+#             message="Evaluation successfully updated",
+#             status_code=status.HTTP_200_OK
+#         )
 
 
 class StartStudyCaseView(APIView):
@@ -370,3 +397,23 @@ class StopStudyCaseView(APIView):
             status_code=status.HTTP_200_OK
         )
 
+
+class StudyCaseAttemptView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get(self, request, case_id):
+        study_case = get_object_or_404(StudyCase, id=case_id)
+
+        # TODO Check if user is course participant of the course
+
+        study_case_attempts = StudyCaseAttempt.objects.filter(
+            study_case="study_case",
+        )
+
+        out_serializer = StudyCaseAttemptSerializer(study_case_attempts, many=True)
+
+        return ApiResponse.success(
+            data=out_serializer.data,
+            message="Study Case successfully retrieved"
+        )

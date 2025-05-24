@@ -31,6 +31,12 @@ class StudyCaseManager(Manager):
 class StudyCaseQuestionManager(Manager):
    pass
 
+
+class StudyCaseAttemptManager(Manager):
+   def get_queryset(self):
+        return super().get_queryset()
+
+
 class StudyCaseAnswerManager(Manager):
 
    def get_studycase_answer(self, requester, session_id, case_id, target_student):

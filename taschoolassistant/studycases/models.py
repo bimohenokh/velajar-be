@@ -15,7 +15,8 @@ from django.db.models import (
     OneToOneField,
 )
 from taschoolassistant.courses.models import CourseSession, CourseParticipant
-from taschoolassistant.studycases.managers import StudyCaseManager, StudyCaseAnswerManager, StudyCaseQuestionManager
+from taschoolassistant.studycases.managers import StudyCaseManager, StudyCaseAnswerManager, StudyCaseQuestionManager, \
+    StudyCaseAttemptManager
 
 
 class StudyCaseStatus(TextChoices):
@@ -48,16 +49,29 @@ class StudyCaseQuestion(Model):
     objects = StudyCaseQuestionManager()
 
 
+class StudyCaseAttempt(Model):
+    study_case = ForeignKey(StudyCase, on_delete=CASCADE)
+    student = ForeignKey(CourseParticipant, on_delete=CASCADE)
+    submitted_at = DateTimeField(blank=True, null=True)
+
+    objects = StudyCaseAttemptManager()
+
+    @property
+    def is_submitted(self):
+        if self.submitted_at:
+            return True
+        return False
+
+
 class StudyCaseAnswer(Model):
-    # TODO ubah view
-    student = ForeignKey(
-        CourseParticipant, on_delete=CASCADE)
     study_case_question = ForeignKey(StudyCaseQuestion, on_delete=CASCADE)
     answer = TextField(blank=True, null=True)
-    started_at = DateTimeField(blank=True, null=True)
-    submitted_at = DateTimeField(blank=True, null=True)
-    point = FloatField(default=0)
-    is_submitted = BooleanField(default=False)
-    is_evaluated = BooleanField(default=False)
+    point = FloatField(blank=True, null=True)
 
     objects = StudyCaseAnswerManager()
+
+    @property
+    def is_evaluated(self):
+        if self.point or self.point == 0:
+            return True
+        return False

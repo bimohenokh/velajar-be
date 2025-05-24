@@ -2,8 +2,11 @@ from django.db import transaction
 from rest_framework.fields import IntegerField
 from rest_framework.serializers import Serializer, ModelSerializer
 
-from .models import StudyCase, StudyCaseQuestion, StudyCaseAnswer
+from .models import StudyCase, StudyCaseQuestion, StudyCaseAnswer, StudyCaseAttempt
 from rest_framework import serializers
+
+from ..courses.serializers import CourseParticipantSerializer
+
 
 class StudyCaseParamSerializer(Serializer):
     course_session_id = IntegerField(required=True)
@@ -63,32 +66,40 @@ class StudyCaseWithQuestionsSerializer(ModelSerializer):
 
         return instance
 
+#
+# # Serializers for read studycase, question, and answer
+# class StudyCaseSerializerForAnswer(ModelSerializer):
+#     class Meta:
+#         model = StudyCase
+#         fields = ['id', 'title', 'description', 'image_study_case', 'course_session', 'total_point', 'started_at', 'time_range', 'status']
+#
+#
+# class StudyCaseQuestionSerializerForAnswer(ModelSerializer):
+#     study_case = StudyCaseSerializerForAnswer()
+#
+#     class Meta:
+#         model = StudyCaseQuestion
+#         fields = ['id', 'question', 'study_case']
+#
+#
+# class StudyCaseAnswerReadSerializers(ModelSerializer):
+#     study_case_question = StudyCaseQuestionSerializerForAnswer()
+#
+#     class Meta:
+#         model = StudyCaseAnswer
+#         fields = '__all__'
+#
+#
+# #Serializers for post answer
+# class StudyCaseAnswerWriteSerializer(ModelSerializer):
+#     class Meta:
+#         model = StudyCaseAnswer
+#         fields = '__all__'
 
-# Serializers for read studycase, question, and answer 
-class StudyCaseSerializerForAnswer(ModelSerializer):
+
+class StudyCaseAttemptSerializer(ModelSerializer):
+    participant_user = CourseParticipantSerializer(read_only=True, source="student.participant")
+
     class Meta:
-        model = StudyCase
-        fields = ['id', 'title', 'description', 'image_study_case', 'course_session', 'total_point', 'started_at', 'time_range', 'status']
-
-
-class StudyCaseQuestionSerializerForAnswer(ModelSerializer):
-    study_case = StudyCaseSerializerForAnswer()
-
-    class Meta:
-        model = StudyCaseQuestion
-        fields = ['id', 'question', 'study_case']
-
-
-class StudyCaseAnswerReadSerializers(ModelSerializer):
-    study_case_question = StudyCaseQuestionSerializerForAnswer()
-
-    class Meta:
-        model = StudyCaseAnswer
-        fields = '__all__'
-
-
-#Serializers for post answer
-class StudyCaseAnswerWriteSerializer(ModelSerializer):
-    class Meta:
-        model = StudyCaseAnswer
+        model = StudyCaseAttempt
         fields = '__all__'
