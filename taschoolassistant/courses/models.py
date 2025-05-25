@@ -64,7 +64,7 @@ class CourseParticipant(Model):
 
 
 class ParticipantPoint(Model):
-    course_participant = ForeignKey(CourseParticipant, on_delete=CASCADE)
+    course_participant = OneToOneField(CourseParticipant, on_delete=CASCADE)
     point_achieved = FloatField(default=0)
 
     objects = ParticipantPointManager()

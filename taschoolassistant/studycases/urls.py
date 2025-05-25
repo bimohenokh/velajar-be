@@ -18,7 +18,7 @@ urlpatterns = [
     path("<int:case_id>/stop", StopStudyCaseView.as_view(), name="stop-study-case"),
     path("<int:case_id>/attempts/", StudyCaseAttemptView.as_view(), name="study-case-attempts"),
     path("attempts/<int:attempt_id>/", StartStudyCaseView.as_view(), name="study-case-attempt-id"),
-    path("attempts/answers/evaluate/", EvaluateStudyCaseAnswerView.as_view(), name="evaluate-study-case-attempt"),
+    path("attempts/<int:attempt_id>/answers/evaluate/", EvaluateStudyCaseAnswerView.as_view(), name="evaluate-study-case-attempt"),
 
     
     # path("session/<int:session_id>/<int:case_id>/answer/<int:student_id>/", StudyCaseAnswerReadView.as_view(), name="study-case-answer"),

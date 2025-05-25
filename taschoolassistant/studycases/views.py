@@ -1,4 +1,6 @@
 import traceback
+
+from django.db import transaction
 from django.utils import timezone
 from django_q.tasks import schedule
 from rest_framework.generics import get_object_or_404
@@ -466,7 +468,7 @@ class StudyCaseAttemptByIdView(APIView):
         return ApiResponse.success(
             data=serializer.data,
             message="Study Case Attempt successfully retrieved",
-            status_code=status.HTTP_200_OK
+            status_code=status.HTTP_200_OK,
         )
 
     def put(self, request, attempt_id):
@@ -492,18 +494,49 @@ class EvaluateStudyCaseAnswerView(APIView):
     permission_classes = [IsAuthenticated, IsTeacher]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-    def put(self, request):
+    def put(self, request, attempt_id):
 
-        # TODO Check if user can evaluate study case answers cause no course id
+        study_case_attempt: StudyCaseAttempt = get_object_or_404(
+            StudyCaseAttempt.objects.select_related("study_case", "student__participantpoint"), id=attempt_id
+        )
+
+        study_case = study_case_attempt.study_case
+        if study_case.status != StudyCaseStatus.FINISHED:
+            raise ValidationError("Study Case hasn't finished.")
+
+        if study_case_attempt.is_evaluated:
+            raise ValidationError("Study Case Attempt has already been evaluated.")
+
+        # TODO Check if user is course instructor of the course
+
+        request_data = request.data
+        answer_ids = [item.get("id") for item in request_data if "id" in item]
+
+        # Fetch instances and ensure they exist
+        answers = list(StudyCaseAnswer.objects.filter(id__in=answer_ids))
+
+        if len(answers) != len(answer_ids):
+            raise ValidationError("One or more answers do not exist.", code="some_answers_not_found")
 
         serializer = EvaluateStudyCaseAnswerSerializer(
             data=request.data,
-            many=True
+            many=True,
+            context={'attempt': study_case_attempt}
         )
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        with transaction.atomic():
+            serializer.save()
 
-        # TODO penambahan point ke student
+            # study_case_attempt is evaluated
+            study_case_attempt.is_evaluated = True
+            study_case_attempt.save()
+
+            # penambahan point ke student
+            course_student_point = study_case_attempt.student.participantpoint
+            for answer in answers:
+                point_added = answer.point
+                course_student_point += point_added
+            course_student_point.save()
 
         return ApiResponse.success(
             data=serializer.data,

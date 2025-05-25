@@ -164,6 +164,9 @@ class EvaluateStudyCaseAnswerSerializer(ModelSerializer):
         model = StudyCaseAnswer
         fields = ['id', 'point']
         read_only_fields = ['id']
+        extra_kwargs = {
+            'point': {'required': True, 'allow_null': False}
+        }
 
     def validate_point(self, value):
         if value is None:
@@ -171,3 +174,17 @@ class EvaluateStudyCaseAnswerSerializer(ModelSerializer):
         if value < 0:
             raise ValidationError("Point cannot be negative.")
         return value
+
+    def validate(self, data):
+        if self.instance:
+            attempt = self.context.get("attempt")
+
+            if self.instance.study_case_attempt_id != attempt.id:
+                raise ValidationError(
+                    "This answer does not belong to the given attempt."
+                )
+
+            return super().validate(data)
+
+    def create(self, validated_data):
+        raise ValidationError("This serializer is for updating existing answers only.")

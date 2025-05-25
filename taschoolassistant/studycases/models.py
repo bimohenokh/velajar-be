@@ -55,6 +55,7 @@ class StudyCaseAttempt(Model):
     study_case = ForeignKey(StudyCase, on_delete=CASCADE)
     student = ForeignKey(CourseParticipant, on_delete=CASCADE)
     submitted_at = DateTimeField(blank=True, null=True)
+    is_evaluated = BooleanField(default=False)
 
     objects = StudyCaseAttemptManager()
 
