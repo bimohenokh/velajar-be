@@ -1,6 +1,6 @@
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
-from rest_framework.fields import IntegerField
+from rest_framework.fields import IntegerField, CharField
 from rest_framework.serializers import Serializer, ModelSerializer
 
 from .models import StudyCase, StudyCaseQuestion, StudyCaseAnswer, StudyCaseAttempt
@@ -29,6 +29,7 @@ class NestedStudyCaseQuestionSerializer(ModelSerializer):
 
 class StudyCaseWithQuestionsSerializer(ModelSerializer):
     questions = NestedStudyCaseQuestionSerializer(many=True)
+    status = CharField(read_only=True)
     class Meta:
         model = StudyCase
         fields = '__all__'
@@ -70,7 +71,7 @@ class StudyCaseWithQuestionsSerializer(ModelSerializer):
 # class StudyCaseSerializerForAnswer(ModelSerializer):
 #     class Meta:
 #         model = StudyCase
-#         fields = ['id', 'title', 'description', 'image_study_case', 'course_session', 'total_point', 'started_at', 'time_range', 'status']
+#         fields = ['id', 'title', 'description', 'image_study_case', 'course_session', 'max_point_per_question', 'started_at', 'time_range', 'status']
 #
 #
 # class StudyCaseQuestionSerializerForAnswer(ModelSerializer):
@@ -170,9 +171,14 @@ class EvaluateStudyCaseAnswerSerializer(ModelSerializer):
 
     def validate_point(self, value):
         if value is None:
-            return value
+            raise ValidationError("Point cannot be null.")
         if value < 0:
             raise ValidationError("Point cannot be negative.")
+        attempt = self.context["attempt"]
+        if value > attempt.study_case.max_point_per_question:
+            raise ValidationError(
+                f"Point cannot be greater than the total point of the study case ({attempt.study_case.max_point_per_question})."
+            )
         return value
 
     def validate(self, data):

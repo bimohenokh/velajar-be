@@ -29,7 +29,7 @@ class StudyCase(Model):
     image_study_case = ImageField(
         upload_to='study-case-image/', null=True, blank=True)
     course_session = OneToOneField(CourseSession, on_delete=CASCADE)
-    total_point = FloatField(default=100)
+    max_point_per_question = FloatField(default=100)
     started_at = DateTimeField(blank=True, null=True)
     time_range= DurationField()
     status = CharField(
