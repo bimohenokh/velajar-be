@@ -4,7 +4,7 @@ from rest_framework.fields import IntegerField, CharField
 from rest_framework.serializers import Serializer, ModelSerializer
 
 from .models import StudyCase, StudyCaseQuestion, StudyCaseAnswer, StudyCaseAttempt
-from ..courses.serializers import CourseParticipantSerializer
+from ..users.serializers import UserSerializer
 
 
 class StudyCaseParamSerializer(Serializer):
@@ -98,7 +98,7 @@ class StudyCaseWithQuestionsSerializer(ModelSerializer):
 
 
 class StudyCaseAttemptSerializer(ModelSerializer):
-    participant_user = CourseParticipantSerializer(read_only=True, source="student.participant")
+    participant_user = UserSerializer(read_only=True, source="student.participant")
 
     class Meta:
         model = StudyCaseAttempt
@@ -111,11 +111,12 @@ class NestedStudyCaseAnswerSerializer(ModelSerializer):
     """
     class Meta:
         model = StudyCaseAnswer
-        exclude = ["study_case_attempt", "point"]
+        exclude = ["study_case_attempt"]
+        read_only_fields = 'point'
 
 
 class StudyCaseAttemptWithAnswersSerializer(ModelSerializer):
-    participant_user = CourseParticipantSerializer(read_only=True, source="student.participant")
+    participant_user = UserSerializer(read_only=True, source="student.participant")
     answers = NestedStudyCaseAnswerSerializer(many=True)
 
     class Meta:

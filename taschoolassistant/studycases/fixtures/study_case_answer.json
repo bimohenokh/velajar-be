@@ -1,0 +1,42 @@
+[
+  {
+    "model": "studycases.studycaseanswer",
+    "pk": 1,
+    "fields": {
+      "study_case_question": 1,
+      "study_case_attempt": 1,
+      "answer": "Photosynthesis converts solar energy into chemical energy.",
+      "point": 4.5
+    }
+  },
+  {
+    "model": "studycases.studycaseanswer",
+    "pk": 2,
+    "fields": {
+      "study_case_question": 2,
+      "study_case_attempt": 1,
+      "answer": "Chlorophyll is responsible for the green color of plants.",
+      "point": 5.0
+    }
+  },
+  {
+    "model": "studycases.studycaseanswer",
+    "pk": 3,
+    "fields": {
+      "study_case_question": 1,
+      "study_case_attempt": 2,
+      "answer": "Gk tau ah mau beli truk",
+      "point": null
+    }
+  },
+  {
+    "model": "studycases.studycaseanswer",
+    "pk": 4,
+    "fields": {
+      "study_case_question": 2,
+      "study_case_attempt": 2,
+      "answer": null,
+      "point": null
+    }
+  }
+]

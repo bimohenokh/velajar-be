@@ -1,5 +1,3 @@
-import traceback
-
 from django.db import transaction
 from django.utils import timezone
 from django_q.tasks import schedule
@@ -411,9 +409,9 @@ class StudyCaseAttemptView(APIView):
 
         # TODO Check if user is course participant of the course
 
-        study_case_attempts = StudyCaseAttempt.objects.filter(
-            study_case="study_case",
-        )
+        study_case_attempts = list(StudyCaseAttempt.objects.filter(
+            study_case=study_case,
+        ).select_related("student__participant"))
 
         out_serializer = StudyCaseAttemptSerializer(study_case_attempts, many=True)
 
