@@ -5,16 +5,13 @@ from django.db.models import (
     CASCADE,
     ForeignKey,
     BooleanField,
-    FileField,
     TextField,
     FloatField,
-    DateField,
     DurationField,
     DateTimeField,
     TextChoices,
     OneToOneField,
 )
-from django.utils import timezone
 
 from taschoolassistant.courses.models import CourseSession, CourseParticipant
 from taschoolassistant.studycases.managers import StudyCaseManager, StudyCaseAnswerManager, StudyCaseQuestionManager, \
@@ -34,7 +31,7 @@ class StudyCase(Model):
     course_session = OneToOneField(CourseSession, on_delete=CASCADE)
     total_point = FloatField(default=100)
     started_at = DateTimeField(blank=True, null=True)
-    time_range= DurationField(blank=True, null=True)
+    time_range= DurationField()
     status = CharField(
         max_length=50,
         choices=StudyCaseStatus,
