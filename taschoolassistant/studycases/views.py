@@ -440,7 +440,10 @@ class StudyCaseAttemptView(APIView):
 
         serializer = StudyCaseAttemptWithAnswersSerializer(
             data=request.data,
-            context={'study_case': study_case}
+            context={
+                'study_case': study_case,
+                'student': course_student,
+            }
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -469,6 +472,7 @@ class StudyCaseAttemptByIdView(APIView):
             status_code=status.HTTP_200_OK,
         )
 
+    # FIXME buat apa ada update kan gk boleh di ubah
     def put(self, request, attempt_id):
         study_case_attempt = get_object_or_404(StudyCaseAttempt, id=attempt_id)
 

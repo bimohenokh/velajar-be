@@ -1,6 +1,7 @@
 from django.db import transaction
+from django.utils import timezone
 from rest_framework.exceptions import ValidationError
-from rest_framework.fields import IntegerField, CharField
+from rest_framework.fields import IntegerField, CharField, SerializerMethodField
 from rest_framework.serializers import Serializer, ModelSerializer
 
 from .models import StudyCase, StudyCaseQuestion, StudyCaseAnswer, StudyCaseAttempt
@@ -99,10 +100,14 @@ class StudyCaseWithQuestionsSerializer(ModelSerializer):
 
 class StudyCaseAttemptSerializer(ModelSerializer):
     participant_user = UserSerializer(read_only=True, source="student.participant")
+    total_point = SerializerMethodField()
 
     class Meta:
         model = StudyCaseAttempt
         fields = '__all__'
+
+    def get_total_point(self, obj):
+        return sum(answer.point for answer in obj.answers.all() if answer.point is not None)
 
 
 class NestedStudyCaseAnswerSerializer(ModelSerializer):
@@ -112,26 +117,40 @@ class NestedStudyCaseAnswerSerializer(ModelSerializer):
     class Meta:
         model = StudyCaseAnswer
         exclude = ["study_case_attempt"]
-        read_only_fields = 'point'
+        read_only_fields = ('point',)
 
 
 class StudyCaseAttemptWithAnswersSerializer(ModelSerializer):
     participant_user = UserSerializer(read_only=True, source="student.participant")
     answers = NestedStudyCaseAnswerSerializer(many=True)
+    total_point = SerializerMethodField()
 
     class Meta:
         model = StudyCaseAttempt
         fields = '__all__'
-        read_only_fields = ('id', 'study_case', 'student', 'submitted_at')
+        read_only_fields = ('submitted_at', 'is_evaluated')
+
+    def get_total_point(self, obj):
+        return sum(answer.point for answer in obj.answers.all() if answer.point is not None)
 
     @transaction.atomic
     def create(self, validated_data):
-        study_case = self.context.get('study_case')
+        study_case = self.context.get("study_case")
+        student = self.context.get('student')
         answers_data = validated_data.pop('answers', [])
-        study_case_attempt = StudyCaseAttempt.objects.create(study_case=study_case, **validated_data)
+        submitted_at =  timezone.now()
+        study_case_attempt = StudyCaseAttempt.objects.create(
+            study_case=study_case,
+            student=student,
+            submitted_at=submitted_at,
+            **validated_data
+        )
 
         answer_objs = [
-            StudyCaseAnswer(study_case_attempt=study_case_attempt, **answer) for answer in answers_data
+            StudyCaseAnswer(
+                study_case_attempt=study_case_attempt,
+                **answer
+            ) for answer in answers_data
         ]
         StudyCaseAnswer.objects.bulk_create(answer_objs)
 
