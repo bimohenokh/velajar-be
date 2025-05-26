@@ -1,4 +1,7 @@
+import json
+
 from django.db import transaction
+from django.http import QueryDict
 from django.utils import timezone
 from django_q.tasks import schedule
 from rest_framework.generics import get_object_or_404
@@ -12,6 +15,7 @@ from .serializers import (
     StudyCaseAttemptSerializer,
     StudyCaseAttemptWithAnswersSerializer,
     EvaluateStudyCaseAnswerSerializer,
+    StudyCaseQuestionSerializer,
 )
 from rest_framework import status
 from taschoolassistant.core.utils.response import ApiResponse
@@ -49,7 +53,7 @@ class StudyCaseView(APIView):
         except StudyCase.DoesNotExist:
             raise NotFound("StudyCase not found")
 
-        out_serializer = StudyCaseSerializer(studycase)
+        out_serializer = StudyCaseWithQuestionsSerializer(studycase)
 
         return ApiResponse.success(
             data=out_serializer.data,
@@ -57,14 +61,15 @@ class StudyCaseView(APIView):
         )
 
     def post(self, request):
-        data = request.data
+
         # TODO check if user is course instructor of the course
 
-        serializer = StudyCaseWithQuestionsSerializer(data=data)
+        serializer = StudyCaseWithQuestionsSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
         return ApiResponse.success(
+            # data=out_data,
             data=serializer.data,
             message="Study Case successfully created",
             status_code=status.HTTP_201_CREATED
@@ -91,13 +96,15 @@ class StudyCaseViewById(APIView):
             status_code=status.HTTP_200_OK
         )
 
-    def patch(self, request, case_id):
+    def put(self, request, case_id):
         try:
             study_case = StudyCase.objects.get(id=case_id)
         except StudyCase.DoesNotExist:
             raise NotFound("Study Case not found.")
 
         # TODO check if user is course instructor of the course
+        if study_case.status != StudyCaseStatus.DRAF:
+            raise ValidationError("Study Case is not in draft mode, cannot be updated.")
 
         serializer = StudyCaseWithQuestionsSerializer(study_case, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)

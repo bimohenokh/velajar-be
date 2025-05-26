@@ -1,7 +1,13 @@
 from django.db import transaction
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
-from rest_framework.fields import IntegerField, CharField, SerializerMethodField
+from rest_framework.fields import (
+    IntegerField,
+    CharField,
+    SerializerMethodField,
+    ListField,
+    DictField,
+)
 from rest_framework.serializers import Serializer, ModelSerializer
 
 from .models import StudyCase, StudyCaseQuestion, StudyCaseAnswer, StudyCaseAttempt
@@ -12,13 +18,20 @@ class StudyCaseParamSerializer(Serializer):
     course_session_id = IntegerField(required=True)
 
 
+class StudyCaseQuestionSerializer(ModelSerializer):
+    class Meta:
+        model = StudyCaseQuestion
+        fields = '__all__'
+
+
 class StudyCaseSerializer(ModelSerializer):
     class Meta:
         model = StudyCase
         fields = '__all__'
-        read_only_fields = ('id', 'course_session')
+        read_only_fields = ('status',)
 
-# Serializers for read and post studycase and question 
+
+# Serializers for read and post studycase and question
 class NestedStudyCaseQuestionSerializer(ModelSerializer):
     """
     Serializer for nested StudyCaseQuestion within StudyCaseWithQuestionsSerializer.
@@ -30,10 +43,11 @@ class NestedStudyCaseQuestionSerializer(ModelSerializer):
 
 class StudyCaseWithQuestionsSerializer(ModelSerializer):
     questions = NestedStudyCaseQuestionSerializer(many=True)
-    status = CharField(read_only=True)
+
     class Meta:
         model = StudyCase
         fields = '__all__'
+        read_only_fields = ('status',)
 
     @transaction.atomic
     def create(self, validated_data):
