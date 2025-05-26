@@ -43,7 +43,7 @@ class StudyCase(Model):
 
 class StudyCaseQuestion(Model):
     study_case = ForeignKey(StudyCase, on_delete=CASCADE, related_name="questions")
-    question = CharField(max_length=255, null=True, blank=True)
+    question = CharField(max_length=255)
 
     objects = StudyCaseQuestionManager()
 
