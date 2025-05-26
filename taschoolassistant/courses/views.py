@@ -357,38 +357,42 @@ class SubmitCourseInviteToken(APIView):
 
         # check if user already joined the course
         # if not create course participant
-        if course_invite_token.is_for_student:
-            try:
-                course_participant = CourseParticipant.objects.get(
-                    course_id=course_invite_token.course_id,
-                    participant_id=request.user.id
-                )
-                if course_participant.is_participating:
-                    pass
-                else:
-                    course_participant.is_participating = True
-                    course_participant.save()
-            except CourseParticipant.DoesNotExist:
-                course_participant = CourseParticipant.objects.create(
-                    course_id=course_invite_token.course_id,
-                    participant_id=request.user.id,
-                    is_participating=True
-                )
+        with transaction.atomic():
+            if course_invite_token.is_for_student:
+                try:
+                    course_participant = CourseParticipant.objects.get(
+                        course_id=course_invite_token.course_id,
+                        participant_id=request.user.id
+                    )
+                    if course_participant.is_participating:
+                        pass
+                    else:
+                        course_participant.is_participating = True
+                        course_participant.save()
+                except CourseParticipant.DoesNotExist:
+                    course_participant = CourseParticipant.objects.create(
+                        course_id=course_invite_token.course_id,
+                        participant_id=request.user.id,
+                        is_participating=True
+                    )
+                    participant_point = ParticipantPoint.objects.create(
+                        course_participant=course_participant,
+                        point_achieved=0
+                    )
 
-        elif course_invite_token.is_for_teacher:
-            try:
-                course_participant = CourseParticipant.objects.get(
-                    course_id=course_invite_token.course_id,
-                    participant_id=request.user.id
-                )
-                if course_participant.is_participating:
-                    pass
-                else:
-                    course_participant.is_participating = True
-                    course_participant.save()
+            elif course_invite_token.is_for_teacher:
+                try:
+                    course_participant = CourseParticipant.objects.get(
+                        course_id=course_invite_token.course_id,
+                        participant_id=request.user.id
+                    )
+                    if course_participant.is_participating:
+                        pass
+                    else:
+                        course_participant.is_participating = True
+                        course_participant.save()
 
-            except CourseParticipant.DoesNotExist:
-                with transaction.atomic():
+                except CourseParticipant.DoesNotExist:
                     course_participant = CourseParticipant.objects.create(
                         course_id=course_invite_token.course_id,
                         participant_id=request.user.id,
@@ -399,8 +403,8 @@ class SubmitCourseInviteToken(APIView):
                         is_owner=False
                     )
 
-        else:
-            raise ValidationError("Invalid role")
+            else:
+                raise ValidationError("Invalid role")
 
         out_serializer = CourseParticipantSerializer(course_participant)
 

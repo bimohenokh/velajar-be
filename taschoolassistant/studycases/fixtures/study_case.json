@@ -1,0 +1,30 @@
+[
+  {
+    "model": "studycases.studycase",
+    "pk": 1,
+    "fields": {
+      "title": "Sesi 1 Fisika",
+      "description": "Sebuah mobil bermassa 1000 kg didorong dengan gaya konstan sebesar 2000 N di jalan datar tanpa gesekan.",
+      "image_study_case": "study-case-image/images.jpg",
+      "course_session": 1,
+      "max_point_per_question": 100,
+      "started_at": "2025-04-29T14:30:00Z",
+      "time_range": "00:20:00",
+      "status": "Finished"
+    }
+  },
+  {
+    "model": "studycases.studycase",
+    "pk": 2,
+    "fields": {
+      "title": "Sesi 2 Fisika",
+      "description": "Seorang siswa melepaskan bola dari ketinggian 20 meter tanpa kecepatan awal. Bola tersebut jatuh bebas ke tanah.",
+      "image_study_case": "study-case-image/nginx-svgrepo-com.png",
+      "course_session": 2,
+      "max_point_per_question": 100,
+      "started_at": "2025-04-29T14:30:00Z",
+      "time_range": "00:20:00",
+      "status": "Draft"
+    }
+  }
+]

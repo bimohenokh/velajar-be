@@ -1,0 +1,42 @@
+[
+  {
+    "model": "studycases.studycaseattempt",
+    "pk": 1,
+    "fields": {
+      "study_case": 1,
+      "student": 5,
+      "submitted_at": "2025-04-29T14:40:00Z",
+      "is_evaluated": true
+    }
+  },
+  {
+    "model": "studycases.studycaseattempt",
+    "pk": 2,
+    "fields": {
+      "study_case": 1,
+      "student": 7,
+      "submitted_at": "2025-04-29T14:45:00Z",
+      "is_evaluated": false
+    }
+  },
+    {
+    "model": "studycases.studycaseattempt",
+    "pk": 3,
+    "fields": {
+      "study_case": 2,
+      "student": 5,
+      "submitted_at": "2025-04-29T14:40:00Z",
+      "is_evaluated": false
+    }
+  },
+  {
+    "model": "studycases.studycaseattempt",
+    "pk": 4,
+    "fields": {
+      "study_case": 2,
+      "student": 7,
+      "submitted_at": "2025-04-29T14:45:00Z",
+      "is_evaluated": false
+    }
+  }
+]

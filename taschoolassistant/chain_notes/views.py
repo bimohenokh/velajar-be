@@ -156,6 +156,7 @@ class ChainNoteViewById(APIView):
 
 
 class StartChainNoteView(APIView):
+    # TODO tambahin background task pas Chain Note selesai
     async def post(self, request, pk):
         chain_note: ChainNote = await aget_object_or_404(
             ChainNote.objects.select_related("course_session"), pk=pk

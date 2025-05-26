@@ -1,0 +1,34 @@
+[
+  {
+    "model": "studycases.studycasequestion",
+    "pk": 1,
+    "fields": {
+      "study_case": 1,
+      "question": "jelaskan bagaimana gaya tersebut bekerja?"
+    }
+  },
+  {
+    "model": "studycases.studycasequestion",
+    "pk": 2,
+    "fields": {
+      "study_case": 1,
+      "question": "Jelaskan gaya apa saja yang beraksi saat gerakan tersebut?"
+    }
+  },
+  {
+    "model": "studycases.studycasequestion",
+    "pk": 3,
+    "fields": {
+      "study_case": 2,
+      "question": "Jelaskan perubahan wujud zat yang terjadi pada es batu tersebut?"
+    }
+  },
+  {
+    "model": "studycases.studycasequestion",
+    "pk": 4,
+    "fields": {
+      "study_case": 2,
+      "question": "Jelaskan apakah termasuk perubahan wujud tersebut termasuk perubahan fisika?"
+    }
+  }
+]
