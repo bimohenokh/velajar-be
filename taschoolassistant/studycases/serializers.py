@@ -3,10 +3,7 @@ from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import (
     IntegerField,
-    CharField,
     SerializerMethodField,
-    ListField,
-    DictField,
 )
 from rest_framework.serializers import Serializer, ModelSerializer
 
@@ -80,36 +77,6 @@ class StudyCaseWithQuestionsSerializer(ModelSerializer):
             StudyCaseQuestion.objects.bulk_create(question_objs)
 
         return instance
-
-#
-# # Serializers for read studycase, question, and answer
-# class StudyCaseSerializerForAnswer(ModelSerializer):
-#     class Meta:
-#         model = StudyCase
-#         fields = ['id', 'title', 'description', 'image_study_case', 'course_session', 'max_point_per_question', 'started_at', 'time_range', 'status']
-#
-#
-# class StudyCaseQuestionSerializerForAnswer(ModelSerializer):
-#     study_case = StudyCaseSerializerForAnswer()
-#
-#     class Meta:
-#         model = StudyCaseQuestion
-#         fields = ['id', 'question', 'study_case']
-#
-#
-# class StudyCaseAnswerReadSerializers(ModelSerializer):
-#     study_case_question = StudyCaseQuestionSerializerForAnswer()
-#
-#     class Meta:
-#         model = StudyCaseAnswer
-#         fields = '__all__'
-#
-#
-# #Serializers for post answer
-# class StudyCaseAnswerWriteSerializer(ModelSerializer):
-#     class Meta:
-#         model = StudyCaseAnswer
-#         fields = '__all__'
 
 
 class StudyCaseAttemptSerializer(ModelSerializer):
