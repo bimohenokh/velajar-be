@@ -12,3 +12,4 @@ uvicorn
 adrf
 django-cors-headers
 django-q2
+django-prometheus
