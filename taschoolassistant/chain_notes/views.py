@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, aget_object_or_404
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied, NotFound
+from rest_framework.permissions import IsAuthenticated
 
 from taschoolassistant.chain_notes.exceptions import (
     ChainNoteAlreadyStartedException,
@@ -26,6 +27,8 @@ from taschoolassistant.courses.models import CourseParticipant, CourseSession
 
 
 class ChainNoteView(APIView):
+    permission_classes = [IsAuthenticated]
+
     async def get(self, request):
         def _():
             param_serializer = ChainNoteParamSerializer(data=request.query_params)
@@ -89,6 +92,8 @@ class ChainNoteView(APIView):
 
 
 class ChainNoteViewById(APIView):
+    permission_classes = [IsAuthenticated]
+
     async def get(self, request, pk):
         def logic():
             chain_note: ChainNote = get_object_or_404(
@@ -156,6 +161,8 @@ class ChainNoteViewById(APIView):
 
 
 class StartChainNoteView(APIView):
+    permission_classes = [IsAuthenticated]
+
     # TODO tambahin background task pas Chain Note selesai
     async def post(self, request, pk):
         chain_note: ChainNote = await aget_object_or_404(
@@ -228,6 +235,8 @@ class StartChainNoteView(APIView):
 
 
 class CurrentChainNoteTurnView(APIView):
+    permission_classes = [IsAuthenticated]
+
     async def get(self, request, pk):
         # check if user is participant of the course
         chain_note = await ChainNote.objects.select_related("course_session").aget(
@@ -330,6 +339,8 @@ class CurrentChainNoteTurnView(APIView):
 
 
 class SkipChainNoteTurnView(APIView):
+    permission_classes = [IsAuthenticated]
+
     async def post(self, request, chain_note_pk):
         # Check if the user is a participant of the course
         chain_note = await ChainNote.objects.select_related("course_session").aget(pk=chain_note_pk)
