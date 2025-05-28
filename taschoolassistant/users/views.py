@@ -49,6 +49,7 @@ class LoginView(APIView):
 
         refresh["username"] = user.username
         refresh["email"] = user.email
+        refresh["nama_lengkap"] = user.nama_lengkap
         refresh["role"] = user.role
 
         return ApiResponse.success(
