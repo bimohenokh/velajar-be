@@ -47,6 +47,10 @@ class LoginView(APIView):
 
         refresh = RefreshToken.for_user(user)
 
+        refresh["username"] = user.username
+        refresh["email"] = user.email
+        refresh["role"] = user.role
+
         return ApiResponse.success(
             data=LoginOutSerializer({
                 "refresh": str(refresh),
