@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+import multiprocessing
 import sys
 from datetime import timedelta
 from pathlib import Path
@@ -207,7 +208,7 @@ SPECTACULAR_SETTINGS = {
 # Django-Q settings
 Q_CLUSTER = {
     'name': 'DjangoQ',
-    'workers': 2,
+    'workers': multiprocessing.cpu_count(),
     'timeout': 10,   # max seconds a worker can block waiting for a task (lower means more frequent polling)
     'retry': 20,     # retry failed tasks after 3 seconds
     'queue_limit': 50,
