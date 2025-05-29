@@ -67,7 +67,7 @@
     },
     {
         "model": "users.user",
-        "pk": 5,
+        "pk": 7,
         "fields": {
             "username": "siswa5",
             "password": "pbkdf2_sha256$870000$vypeYyFYfQfPGmjTMdG6xQ$v+uUT5zxTYEM6ho7NuTmTS6GHver20r7333+SlhWuyw=",
@@ -77,7 +77,7 @@
     },
     {
         "model": "users.user",
-        "pk": 6,
+        "pk": 8,
         "fields": {
             "username": "siswa6",
             "password": "pbkdf2_sha256$870000$vypeYyFYfQfPGmjTMdG6xQ$v+uUT5zxTYEM6ho7NuTmTS6GHver20r7333+SlhWuyw=",
