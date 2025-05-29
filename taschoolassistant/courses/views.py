@@ -131,7 +131,7 @@ class CourseViewById(APIView):
         course.delete()
         return ApiResponse.success(
             message="Course successfully deleted",
-            status_code=status.HTTP_204_NO_CONTENT
+            status_code=status.HTTP_200_OK
         )
 
 
@@ -224,7 +224,7 @@ class CourseSessionViewById(APIView):
 
         return ApiResponse.success(
             message="Course session successfully deleted",
-            status_code=status.HTTP_204_NO_CONTENT
+            status_code=status.HTTP_200_OK
         )
 
 

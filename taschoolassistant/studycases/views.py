@@ -118,7 +118,7 @@ class StudyCaseViewById(APIView):
 
         return ApiResponse.success(
             message="Study Case successfully deleted",
-            status_code=status.HTTP_204_NO_CONTENT
+            status_code=status.HTTP_200_OK
         )
 
 
