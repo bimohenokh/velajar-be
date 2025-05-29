@@ -175,29 +175,26 @@ class CourseSessionView(APIView):
 class CourseSessionViewById(APIView):
     permission_classes = [IsAuthenticated]
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.course_session_serializer = CourseSessionSerializer
-
-    def get(self, request, course_id, session_id):
-        user = request.user
-        course_instance = CourseSession.objects.get_detail_course_session_by_id(user, course_id, session_id)
-        if not course_instance:
+    def get(self, request, session_id):
+        try:
+            course_session = CourseSession.objects.get(id=session_id)
+        except CourseSession.DoesNotExist:
             raise NotFound("Course session not found")
 
-        serializer = self.course_session_serializer(course_instance)
+        # TODO check if user is participant of the course
+
+        serializer = CourseSessionSerializer(course_session)
         return ApiResponse.success(serializer.data, message="Course session successfully retrieved")
 
-    def patch(self, request, course_id, session_id):
-
+    def patch(self, request, session_id):
         try:
-            course_session = CourseSession.objects.get(course=course_id, pk=session_id)
+            course_session = CourseSession.objects.get(id=session_id)
         except CourseSession.DoesNotExist:
             raise NotFound("Course session not found.")
-        
 
+        # TODO check if user is instructor of the course
 
-        serializer = self.course_session_serializer(course_session, data=request.data, partial=True)
+        serializer = CourseSessionSerializer(course_session, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -207,9 +204,9 @@ class CourseSessionViewById(APIView):
             status_code=status.HTTP_200_OK
         )
 
-    def delete(self, request, course_id, session_id):
+    def delete(self, request, session_id):
         try:
-            course_session = CourseSession.objects.get(pk=session_id, course=course_id)
+            course_session = CourseSession.objects.get(id=session_id)
         except CourseSession.DoesNotExist:
             raise NotFound("Course session not found.")
 
