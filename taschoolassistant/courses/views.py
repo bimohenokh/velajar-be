@@ -134,7 +134,6 @@ class CourseViewById(APIView):
 
 class CourseSessionView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -142,10 +141,8 @@ class CourseSessionView(APIView):
 
     def get(self, request, course_id):
         user = request.user
-        try:
-            course_session_instance = CourseSession.objects.get_course_session(user, course_id)
-        except Exception as e:
-            raise e
+
+        course_session_instance = CourseSession.objects.get_course_session(user, course_id)
 
         if not course_session_instance.exists():
             raise NotFound("Course Sessions not found")
@@ -177,7 +174,6 @@ class CourseSessionView(APIView):
 
 class CourseSessionViewById(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -272,7 +268,6 @@ class CourseSessionFeatureViewById(APIView):
 
 class LeaderboardView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
