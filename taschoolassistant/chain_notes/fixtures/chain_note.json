@@ -1,22 +1,22 @@
 [
   {
-        "model": "chain_notes.chainnote",
-        "pk": 1,
-        "fields": {
-            "course_session": 1,
-            "description": "Bagaimana menurutmu keadaan politik Indonesia",
-            "duration_per_participant":  "00:00:10",
-            "status": 0
-        }
-    },
-  {
-        "model": "chain_notes.chainnote",
-        "pk": 2,
-        "fields": {
-            "course_session": 2,
-            "description": "Kenapa menurutmu keadaan politik Indonesia",
-            "duration_per_participant":  "00:00:5",
-            "status": 0
-        }
+    "model": "chain_notes.chainnote",
+    "pk": 1,
+    "fields": {
+      "course_session": 1,
+      "description": "Bagaimana menurutmu keadaan politik Indonesia",
+      "duration_per_participant": "00:00:10",
+      "status": 0
     }
+  },
+  {
+    "model": "chain_notes.chainnote",
+    "pk": 2,
+    "fields": {
+      "course_session": 2,
+      "description": "Kenapa menurutmu keadaan politik Indonesia",
+      "duration_per_participant": "00:00:5",
+      "status": 0
+    }
+  }
 ]

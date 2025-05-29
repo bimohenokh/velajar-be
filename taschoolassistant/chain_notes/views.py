@@ -66,8 +66,8 @@ class ChainNoteView(APIView):
             serializer.is_valid(raise_exception=True)
 
             # check if user is instructor of the course
-            course_session_id = serializer.validated_data.get("course_session_id")
-            course_session = CourseSession.objects.get(id=course_session_id)
+            course_session = serializer.validated_data.get("course_session")
+
             try:
                 # check if user is instructor of the course
                 course_instructor = (
