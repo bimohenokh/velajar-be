@@ -228,7 +228,7 @@ class CourseSessionViewById(APIView):
 class CourseSessionFeatureViewById(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, course_id, session_id):
+    def get(self, request, session_id):
 
         course_session = get_object_or_404(CourseSession, pk=session_id)
 
