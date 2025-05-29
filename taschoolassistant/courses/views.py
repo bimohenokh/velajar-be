@@ -332,7 +332,7 @@ class InviteCourseWithLink(APIView):
 class SubmitCourseInviteToken(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def post(self, request, token_str):
 
         # FIXME perlu param gk ya
         # role = request.query_params.get("role", None)
@@ -340,7 +340,7 @@ class SubmitCourseInviteToken(APIView):
         #     raise ValidationError("Role is required")
 
         try:
-            course_invite_token = CourseInviteToken.objects.get(token=request.data["token"], role=role)
+            course_invite_token = CourseInviteToken.objects.get(token=token_str)
         except CourseInviteToken.DoesNotExist:
             raise NotFound("Course invite token not found")
 
@@ -350,7 +350,7 @@ class SubmitCourseInviteToken(APIView):
 
         # check if token role and user role same
         if not course_invite_token.is_user_and_token_role_same(request.user):
-            raise PermissionDenied("Course invite token is not valid", code="url_link_invalid")
+            raise PermissionDenied("Your role is different with the token", code="role_mismatch")
 
         # check if user already joined the course
         # if not create course participant
@@ -362,6 +362,7 @@ class SubmitCourseInviteToken(APIView):
                         participant_id=request.user.id
                     )
                     if course_participant.is_participating:
+                        # If the user is already participating, do nothing
                         pass
                     else:
                         course_participant.is_participating = True
@@ -370,11 +371,10 @@ class SubmitCourseInviteToken(APIView):
                     course_participant = CourseParticipant.objects.create(
                         course_id=course_invite_token.course_id,
                         participant_id=request.user.id,
-                        is_participating=True
+                        is_participating=True,
                     )
                     participant_point = ParticipantPoint.objects.create(
-                        course_participant=course_participant,
-                        point_achieved=0
+                        course_participant=course_participant, point_achieved=0
                     )
 
             elif course_invite_token.is_for_teacher:
@@ -384,6 +384,7 @@ class SubmitCourseInviteToken(APIView):
                         participant_id=request.user.id
                     )
                     if course_participant.is_participating:
+                        # If the user is already participating, do nothing
                         pass
                     else:
                         course_participant.is_participating = True
@@ -407,6 +408,6 @@ class SubmitCourseInviteToken(APIView):
 
         return ApiResponse.success(
             data=out_serializer.data,
-            message="Course invite token successfully retrieved",
+            message="Successfully joined the course",
             status_code=status.HTTP_200_OK
         )

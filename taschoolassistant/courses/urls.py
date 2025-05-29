@@ -18,5 +18,5 @@ urlpatterns = [
     path("<int:course_id>/sessions/<int:session_id>/", CourseSessionViewById.as_view(), name="course-session-id"),
     path("sessions/<int:session_id>/features/", CourseSessionFeatureViewById.as_view(), name="course-session-feature-id"),
     path("<int:course_id>/invite/", InviteCourseWithLink.as_view(), name="course-invite-token"),
-    path("invite/<token_str>", SubmitCourseInviteToken.as_view(), name="course-invite-submit-token"),
+    path("invite/<token_str>/", SubmitCourseInviteToken.as_view(), name="course-invite-submit-token"),
 ]
