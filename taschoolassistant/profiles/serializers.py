@@ -8,7 +8,8 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["username", "nama_lengkap", "email", "password"]
+        fields = "__all__"
+        read_only_fields = ['id', 'username', 'email', 'role']
 
         extra_kwargs = {
             'password': {'write_only': True}
@@ -59,9 +60,10 @@ class TeacherProfileSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
     
 
-class StudentPostProfileSerializer(serializers.ModelSerializer):
+class CreateStudentProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentProfile
+        fields = "__all__"
         read_only_fields = ["user"]
 
     def create(self, validated_data):
@@ -69,9 +71,10 @@ class StudentPostProfileSerializer(serializers.ModelSerializer):
         return StudentProfile.objects.create(user=user, **validated_data)
 
 
-class TeacherPostProfileSerializer(serializers.ModelSerializer):
+class CreateTeacherProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherProfile
+        fields = "__all__"
         read_only_fields = ["user"]
 
     def create(self, validated_data):

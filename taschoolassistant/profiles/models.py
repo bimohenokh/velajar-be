@@ -26,7 +26,7 @@ class TeacherProfile(Model):
 class StudentProfile(Model):
     user = OneToOneField(User, on_delete=CASCADE)
     image_profile = ImageField(
-        upload_to='teacher-profile/', null=True, blank=True)
+        upload_to='student-profile/', null=True, blank=True)
     dateOfBirth = DateField(null=True, blank=True)
     school = CharField(max_length=255, null=True, blank=True)
     student_class = CharField(
