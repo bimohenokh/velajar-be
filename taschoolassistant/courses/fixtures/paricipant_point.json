@@ -1,0 +1,66 @@
+[
+  {
+    "model": "courses.participantpoint",
+    "pk": 1,
+    "fields": {
+      "course_participant": 5,
+      "point_achieved": 0
+    }
+  },
+  {
+    "model": "courses.participantpoint",
+    "pk": 2,
+    "fields": {
+      "course_participant": 6,
+      "point_achieved": 0
+    }
+  },
+  {
+    "model": "courses.participantpoint",
+    "pk": 3,
+    "fields": {
+      "course_participant": 7,
+      "point_achieved": 0
+    }
+  },
+  {
+    "model": "courses.participantpoint",
+    "pk": 4,
+    "fields": {
+      "course_participant": 8,
+      "point_achieved": 0
+    }
+  },
+  {
+    "model": "courses.participantpoint",
+    "pk": 5,
+    "fields": {
+      "course_participant": 9,
+      "point_achieved": 0
+    }
+  },
+  {
+    "model": "courses.participantpoint",
+    "pk": 6,
+    "fields": {
+      "course_participant": 10,
+      "point_achieved": 0
+    }
+  },
+  {
+    "model": "courses.participantpoint",
+    "pk": 7,
+    "fields": {
+      "course_participant": 11,
+      "point_achieved": 0
+    }
+  },
+  {
+    "model": "courses.participantpoint",
+    "pk": 8,
+    "fields": {
+      "course_participant": 12,
+      "point_achieved": 0
+    }
+  }
+]
