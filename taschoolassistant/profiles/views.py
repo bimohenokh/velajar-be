@@ -4,7 +4,7 @@ from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.exceptions import NotFound, ValidationError
-from .serializers import StudentProfileSerializer, TeacherProfileSerializer, StudentPostProfileSerializer, TeacherPostProfileSerializer
+from .serializers import StudentProfileSerializer, TeacherProfileSerializer, CreateStudentProfileSerializer, CreateTeacherProfileSerializer
 from .models import StudentProfile, TeacherProfile
 from .schemas import profile_schema
 from taschoolassistant.users.models import User
@@ -38,9 +38,9 @@ class ProfileView(APIView):
         role = user.role
 
         serializer = (
-            StudentPostProfileSerializer(data=request.data, context={"user": user})
+            CreateStudentProfileSerializer(data=request.data, context={"user": user})
             if role == "student"
-            else TeacherPostProfileSerializer(data=request.data, context={"user": user})
+            else CreateTeacherProfileSerializer(data=request.data, context={"user": user})
         )
 
         serializer.is_valid(raise_exception=True)
