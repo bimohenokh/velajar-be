@@ -63,24 +63,21 @@ class CourseView(APIView):
         user = request.user
         role = user.role
         serializer = self.course_serializer(data=request.data)
-
         serializer.is_valid(raise_exception=True)
-        course = serializer.save()
 
-        course_participant = CourseParticipant.objects.create(
-            course=course, participant=user, is_participating=True
-        )
+        with transaction.atomic():
+            course = serializer.save()
 
-        if role == "teacher":
-            CourseInstructor.objects.create(
-                course_participant=course_participant, is_owner=True
-            )
-        else:
-            CourseInstructor.objects.create(
-                course_participant=course_participant, is_owner=False
+            course_participant = CourseParticipant.objects.create(
+                course=course,
+                participant=user,
+                is_participating=True,
             )
 
-        ParticipantPoint.objects.create(course_participant=course_participant, point=0)
+            course_instructor = CourseInstructor.objects.create(
+                course_participant=course_participant,
+                is_owner=True
+            )
 
         return ApiResponse.success(
             data=serializer.data,
@@ -131,7 +128,7 @@ class CourseViewById(APIView):
         course.delete()
         return ApiResponse.success(
             message="Course successfully deleted",
-            status_code=status.HTTP_200_OK
+            status_code=status.HTTP_204_NO_CONTENT
         )
 
 
@@ -224,7 +221,7 @@ class CourseSessionViewById(APIView):
 
         return ApiResponse.success(
             message="Course session successfully deleted",
-            status_code=status.HTTP_200_OK
+            status_code=status.HTTP_204_NO_CONTENT
         )
 
 

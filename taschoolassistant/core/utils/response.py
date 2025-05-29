@@ -10,6 +10,11 @@ class ApiResponse:
         """
         Standardized success response.
         """
+        if status_code == status.HTTP_204_NO_CONTENT:
+            return Response(
+                status=status_code,
+            )
+
         return Response(
             StandardOutSerializer({
                 "status": status_code,
