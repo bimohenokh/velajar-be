@@ -154,6 +154,7 @@ FILE_UPLOAD_HANDLERS = [
 ]
 
 # TODO kalau mau pake
+CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins
 # CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=)
 #
 # CORS_ALLOW_HEADERS = [
