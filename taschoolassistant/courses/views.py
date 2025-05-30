@@ -49,8 +49,6 @@ class CourseView(APIView):
         name = request.GET.get('name', None)
         jenjang = request.GET.get('jenjang_kelas', None)
         courses_instance = Course.objects.get_courses(user, name, jenjang)
-        if not courses_instance.exists():
-            raise NotFound("Course not found")
         serializer = self.course_serializer(
             courses_instance, many=True)
 
