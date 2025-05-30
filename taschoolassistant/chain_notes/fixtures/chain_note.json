@@ -5,7 +5,7 @@
     "fields": {
       "course_session": 1,
       "description": "Bagaimana menurutmu keadaan politik Indonesia",
-      "duration_per_participant": "00:00:10",
+      "duration_per_participant": "00:00:20",
       "status": 0
     }
   },
@@ -15,7 +15,7 @@
     "fields": {
       "course_session": 2,
       "description": "Kenapa menurutmu keadaan politik Indonesia",
-      "duration_per_participant": "00:00:5",
+      "duration_per_participant": "00:05:00",
       "status": 0
     }
   }

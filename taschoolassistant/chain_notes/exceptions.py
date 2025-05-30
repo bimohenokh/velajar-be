@@ -10,13 +10,13 @@ class CannotChangeChainNoteStatus(APIException):
 
 class ChainNoteAlreadyStartedException(APIException):
     status_code = status.HTTP_423_LOCKED
-    default_detail = "Cannot change chain note after it already ongoing"
+    default_detail = "Cannot change chain note after it already started"
     default_code = "chain_note_already_started"
 
 
 class ChainNoteTurnHasFinishedException(APIException):
     status_code = status.HTTP_423_LOCKED
-    default_detail = "Cannot change chain note turn after it already finished"
+    default_detail = "Chain note turn has finished"
     default_code = "chain_note_turn_has_finished"
 
 

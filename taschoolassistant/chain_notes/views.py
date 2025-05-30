@@ -7,6 +7,7 @@ from asgiref.sync import sync_to_async
 from django.db import transaction
 from django.shortcuts import get_object_or_404, aget_object_or_404
 from django.utils import timezone
+from django_q.tasks import schedule
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied, NotFound
 from rest_framework.permissions import IsAuthenticated
@@ -20,7 +21,12 @@ from taschoolassistant.chain_notes.models import ChainNote, ChainNoteTurn
 from taschoolassistant.chain_notes.serializers import (
     ChainNoteParamSerializer,
     ChainNoteSerializer,
-    ChainNoteTurnLongPollingSerializer,
+    UpdateChainNoteSerializer,
+    ChainNoteTurnSerializer,
+)
+from taschoolassistant.chain_notes.tasks import (
+    check_chain_note_finished,
+    check_chain_note_finished_name,
 )
 from taschoolassistant.core.utils.response import ApiResponse
 from taschoolassistant.courses.models import CourseParticipant, CourseSession
@@ -144,7 +150,7 @@ class ChainNoteViewById(APIView):
                     "not_instructor_of_this_course",
                 )
 
-            serializer = ChainNoteSerializer(chain_note, data=request.data)
+            serializer = UpdateChainNoteSerializer(chain_note, data=request.data)
             serializer.is_valid(raise_exception=True)
 
             if chain_note.status != ChainNote.Status.DRAFT:
@@ -182,7 +188,7 @@ class StartChainNoteView(APIView):
         if chain_note.status != ChainNote.Status.DRAFT:
             raise ChainNoteAlreadyStartedException()
 
-        serializer = ChainNoteSerializer(chain_note, data=request.data)
+        serializer = ChainNoteSerializer(chain_note, data=request.data, partial=True)
 
         await sync_to_async(
             lambda: serializer.is_valid(raise_exception=True), thread_sensitive=True
@@ -213,6 +219,17 @@ class StartChainNoteView(APIView):
             # Save all turns
             ChainNoteTurn.objects.bulk_create(new_chain_note_turns)
 
+            # Menjalankan task yang akan mengecek apakah Chain Note sudah selesai
+            # jika sudah selesai, akan mengubah status Chain Note menjadi FINISHED
+            schedule(
+                f"{check_chain_note_finished.__module__}.{check_chain_note_finished.__name__}",
+                pk,
+                schedule_type="I",  # Interval
+                minutes=0,
+                repeats=-1,  # run indefinitely
+                name=check_chain_note_finished_name(pk),
+            )
+
         # Fetch course participants (excluding instructors)
         course_id = chain_note.course_session.course_id
         course_students: list[CourseParticipant] = [
@@ -237,6 +254,10 @@ class StartChainNoteView(APIView):
 class CurrentChainNoteTurnView(APIView):
     permission_classes = [IsAuthenticated]
 
+    CHAIN_NOTE_FINISHED_RESPONSE = {
+        "is_chain_note_finished": True,
+    }
+
     async def get(self, request, pk):
         # check if user is participant of the course
         chain_note = await ChainNote.objects.select_related("course_session").aget(
@@ -251,9 +272,6 @@ class CurrentChainNoteTurnView(APIView):
         except CourseParticipant.DoesNotExist:
             raise PermissionDenied("User is not a participant of this course", "not_participant_of_this_course")
 
-
-        # TODO kalau sudah selesai ubah chain_note status jadi finished di background task
-
         last_known_turn_id = request.query_params.get("last_known_turn_id")
         last_known_turn_id = int(last_known_turn_id) if last_known_turn_id else None
         timeout_seconds = 30
@@ -265,9 +283,8 @@ class CurrentChainNoteTurnView(APIView):
         while (timezone.now() - start_time).seconds < timeout_seconds:
             # if ChainNote has ended
             if chain_note.is_ended:
-                serializer = ChainNoteTurnLongPollingSerializer({"is_chain_note_finished":True})
                 return ApiResponse.success(
-                    data=serializer.data,
+                    data=self.CHAIN_NOTE_FINISHED_RESPONSE,
                     message="Chain Note has ended",
                     status_code=status.HTTP_200_OK,
                 )
@@ -286,16 +303,13 @@ class CurrentChainNoteTurnView(APIView):
                 )
 
                 if current_turn is None:
-                    serializer = ChainNoteTurnLongPollingSerializer(
-                        {"is_chain_note_finished": True}
-                    )
                     return ApiResponse.success(
-                        data=serializer.data,
+                        data=self.CHAIN_NOTE_FINISHED_RESPONSE,
                         message="Chain Note has ended",
                         status_code=status.HTTP_200_OK,
                     )
 
-                serializer = ChainNoteTurnLongPollingSerializer(current_turn)
+                serializer = ChainNoteTurnSerializer(current_turn)
                 return ApiResponse.success(
                     data=serializer.data,
                     message="Chain Note Turn successfully retrieved",
@@ -311,17 +325,14 @@ class CurrentChainNoteTurnView(APIView):
                 )
 
                 if current_turn is None:
-                    serializer = ChainNoteTurnLongPollingSerializer(
-                        {"is_chain_note_finished": True}
-                    )
                     return ApiResponse.success(
-                        data=serializer.data,
+                        data=self.CHAIN_NOTE_FINISHED_RESPONSE,
                         message="Chain Note has ended",
                         status_code=status.HTTP_200_OK,
                     )
 
                 if current_turn.pk != last_known_turn_id:
-                    serializer = ChainNoteTurnLongPollingSerializer(current_turn)
+                    serializer = ChainNoteTurnSerializer(current_turn)
                     return ApiResponse.success(
                         data=serializer.data,
                         message="Chain Note Turn successfully retrieved",
@@ -342,35 +353,43 @@ class SkipChainNoteTurnView(APIView):
     permission_classes = [IsAuthenticated]
 
     async def post(self, request, chain_note_pk):
-        # Check if the user is a participant of the course
-        chain_note = await ChainNote.objects.select_related("course_session").aget(pk=chain_note_pk)
-        try:
-            course_participant = await CourseParticipant.objects.aget_by_course_id_and_user_id(chain_note.course_session.course_id, request.user.id)
-        except CourseParticipant.DoesNotExist:
-            raise PermissionDenied("User is not a participant of this course", "not_participant_of_this_course")
+
+        @sync_to_async
+        def _():
+            # Check if the user is a participant of the course
+            chain_note = ChainNote.objects.select_related("course_session").get(pk=chain_note_pk)
+            try:
+                course_participant = CourseParticipant.objects.get_by_course_id_and_user_id(chain_note.course_session.course_id, request.user.id)
+            except CourseParticipant.DoesNotExist:
+                raise PermissionDenied("User is not a participant of this course", "not_participant_of_this_course")
 
 
-        available_turns = [turn async for turn in
-                           ChainNoteTurn.objects.filter_available_turn_by_chain_note(chain_note_pk)]
+            available_turns = list(
+                               ChainNoteTurn
+                               .objects
+                               .filter_available_turn_by_chain_note(chain_note)
+                               .select_related("participant__participant"))
 
-        if len(available_turns) == 0:
-            raise ChainNoteTurnHasFinishedException()
+            if len(available_turns) == 0:
+                raise ChainNoteTurnHasFinishedException()
 
-        current_turn = available_turns[0]
-        # Only the turn owner or instructor can skip the turn
-        if current_turn.participant.participant_id != request.user.id and not course_participant.is_teacher:
-            raise PermissionDenied("You are not allowed to skip this turn")
+            current_turn = available_turns[0]
+            # Only the turn owner or instructor can skip the turn
+            if current_turn.participant.participant_id != request.user.id and not course_participant.is_teacher:
+                raise PermissionDenied("You are not allowed to skip this turn")
 
-        current_turn.is_skipped = True
-        compensation_delay = timedelta(seconds=1)
-        remaining_time = current_turn.finished_at - timezone.now() + compensation_delay
-        for turn in available_turns[1:]:
-            turn.started_at -= remaining_time
+            current_turn.is_skipped = True
+            compensation_delay = timedelta(seconds=1)
+            remaining_time = current_turn.finished_at - timezone.now() + compensation_delay
+            for turn in available_turns[1:]:
+                turn.started_at -= remaining_time
 
-        await ChainNoteTurn.objects.abulk_update(available_turns)
+            ChainNoteTurn.objects.bulk_update(available_turns,
+                                              ["is_skipped", "started_at"])
+
+        await _()
 
         return ApiResponse.success(
-            data={},
             message="Chain Note Turn successfully skipped",
             status_code=status.HTTP_204_NO_CONTENT,
         )

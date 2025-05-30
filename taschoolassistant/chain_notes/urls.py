@@ -13,6 +13,6 @@ urlpatterns = [
     path("<int:pk>/", ChainNoteViewById.as_view(), name="chain_note_by_id"),
     path("<int:pk>/start/", StartChainNoteView.as_view(), name="chain_note_start"),
     path("<int:pk>/turns/current/", CurrentChainNoteTurnView.as_view(), name="chain_note_current_turn"),
-    path("<int:chain_note_pk>/turns/skip", SkipChainNoteTurnView.as_view(), name="chain_note_turn_by_id"),
+    path("<int:chain_note_pk>/turns/skip/", SkipChainNoteTurnView.as_view(), name="chain_note_turn_by_id"),
 ]
 

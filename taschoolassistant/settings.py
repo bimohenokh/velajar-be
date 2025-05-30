@@ -208,7 +208,7 @@ SPECTACULAR_SETTINGS = {
 # Django-Q settings
 Q_CLUSTER = {
     'name': 'DjangoQ',
-    'workers': multiprocessing.cpu_count(),
+    'workers': multiprocessing.cpu_count() if not DEBUG else 1,
     'timeout': 10,   # max seconds a worker can block waiting for a task (lower means more frequent polling)
     'retry': 20,     # retry failed tasks after 3 seconds
     'queue_limit': 50,

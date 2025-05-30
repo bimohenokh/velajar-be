@@ -45,10 +45,10 @@ class CourseParticipantManager(Manager):
         return self.filter(name=user)
 
     def get_by_course_id_and_user_id(self, course_id, user_id):
-        return self.get(course_id=course_id, user_id=user_id)
+        return self.get(course_id=course_id, participant_id=user_id)
 
     async def aget_by_course_id_and_user_id(self, course_id, user_id):
-        return self.aget(course_id=course_id, user_id=user_id)
+        return await self.aget(course_id=course_id, participant_id=user_id)
 
     def get_by_course_id_and_user_teacher_id(self, course_id, user_teacher_id):
         return (
@@ -61,7 +61,7 @@ class CourseParticipantManager(Manager):
         )
 
     async def aget_by_course_id_and_user_teacher_id(self, course_id, user_teacher_id):
-        return sync_to_async(self.get_by_course_id_and_user_teacher_id)(course_id, user_teacher_id)
+        return await sync_to_async(self.get_by_course_id_and_user_teacher_id)(course_id, user_teacher_id)
 
 class CourseSessionManager(Manager):
     def get_course_session(self, user, course_id):

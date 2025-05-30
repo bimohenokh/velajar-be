@@ -1,7 +1,9 @@
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField, DateTimeField, BooleanField, CharField
 from rest_framework.serializers import Serializer, ModelSerializer
 
-from taschoolassistant.chain_notes.models import ChainNote
+from taschoolassistant.chain_notes.models import ChainNote, ChainNoteTurn
+from taschoolassistant.users.serializers import UserSerializer
 
 
 class ChainNoteParamSerializer(Serializer):
@@ -14,20 +16,26 @@ class ChainNoteSerializer(ModelSerializer):
         fields = "__all__"
         read_only_fields = ["status"] # TODO status dan course_session gk boleh diubah
 
-
-class ChainNoteTurnLongPollingSerializer(Serializer):
-    chain_note_id = IntegerField(required=False)
-    started_at = DateTimeField(required=False)
-    finished_at = DateTimeField(required=False)
-    is_turn_reached = IntegerField(required=False)
-    is_skipped = IntegerField(required=False)
-    participant_id = IntegerField(required=False)
-    pariticipant_username = CharField(source="participant.participant.username", required=False)
-    # TODO buat nama panjang participant nunggu dari profile si
-    is_chain_note_finished = BooleanField(default=False)
+    def validate(self, attrs):
+        if self.instance:
+            if attrs.get("course_session"):
+                raise ValidationError(
+                    {"course_session": ["course_session cannot be changed"]}
+                )
+        return super().validate(attrs)
 
 
-# class StartChainNoteSerializer(ModelSerializer):
-#     class Meta:
-#         model = ChainNote
-#         fields = "__all__"
+class UpdateChainNoteSerializer(ModelSerializer):
+    class Meta:
+        model = ChainNote
+        fields = "__all__"
+        read_only_fields = ["course_session", "status"]
+
+
+class ChainNoteTurnSerializer(ModelSerializer):
+    participant_user = UserSerializer(source="participant.participant", read_only=True)
+
+    class Meta:
+        model = ChainNoteTurn
+        fields = "__all__"
+

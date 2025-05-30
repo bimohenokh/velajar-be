@@ -43,7 +43,7 @@ class ChainNote(Model):
 
 
 class ChainNoteTurn(Model):
-    chain_note = ForeignKey(ChainNote, on_delete=CASCADE)
+    chain_note = ForeignKey(ChainNote, on_delete=CASCADE, related_name='turns')
     participant = ForeignKey(CourseParticipant, on_delete=CASCADE)
     started_at = DateTimeField(null=True, blank=True)
     is_skipped = BooleanField(default=False)
