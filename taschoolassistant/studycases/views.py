@@ -11,6 +11,7 @@ from .serializers import (
     StudyCaseAttemptSerializer,
     StudyCaseAttemptWithAnswersSerializer,
     EvaluateStudyCaseAnswerSerializer,
+    StudyCaseSerializer,
 )
 from rest_framework import status
 from taschoolassistant.core.utils.response import ApiResponse
@@ -158,7 +159,10 @@ class StartStudyCaseView(APIView):
             schedule_type='O',
         )
 
+        serializer = StudyCaseSerializer(study_case)
+
         return ApiResponse.success(
+            data=serializer.data,
             message="Study Case successfully started",
             status_code=status.HTTP_200_OK
         )
@@ -181,7 +185,10 @@ class StopStudyCaseView(APIView):
 
         # TODO should i stop the scheduller?
 
+        out_serializer = StudyCaseSerializer(study_case)
+
         return ApiResponse.success(
+            data=out_serializer.data,
             message="Study Case successfully stopped",
             status_code=status.HTTP_200_OK
         )
