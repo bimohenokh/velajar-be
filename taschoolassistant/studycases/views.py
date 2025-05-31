@@ -12,6 +12,8 @@ from .serializers import (
     StudyCaseAttemptWithAnswersSerializer,
     EvaluateStudyCaseAnswerSerializer,
     StudyCaseSerializer,
+    StudyCaseAnswerSerializer,
+    EvaluateStudyCaseAnswerInSerializer,
 )
 from rest_framework import status
 from taschoolassistant.core.utils.response import ApiResponse
@@ -297,7 +299,6 @@ class StudyCaseAttemptByIdView(APIView):
 
 class EvaluateStudyCaseAnswerView(APIView):
     permission_classes = [IsAuthenticated, IsTeacher]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def put(self, request, attempt_id):
 
@@ -314,23 +315,35 @@ class EvaluateStudyCaseAnswerView(APIView):
 
         # TODO Check if user is course instructor of the course
 
-        request_data = request.data
-        answer_ids = [item.get("id") for item in request_data if "id" in item]
+        in_serializer = EvaluateStudyCaseAnswerInSerializer(data=request.data, context={"attempt": study_case_attempt}, many=True)
+        in_serializer.is_valid(raise_exception=True)
 
-        # Fetch instances and ensure they exist
-        answers = list(StudyCaseAnswer.objects.filter(id__in=answer_ids))
-
-        if len(answers) != len(answer_ids):
-            raise ValidationError("One or more answers do not exist.", code="some_answers_not_found")
-
-        serializer = EvaluateStudyCaseAnswerSerializer(
-            data=request.data,
-            many=True,
-            context={'attempt': study_case_attempt}
-        )
-        serializer.is_valid(raise_exception=True)
         with transaction.atomic():
-            serializer.save()
+
+            input_map = {
+                item["id"]: item["point"]
+                for item in in_serializer.data
+                if "id" in item and "point" in item
+            }
+
+            available_answers = list(study_case_attempt.answers.all())
+            available_ids = {a.id for a in available_answers}
+            submitted_ids = set(input_map.keys())
+
+            # Validate all submitted IDs are valid
+            invalid_ids = submitted_ids - available_ids
+            if invalid_ids:
+                raise ValidationError(
+                    f"One or more answers are invalid or do not belong to this attempt: {list(invalid_ids)}",
+                    code="invalid_answer_ids",
+                )
+
+            # Update each answer's point
+            for answer in available_answers:
+                if answer.id in input_map:
+                    answer.point = input_map[answer.id]
+
+            StudyCaseAnswer.objects.bulk_update(available_answers, ['point'])
 
             # study_case_attempt is evaluated
             study_case_attempt.is_evaluated = True
@@ -338,13 +351,15 @@ class EvaluateStudyCaseAnswerView(APIView):
 
             # penambahan point ke student
             course_student_point = study_case_attempt.student.participantpoint
-            for answer in answers:
+            for answer in available_answers:
                 point_added = answer.point
-                course_student_point += point_added
+                course_student_point.point_achieved += point_added
             course_student_point.save()
 
+            out_serializer = StudyCaseAnswerSerializer(available_answers, many=True)
+
         return ApiResponse.success(
-            data=serializer.data,
+            data=out_serializer.data,
             message="Study Case Attempt successfully evaluated",
             status_code=status.HTTP_200_OK
         )

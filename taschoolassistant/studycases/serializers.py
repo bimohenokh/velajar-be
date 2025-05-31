@@ -5,7 +5,7 @@ from rest_framework.fields import (
     IntegerField,
     SerializerMethodField,
 )
-from rest_framework.serializers import Serializer, ModelSerializer
+from rest_framework.serializers import Serializer, ModelSerializer, ListSerializer
 
 from .models import StudyCase, StudyCaseQuestion, StudyCaseAnswer, StudyCaseAttempt
 from ..users.serializers import UserSerializer
@@ -104,12 +104,12 @@ class NestedStudyCaseAnswerSerializer(ModelSerializer):
 class StudyCaseAttemptWithAnswersSerializer(ModelSerializer):
     participant_user = UserSerializer(read_only=True, source="student.participant")
     answers = NestedStudyCaseAnswerSerializer(many=True)
-    total_point = SerializerMethodField()
+    total_point = SerializerMethodField(read_only=True)
 
     class Meta:
         model = StudyCaseAttempt
         fields = '__all__'
-        read_only_fields = ('submitted_at', 'is_evaluated')
+        read_only_fields = ('submitted_at', 'is_evaluated', 'study_case', 'student')
 
     def get_total_point(self, obj):
         return sum(answer.point for answer in obj.answers.all() if answer.point is not None)
@@ -158,40 +158,31 @@ class StudyCaseAttemptWithAnswersSerializer(ModelSerializer):
         return instance
 
 
-class EvaluateStudyCaseAnswerSerializer(ModelSerializer):
+class StudyCaseAnswerSerializer(ModelSerializer):
+    class Meta:
+        model = StudyCaseAnswer
+        fields = "__all__"
+        read_only_fields = ['id', 'study_case_question', 'study_case_attempt']
+        extra_kwargs = {
+            'answer': {'required': False, 'allow_blank': True},
+            'point': {'required': False, 'allow_null': True}
+        }
+
+
+class EvaluateStudyCaseAnswerInSerializer(Serializer):
     """
     Serializer for evaluating StudyCaseAnswer.
     """
-    class Meta:
-        model = StudyCaseAnswer
-        fields = ['id', 'point']
-        read_only_fields = ['id']
-        extra_kwargs = {
-            'point': {'required': True, 'allow_null': False}
-        }
+    id = IntegerField(required=True)
+    point = IntegerField(required=True, min_value=0, allow_null=False)
 
     def validate_point(self, value):
-        if value is None:
-            raise ValidationError("Point cannot be null.")
+        attempt = self.context.get("attempt")
         if value < 0:
-            raise ValidationError("Point cannot be negative.")
-        attempt = self.context["attempt"]
+            raise ValidationError({"point": ["Point cannot be negative."]})
         if value > attempt.study_case.max_point_per_question:
             raise ValidationError(
-                f"Point cannot be greater than the total point of the study case ({attempt.study_case.max_point_per_question})."
+                {"point": [f"Point cannot be greater than max allowed ({attempt.study_case.max_point_per_question})."]}
             )
         return value
 
-    def validate(self, data):
-        if self.instance:
-            attempt = self.context.get("attempt")
-
-            if self.instance.study_case_attempt_id != attempt.id:
-                raise ValidationError(
-                    "This answer does not belong to the given attempt."
-                )
-
-            return super().validate(data)
-
-    def create(self, validated_data):
-        raise ValidationError("This serializer is for updating existing answers only.")
