@@ -142,8 +142,6 @@ class CourseSessionView(APIView):
 
         course_session_instance = CourseSession.objects.get_course_session(user, course_id)
 
-        if not course_session_instance.exists():
-            raise NotFound("Course Sessions not found")
         serializer = self.course_session_serializer(
             course_session_instance, many=True)
 
