@@ -1,4 +1,5 @@
 from django.db import transaction
+from django_q.models import Schedule
 from django_q.tasks import schedule
 from rest_framework.views import APIView
 from rest_framework import status
@@ -13,7 +14,7 @@ from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound, ValidationError
 
-from .tasks import finish_quiz
+from .tasks import finish_quiz, finish_quiz_name
 
 
 class QuizView(APIView):
@@ -256,7 +257,8 @@ class StartQuizView(APIView):
                 f'{finish_quiz.__module__}.{finish_quiz.__name__}',  # Task path
                 quiz_id,
                 next_run=quiz.started_at + quiz.time_range,
-                schedule_type='O'  # One-off
+                schedule_type='O',  # One-off
+                name=finish_quiz_name(quiz_id)  # Unique name for the task
             )
 
             return ApiResponse.success(
@@ -283,7 +285,10 @@ class StopQuizView(APIView):
                 quiz.save()
 
                 submit_attempts_by_quiz_id(quiz_id)
-                # TODO should i stop the scheduller?
+
+                # stop the scheduller?
+                Schedule.objects.filter(name=finish_quiz_name(quiz_id)).delete()
+
                 return ApiResponse.success(
                     message="Quiz successfully stopped",
                     status_code=status.HTTP_201_CREATED

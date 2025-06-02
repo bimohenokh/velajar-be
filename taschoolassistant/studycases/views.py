@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
+from django_q.models import Schedule
 from django_q.tasks import schedule
 from rest_framework.generics import get_object_or_404
 
@@ -27,7 +28,7 @@ from taschoolassistant.courses.models import (
 )
 from rest_framework.exceptions import PermissionDenied
 
-from .tasks import finish_study_case
+from .tasks import finish_study_case, finish_study_case_name
 
 
 class StudyCaseView(APIView):
@@ -160,6 +161,7 @@ class StartStudyCaseView(APIView):
             case_id,
             next_run=study_case.started_at + study_case.time_range,
             schedule_type='O',
+            name=finish_study_case_name(study_case.id),
         )
 
         serializer = StudyCaseSerializer(study_case)
@@ -186,7 +188,8 @@ class StopStudyCaseView(APIView):
         study_case.status = StudyCaseStatus.FINISHED
         study_case.save()
 
-        # TODO should i stop the scheduller?
+        # stop the scheduller
+        Schedule.objects.get(name=finish_study_case_name(case_id)).delete()
 
         out_serializer = StudyCaseSerializer(study_case)
 

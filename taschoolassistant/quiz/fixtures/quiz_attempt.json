@@ -1,0 +1,32 @@
+[
+  {
+    "model": "quiz.quizattempt",
+    "pk": 1,
+    "fields": {
+      "quiz": 1,
+      "student": 3,
+      "started_at": "2025-04-29T14:20:00Z",
+      "submitted_at": "2025-04-29T14:25:00Z",
+      "score": 80,
+      "is_submitted": true
+    }
+  },
+  {
+    "model": "quiz.answer",
+    "pk": 1,
+    "fields": {
+      "attempt": 1,
+      "question": 1,
+      "selected_options": [2]
+    }
+  },
+  {
+    "model": "quiz.answer",
+    "pk": 2,
+    "fields": {
+      "attempt": 1,
+      "question": 2,
+      "selected_options": [4, 5]
+    }
+  }
+]

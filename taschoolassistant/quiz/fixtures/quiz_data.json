@@ -8,11 +8,13 @@
       "description": "Aljabar Dasar dan Algoritma",
       "total_points": 100.0,
       "time_range": "00:30:00",
-      "status": "Draft",
+      "status": "Finished",
       "created_by": 1,
-      "started_at": null
+      "started_at": "2025-04-29T14:30:00Z"
     }
   },
+
+
   {
     "model": "quiz.question",
     "pk": 1,
@@ -49,6 +51,8 @@
       "is_correct": false
     }
   },
+
+
   {
     "model": "quiz.question",
     "pk": 2,
@@ -84,5 +88,77 @@
       "text": "5",
       "is_correct": true
     }
-  }
+  },
+
+
+
+  {
+    "model": "quiz.quiz",
+    "pk": 2,
+    "fields": {
+      "course_session": 2,
+      "title": "Kuis Fisika 2",
+      "description": "Aljabar Dasar dan Algoritma",
+      "total_points": 50.0,
+      "time_range": "01:00:00",
+      "status": "Draft",
+      "created_by": 1,
+      "started_at": null
+    }
+  },
+  {
+    "model": "quiz.question",
+    "pk": 3,
+    "fields": {
+      "quiz": 2,
+      "text": "What is the speed of light?",
+      "type": "single"
+    }
+  },
+  {
+    "model": "quiz.option",
+    "pk": 7,
+    "fields": {
+      "question": 3,
+      "text": "299,792,458 m/s",
+      "is_correct": true
+    }
+  },
+  {
+    "model": "quiz.option",
+    "pk": 8,
+    "fields": {
+      "question": 3,
+      "text": "150,000,000 m/s",
+      "is_correct": false
+    }
+  },
+
+    {
+        "model": "quiz.question",
+        "pk": 4,
+        "fields": {
+        "quiz": 2,
+        "text": "What is the formula for force?",
+        "type": "single"
+        }
+    },
+    {
+        "model": "quiz.option",
+        "pk": 9,
+        "fields": {
+        "question": 4,
+        "text": "F = ma",
+        "is_correct": true
+        }
+    },
+    {
+        "model": "quiz.option",
+        "pk": 10,
+        "fields": {
+        "question": 4,
+        "text": "F = mv^2",
+        "is_correct": false
+        }
+    }
 ]
