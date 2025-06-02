@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import F
 from django.utils import timezone
 from django_q.tasks import schedule
 from rest_framework.generics import get_object_or_404
@@ -10,7 +11,6 @@ from .serializers import (
     StudyCaseParamSerializer,
     StudyCaseAttemptSerializer,
     StudyCaseAttemptWithAnswersSerializer,
-    EvaluateStudyCaseAnswerSerializer,
     StudyCaseSerializer,
     StudyCaseAnswerSerializer,
     EvaluateStudyCaseAnswerInSerializer,
@@ -23,6 +23,7 @@ from rest_framework.exceptions import NotFound, ValidationError
 from taschoolassistant.core.permisssions import IsTeacher
 from taschoolassistant.courses.models import (
     CourseParticipant,
+    ParticipantPoint,
 )
 from rest_framework.exceptions import PermissionDenied
 
@@ -303,7 +304,7 @@ class EvaluateStudyCaseAnswerView(APIView):
     def put(self, request, attempt_id):
 
         study_case_attempt: StudyCaseAttempt = get_object_or_404(
-            StudyCaseAttempt.objects.select_related("study_case", "student__participantpoint"), id=attempt_id
+            StudyCaseAttempt.objects.select_related("study_case", "student"), id=attempt_id
         )
 
         study_case = study_case_attempt.study_case
@@ -343,18 +344,17 @@ class EvaluateStudyCaseAnswerView(APIView):
                 if answer.id in input_map:
                     answer.point = input_map[answer.id]
 
-            StudyCaseAnswer.objects.bulk_update(available_answers, ['point'])
+            StudyCaseAnswer.objects.bulk_update(available_answers, ["point"])
 
             # study_case_attempt is evaluated
             study_case_attempt.is_evaluated = True
             study_case_attempt.save()
 
-            # penambahan point ke student
-            course_student_point = study_case_attempt.student.participantpoint
-            for answer in available_answers:
-                point_added = answer.point
-                course_student_point.point_achieved += point_added
-            course_student_point.save()
+            # Calculate total points awarded
+            total_points = sum(answer.point for answer in available_answers if answer.id in input_map)
+            ParticipantPoint.objects.filter(course_participant_id=study_case_attempt.student_id).update(
+                point_achieved=F('point_achieved') + total_points
+            )
 
             out_serializer = StudyCaseAnswerSerializer(available_answers, many=True)
 
