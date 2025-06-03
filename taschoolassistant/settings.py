@@ -130,7 +130,7 @@ if "test" in sys.argv or not env('DATABASE_NAME', default=""):
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
+            'ENGINE': 'django_prometheus.db.backends.postgresql',
             'NAME': env("DATABASE_NAME"),
             'USER': env("DATABASE_USER"),
             'PASSWORD': env("DATABASE_PASSWORD"),
