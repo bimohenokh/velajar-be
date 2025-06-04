@@ -66,6 +66,13 @@ class LeaderboardSerializer(serializers.ModelSerializer):
         except StudentProfile.DoesNotExist:
             return "-"
 
+
+class ParticipantPointSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ParticipantPoint
+        fields = "__all__"
+
+
 class CourseInviteTokenSerializer(ModelSerializer):
     class Meta:
         model = CourseInviteToken

@@ -20,7 +20,9 @@ from .serializers import (
     CreateCourseInviteTokenSerializerIn,
     CourseInviteTokenSerializer,
     CourseParticipantSerializer,
-    LeaderboardSerializer, CourseSessionFeatureSerializer,
+    LeaderboardSerializer,
+    CourseSessionFeatureSerializer,
+    ParticipantPointSerializer,
 )
 from rest_framework import status
 
@@ -273,10 +275,34 @@ class LeaderboardView(APIView):
             raise NotFound("Course not found.")
 
         # Filter points by course
-        participant_points = ParticipantPoint.objects.filter(course_participant__course=course).order_by('-point_achieved')
+        participant_points = ParticipantPoint.objects.filter(
+            course_participant__course=course
+        ).order_by("-point_achieved")
         serializer = self.course_session_serializer(participant_points, many=True)
 
         return ApiResponse.success(serializer.data, message="Leaderboard successfully retrieved")
+
+
+class MyParticipantPointView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, course_id):
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            raise NotFound("Course not found.")
+
+        try:
+            my_participant_point = ParticipantPoint.objects.get(
+                course_participant__course=course,
+                course_participant__participant=request.user
+            )
+        except ParticipantPoint.DoesNotExist:
+            raise NotFound("Participant point not found for this course.")
+
+        serializer = ParticipantPointSerializer(my_participant_point)
+
+        return ApiResponse.success(serializer.data, message="Participant points successfully retrieved")
 
 
 class InviteCourseWithLink(APIView):

@@ -6,7 +6,7 @@ from .views import (
     CourseSessionViewById,
     InviteCourseWithLink,
     SubmitCourseInviteToken,
-    CourseSessionFeatureViewById,
+    CourseSessionFeatureViewById, MyParticipantPointView,
 )
 from .views import CourseView, CourseViewById, CourseSessionView, CourseSessionViewById, LeaderboardView
 
@@ -14,6 +14,7 @@ urlpatterns = [
     path("", CourseView.as_view(), name="course"),
     path("<int:pk>/", CourseViewById.as_view(), name="course-id"),
     path("<int:course_id>/leaderboards/", LeaderboardView.as_view(), name="leaderboard"),
+    path("<int:course_id>/participant-points/me/", MyParticipantPointView.as_view(), name="my-participant-point"),
     path("<int:course_id>/sessions/", CourseSessionView.as_view(), name="course-session"),
     path("sessions/<int:session_id>/", CourseSessionViewById.as_view(), name="course-session-id"),
     path("sessions/<int:session_id>/features/", CourseSessionFeatureViewById.as_view(), name="course-session-feature-id"),
