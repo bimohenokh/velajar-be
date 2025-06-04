@@ -71,7 +71,7 @@
         "fields": {
             "username": "siswa5",
             "password": "pbkdf2_sha256$870000$vypeYyFYfQfPGmjTMdG6xQ$v+uUT5zxTYEM6ho7NuTmTS6GHver20r7333+SlhWuyw=",
-            "email" : "siswa3@gmail.com",
+            "email" : "siswa5@gmail.com",
             "role" : "student"
         }
     },
@@ -81,7 +81,7 @@
         "fields": {
             "username": "siswa6",
             "password": "pbkdf2_sha256$870000$vypeYyFYfQfPGmjTMdG6xQ$v+uUT5zxTYEM6ho7NuTmTS6GHver20r7333+SlhWuyw=",
-            "email" : "siswa4@gmail.com",
+            "email" : "siswa6@gmail.com",
             "role" : "student"
         }
     }
