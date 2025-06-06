@@ -44,7 +44,6 @@ docker-push:
     - docker push "$IMAGE_FULL_NAME_BACKEND_TASK:latest"
   only:
     - main
-    - staging
 
 #deploy:
 #    stage: deploy
