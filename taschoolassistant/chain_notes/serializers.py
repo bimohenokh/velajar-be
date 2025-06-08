@@ -1,8 +1,15 @@
 from rest_framework.exceptions import ValidationError
-from rest_framework.fields import IntegerField, DateTimeField, BooleanField, CharField
+from rest_framework.fields import (
+    IntegerField,
+    DateTimeField,
+    BooleanField,
+    CharField,
+    SerializerMethodField,
+)
 from rest_framework.serializers import Serializer, ModelSerializer
 
 from taschoolassistant.chain_notes.models import ChainNote, ChainNoteTurn
+from taschoolassistant.profiles.models import StudentProfile
 from taschoolassistant.users.serializers import UserSerializer
 
 
@@ -34,8 +41,21 @@ class UpdateChainNoteSerializer(ModelSerializer):
 
 class ChainNoteTurnSerializer(ModelSerializer):
     participant_user = UserSerializer(source="participant.participant", read_only=True)
+    participant_image_profile = SerializerMethodField(source="participant.participant.image", read_only=True)
 
     class Meta:
         model = ChainNoteTurn
         fields = "__all__"
+
+    def get_participant_image_profile(self, obj):
+        user = (
+            obj.participant.participant
+        )  # This assumes participant.participant is a User instance
+        try:
+            profile = StudentProfile.objects.get(user=user)
+            if profile.image_profile:
+                return profile.image_profile.url
+        except StudentProfile.DoesNotExist:
+            pass
+        return None
 

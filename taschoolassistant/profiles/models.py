@@ -35,5 +35,4 @@ class StudentProfile(Model):
         default=JenjangKelas.SMA_KELAS_1.value,
     )
 
-
     objects = StudentProfileManager()

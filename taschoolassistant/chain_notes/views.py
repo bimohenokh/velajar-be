@@ -311,9 +311,10 @@ class CurrentChainNoteTurnView(APIView):
                         status_code=status.HTTP_200_OK,
                     )
 
-                serializer = ChainNoteTurnSerializer(current_turn)
+                # serializer = ChainNoteTurnSerializer(current_turn)
+                return_data = await sync_to_async(lambda: ChainNoteTurnSerializer(current_turn).data)()
                 return ApiResponse.success(
-                    data=serializer.data,
+                    data=return_data,
                     message="Chain Note Turn successfully retrieved",
                     status_code=status.HTTP_200_OK,
                 )
@@ -334,9 +335,9 @@ class CurrentChainNoteTurnView(APIView):
                     )
 
                 if current_turn.pk != last_known_turn_id:
-                    serializer = ChainNoteTurnSerializer(current_turn)
+                    return_data = await sync_to_async(lambda: ChainNoteTurnSerializer(current_turn).data)()
                     return ApiResponse.success(
-                        data=serializer.data,
+                        data=return_data,
                         message="Chain Note Turn successfully retrieved",
                         status_code=status.HTTP_200_OK,
                     )
