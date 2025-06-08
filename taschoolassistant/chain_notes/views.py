@@ -42,20 +42,22 @@ class ChainNoteView(APIView):
 
             course_session_id = param_serializer.validated_data.get("course_session_id")
             chain_note = get_object_or_404(
-                ChainNote.objects.select_related("course_session"), course_session_id=course_session_id
+                ChainNote.objects.select_related("course_session"),
+                course_session_id=course_session_id,
             )
 
+            # check if user is participant of the course session
             try:
                 # check if user is participant of the course
-                course_instructor = (
-                    CourseParticipant.objects.get_by_course_id_and_user_teacher_id(
+                course_participant = (
+                    CourseParticipant.objects.get_by_course_id_and_user_id(
                         chain_note.course_session.course_id, request.user.id
                     )
                 )
             except CourseParticipant.DoesNotExist:
                 raise PermissionDenied(
-                    "User is not an instructor of this course",
-                    "not_instructor_of_this_course",
+                    "User is not an participant of this course",
+                    "not_participant_of_this_course",
                 )
 
             chain_note_serializer_out = ChainNoteSerializer(chain_note)
@@ -106,18 +108,18 @@ class ChainNoteViewById(APIView):
                 ChainNote.objects.select_related("course_session"), pk=pk
             )
 
-            # check if user is instructor of the course session
+            # check if user is participant of the course session
             try:
-                # check if user is instructor of the course
-                course_instructor = (
-                    CourseParticipant.objects.get_by_course_id_and_user_teacher_id(
+                # check if user is participant of the course
+                course_participant = (
+                    CourseParticipant.objects.get_by_course_id_and_user_id(
                         chain_note.course_session.course_id, request.user.id
                     )
                 )
             except CourseParticipant.DoesNotExist:
                 raise PermissionDenied(
-                    "User is not an instructor of this course",
-                    "not_instructor_of_this_course",
+                    "User is not an participant of this course",
+                    "not_participant_of_this_course",
                 )
 
             chain_note_serializer_out = ChainNoteSerializer(chain_note)
