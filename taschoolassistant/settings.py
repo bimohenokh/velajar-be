@@ -172,6 +172,15 @@ CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
+# Must match the domain used in requests
+CSRF_TRUSTED_ORIGINS = ['https://velajar-be.cs.ui.ac.id']  # Add https if using it
+# If accessed through HTTPS in production:
+CSRF_COOKIE_SECURE = True
+
+SESSION_COOKIE_SECURE = True
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
