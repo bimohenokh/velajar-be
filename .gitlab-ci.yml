@@ -1,7 +1,7 @@
 stages:
   - test
   - docker-push
-#  - deploy
+  - deploy
 
 variables:
   IMAGE_FULL_NAME_BACKEND: "$CI_REGISTRY_IMAGE/${DOCKERHUB_USERNAME}/${IMAGE_NAME_BACKEND}"
@@ -42,6 +42,18 @@ docker-push:
     - docker push "$IMAGE_FULL_NAME_BACKEND:latest"
     - docker build -t "${IMAGE_FULL_NAME_BACKEND_TASK}:latest" -f Dockerfile-task .
     - docker push "$IMAGE_FULL_NAME_BACKEND_TASK:latest"
+  only:
+    - main
+
+trigger-deploy:
+  stage: deploy
+  image: curlimages/curl:latest
+  script:
+    - >
+      curl -X POST
+      -F token=glptt-730404b578e55ee59bc4769e573ac753db5c54d1
+      -F ref=main
+      https://gitlab.cs.ui.ac.id/api/v4/projects/PROJECT_ID/trigger/pipeline
   only:
     - main
 
