@@ -4,7 +4,6 @@ from django.db.models import (
     IntegerChoices,
     IntegerField,
     OneToOneField,
-    RESTRICT,
     DurationField,
     ForeignKey,
     DateTimeField,
@@ -26,7 +25,7 @@ class ChainNote(Model):
         ONGOING = 1, "Ongoing"
         FINISHED = 2, "Finished"
 
-    course_session = OneToOneField(CourseSession, on_delete=RESTRICT)
+    course_session = OneToOneField(CourseSession, on_delete=CASCADE)
     description = TextField()
     duration_per_participant = DurationField()
     status = IntegerField(choices=Status, default=Status.DRAFT)
