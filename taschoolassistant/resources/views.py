@@ -14,7 +14,7 @@ from ..courses.models import CourseParticipant, CourseSession
 # Create your views here.
 class ResourceView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request):
         request_param = ResourceParamSerializer(data=request.query_params)
@@ -45,6 +45,10 @@ class ResourceView(APIView):
         course_session_id = param_serializer.validated_data.get('course_session_id')
 
         course_session = CourseSession.objects.get(id=course_session_id)
+
+        # Guard: return 400 if the list is empty
+        if len(request.data) <= 0:
+            raise ValidationError("Resource list cannot be empty.")
 
         serializer = ResourceSerializer(
             data=request.data,
