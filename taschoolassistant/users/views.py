@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -19,7 +20,15 @@ class RegisterView(APIView):
     def post(self, request):
         serializer = RegisterInSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+
+        with transaction.atomic():
+            user = serializer.save()
+
+            from taschoolassistant.profiles.models import StudentProfile, TeacherProfile
+            if user.role == "student":
+                StudentProfile.objects.create(user=user)
+            elif user.role == "teacher":
+                TeacherProfile.objects.create(user=user)
 
         return ApiResponse.success(
             data=UserSerializer(user).data,
