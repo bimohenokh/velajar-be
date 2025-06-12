@@ -301,6 +301,38 @@ class StudyCaseAttemptByIdView(APIView):
         )
 
 
+class MyStudyCaseAttemptView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get(self, request, case_id):
+        user = request.user
+        study_case = get_object_or_404(StudyCase, id=case_id)
+
+        # Check if user is course participant of the course
+        try:
+            course_participant = CourseParticipant.objects.get(
+                participant=user.id, course_id=study_case.course_session.course_id,
+                courseinstructor__isnull=True
+            )
+        except CourseParticipant.DoesNotExist:
+            raise PermissionDenied("You are not a student of this course.")
+
+        try:
+            study_case_attempts = StudyCaseAttempt.objects.select_related("student__participant").get(
+                study_case=study_case, student=course_participant
+            )
+        except StudyCaseAttempt.DoesNotExist:
+            raise NotFound("Study Case Attempt not found.")
+
+        out_serializer = StudyCaseAttemptSerializer(study_case_attempts)
+
+        return ApiResponse.success(
+            data=out_serializer.data,
+            message="Study Case Attempt successfully retrieved",
+            status_code=status.HTTP_200_OK
+        )
+
 class EvaluateStudyCaseAnswerView(APIView):
     permission_classes = [IsAuthenticated, IsTeacher]
 
