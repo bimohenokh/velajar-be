@@ -230,6 +230,29 @@ class QuestionByQuizIdView(APIView):
             raise NotFound("Question not found in this quiz")
 
 
+class QuestionDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    # GET QUESTION DETAIL BY ID
+    def get(self, request, question_id):
+
+        if question_id is None:
+            raise ValidationError("Question id is required in the URL")
+
+        try:
+            question = Question.objects.get(id=question_id)
+        except Question.DoesNotExist:
+            raise NotFound("Question detail not found")
+
+        # TODO : check if user is participant of the course
+
+        serializer = QuestionSerializer(question)
+        return ApiResponse.success(
+            data=serializer.data,
+            message="Question detail successfully retrieved"
+        )
+
+
 class StartQuizView(APIView):
     permission_classes = [IsAuthenticated]
 
