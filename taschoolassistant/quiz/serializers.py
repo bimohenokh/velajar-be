@@ -155,3 +155,10 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
             if selected_option_ids == correct_option_ids:
                 correct += 1
         return (correct / total_questions) * attempt.quiz.total_points
+
+
+class MyQuizAttemptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuizAttempt
+        fields = ['id', 'quiz', 'student', 'submitted_at', 'score']
+        read_only_fields = ['id', 'quiz', 'student', 'submitted_at', 'score']

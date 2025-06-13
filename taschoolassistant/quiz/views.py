@@ -356,6 +356,26 @@ class StartAttemptView(APIView):
             )
         except Quiz.DoesNotExist:
             raise NotFound("Quiz not found")
+
+
+class MyQuizAttemptView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, quiz_id):
+        if quiz_id is None:
+            raise ValidationError("Quiz id is required in the URL")
+
+        try:
+            quiz_attempt = QuizAttempt.objects.get(quiz_id=quiz_id, student=self.request.user)
+        except QuizAttempt.DoesNotExist:
+            raise NotFound("Quiz attempt not found")
+        serializer = QuizAttemptSerializer(quiz_attempt)
+        return ApiResponse.success(
+            data=serializer.data,
+            message="Quiz attempt successfully retrieved",
+            status_code=status.HTTP_200_OK
+        )
+
         
 class AnswerView(APIView):
     permission_classes = [IsAuthenticated]
