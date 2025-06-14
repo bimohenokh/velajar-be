@@ -347,6 +347,7 @@ class CurrentChainNoteTurnView(APIView):
 
             # wait before looping again
             await asyncio.sleep(poll_interval)
+            await sync_to_async(chain_note.refresh_from_db)()
 
         # longpolling timeout
         raise LongPollingTimeoutException()
