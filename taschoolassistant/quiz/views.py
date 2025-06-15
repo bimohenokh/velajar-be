@@ -414,8 +414,8 @@ class AnswerView(APIView):
                 raise ValidationError("Quiz attempt is already submitted")
             
             question_id = request.data.get('question')
-            selected_options = request.data.get('selected_options', [])
-            if not question_id or not selected_options:     
+            selected_options = request.data.get('selected_options')
+            if not question_id or type(selected_options) != list :
                 raise ValidationError("Question and selected options are required")
 
             question = Question.objects.get(id=question_id, quiz=quiz_attempt.quiz)
