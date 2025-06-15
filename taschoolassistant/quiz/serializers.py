@@ -71,7 +71,8 @@ class QuestionSerializer(serializers.ModelSerializer):
 class QuizSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quiz
-        fields = ['id', 'title', 'description', 'course_session', 'total_points', 'time_range', 'status']
+        fields = ['id', 'title', 'description', 'course_session', 'total_points', 'time_range', 'status', 'started_at']
+        read_only_fields = ['id', 'started_at']
     
     def update(self, instance, validated_data):
 
@@ -160,5 +161,5 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
 class MyQuizAttemptSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuizAttempt
-        fields = ['id', 'quiz', 'student', 'submitted_at', 'score']
+        fields = "__all__"
         read_only_fields = ['id', 'quiz', 'student', 'submitted_at', 'score']

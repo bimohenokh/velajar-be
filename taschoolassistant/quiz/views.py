@@ -8,7 +8,8 @@ from django.utils import timezone
 from .helpers import submit_attempts_by_quiz_id
 # quizzes/views.py
 from .models import Quiz, Question, QuizAttempt, Answer, Option, QuizStatus
-from .serializers import QuizSerializer, QuestionSerializer, AnswerSerializer, QuizAttemptSerializer, OptionSerializer, StudentQuestionSerializer
+from .serializers import QuizSerializer, QuestionSerializer, AnswerSerializer, QuizAttemptSerializer, OptionSerializer, StudentQuestionSerializer, \
+    MyQuizAttemptSerializer
 
 from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
@@ -369,7 +370,7 @@ class MyQuizAttemptView(APIView):
             quiz_attempt = QuizAttempt.objects.get(quiz_id=quiz_id, student=self.request.user)
         except QuizAttempt.DoesNotExist:
             raise NotFound("Quiz attempt not found")
-        serializer = QuizAttemptSerializer(quiz_attempt)
+        serializer = MyQuizAttemptSerializer(quiz_attempt)
         return ApiResponse.success(
             data=serializer.data,
             message="Quiz attempt successfully retrieved",
