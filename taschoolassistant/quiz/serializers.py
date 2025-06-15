@@ -2,6 +2,8 @@
 from django.utils import timezone
 from rest_framework import serializers
 from .models import Quiz, Question, Option, QuizAttempt, Answer
+from ..users.serializers import UserSerializer
+
 
 class OptionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -156,6 +158,19 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
             if selected_option_ids == correct_option_ids:
                 correct += 1
         return (correct / total_questions) * attempt.quiz.total_points
+
+
+class AllQuizAttemptSerializer(serializers.ModelSerializer):
+    student = UserSerializer(read_only=True)
+    class Meta:
+        model = QuizAttempt
+        fields = "__all__"
+
+    def create(self, validated_data):
+        raise serializers.ValidationError("This serializer is read-only and cannot be used to create instances.")
+
+    def update(self, instance, validated_data):
+        raise serializers.ValidationError("This serializer is read-only and cannot be used to update instances.")
 
 
 class MyQuizAttemptSerializer(serializers.ModelSerializer):

@@ -8,8 +8,16 @@ from django.utils import timezone
 from .helpers import submit_attempts_by_quiz_id
 # quizzes/views.py
 from .models import Quiz, Question, QuizAttempt, Answer, Option, QuizStatus
-from .serializers import QuizSerializer, QuestionSerializer, AnswerSerializer, QuizAttemptSerializer, OptionSerializer, StudentQuestionSerializer, \
-    MyQuizAttemptSerializer
+from .serializers import (
+    QuizSerializer,
+    QuestionSerializer,
+    AnswerSerializer,
+    QuizAttemptSerializer,
+    OptionSerializer,
+    StudentQuestionSerializer,
+    MyQuizAttemptSerializer,
+    AllQuizAttemptSerializer,
+)
 
 from taschoolassistant.core.utils.response import ApiResponse
 from rest_framework.permissions import IsAuthenticated
@@ -353,7 +361,29 @@ class StartAttemptView(APIView):
             return ApiResponse.success(
                 data=self.quiz_attempt_serializer(quiz_attempt).data,
                 message="Quiz attempt successfully started",
-                status_code=status.HTTP_201_CREATED
+                status_code=status.HTTP_201_CREATED,
+            )
+        except Quiz.DoesNotExist:
+            raise NotFound("Quiz not found")
+
+
+class QuizAttemptView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, quiz_id):
+        # Check if quiz_id is provided
+        if quiz_id is None:
+            raise ValidationError("Quiz id is required in the URL")
+
+        is_submitted = True
+
+        try:
+            quiz_attempts = QuizAttempt.objects.filter(quiz_id=quiz_id, is_submitted=is_submitted)
+            serializer = AllQuizAttemptSerializer(quiz_attempts, many=True)
+            return ApiResponse.success(
+                data=serializer.data,
+                message="Quiz attempts successfully retrieved",
+                status_code=status.HTTP_200_OK
             )
         except Quiz.DoesNotExist:
             raise NotFound("Quiz not found")
