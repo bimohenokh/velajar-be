@@ -17,6 +17,8 @@ from .serializers import (
     StudentQuestionSerializer,
     MyQuizAttemptSerializer,
     AllQuizAttemptSerializer,
+    QuizAttemptFullDetailSerializer,
+    FullQuizDetailSerializer,
 )
 
 from taschoolassistant.core.utils.response import ApiResponse
@@ -124,6 +126,27 @@ class QuizDetailView(APIView):
             )
         except Quiz.DoesNotExist:
             raise NotFound("Quiz not found")
+
+
+class FullQuizDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, quiz_id):
+        # Check if quiz_id is provided
+        if quiz_id is None:
+            raise ValidationError("Quiz id is required in the URL")
+
+        try:
+            quiz = Quiz.objects.prefetch_related('questions__options').get(id=quiz_id)
+        except Quiz.DoesNotExist:
+            raise NotFound("Quiz detail not found")
+
+        serializer = FullQuizDetailSerializer(quiz)
+        return ApiResponse.success(
+            data=serializer.data,
+            message="Quiz detail successfully retrieved"
+        )
+
 
 class QuestionByQuizIdView(APIView):
     permission_classes = [IsAuthenticated]
@@ -387,6 +410,28 @@ class QuizAttemptView(APIView):
             )
         except Quiz.DoesNotExist:
             raise NotFound("Quiz not found")
+
+
+class QuizAttemptDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, attempt_id):
+        # Check if quiz_attempt_id is provided
+        if attempt_id is None:
+            raise ValidationError("Quiz attempt id is required in the URL")
+
+        try:
+            quiz_attempt = QuizAttempt.objects.prefetch_related("answers__selected_options").get(id=attempt_id)
+        except QuizAttempt.DoesNotExist:
+            raise NotFound("Quiz attempt not found")
+
+        serializer = QuizAttemptFullDetailSerializer(quiz_attempt)
+        return ApiResponse.success(
+            data=serializer.data,
+            message="Quiz attempt detail successfully retrieved",
+            status_code=status.HTTP_200_OK
+        )
+
 
 
 class MyQuizAttemptView(APIView):

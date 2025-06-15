@@ -88,6 +88,21 @@ class QuizSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
+class FullQuizDetailSerializer(serializers.ModelSerializer):
+    questions = QuestionSerializer(many=True)
+
+    class Meta:
+        model = Quiz
+        fields = "__all__"
+        read_only_fields = ['id', 'started_at']
+
+    def create(self, validated_data):
+        raise serializers.ValidationError("This serializer is read-only and cannot be used to create instances.")
+
+    def update(self, instance, validated_data):
+        raise serializers.ValidationError("This serializer is read-only and cannot be used to update instances.")
+
 class AnswerSerializer(serializers.ModelSerializer):
     selected_options = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Option.objects.all()
@@ -165,6 +180,22 @@ class AllQuizAttemptSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuizAttempt
         fields = "__all__"
+
+    def create(self, validated_data):
+        raise serializers.ValidationError("This serializer is read-only and cannot be used to create instances.")
+
+    def update(self, instance, validated_data):
+        raise serializers.ValidationError("This serializer is read-only and cannot be used to update instances.")
+
+
+class QuizAttemptFullDetailSerializer(serializers.ModelSerializer):
+    student = UserSerializer(read_only=True)
+    answers = AnswerSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = QuizAttempt
+        fields = "__all__"
+        read_only_fields = ['id', 'quiz', 'student', 'started_at', 'submitted_at', 'score', 'is_submitted']
 
     def create(self, validated_data):
         raise serializers.ValidationError("This serializer is read-only and cannot be used to create instances.")

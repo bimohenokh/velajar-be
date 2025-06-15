@@ -11,12 +11,13 @@ from .views import (
     SubmitQuizView,
     QuestionDetailView,
     MyQuizAttemptView,
-    QuizAttemptView,
+    QuizAttemptView, QuizAttemptDetailView, FullQuizDetailView,
 )
 
 urlpatterns = [
     path('', QuizView.as_view(), name='quiz'),
     path('<int:quiz_id>/', QuizDetailView.as_view(), name='quiz-detail'),
+    path("<int:quiz_id>/full/", FullQuizDetailView.as_view(), name="full-quiz-detail"),
     path('<int:quiz_id>/questions/', QuestionByQuizIdView.as_view(), name='quiz-questions'),
     path("questions/<int:question_id>/", QuestionDetailView.as_view(), name='question-detail'),
     path('<int:quiz_id>/start/', StartQuizView.as_view(), name='start-quiz'),
@@ -25,5 +26,6 @@ urlpatterns = [
     path('<int:quiz_id>/start-attempt/', StartAttemptView.as_view(), name='start-attempt'),
     path('<int:quiz_id>/attempts/', QuizAttemptView.as_view(), name='quiz-attempts'),
     path("<int:quiz_id>/attempts/me/", MyQuizAttemptView.as_view(), name="my-quiz-attempt"),
+    path("attempts/<int:attempt_id>/", QuizAttemptDetailView.as_view(), name="quiz-attempt-detail"),
     path('submit/', SubmitQuizView.as_view(), name='submit-quiz'),
 ]
