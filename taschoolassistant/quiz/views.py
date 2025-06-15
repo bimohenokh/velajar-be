@@ -386,12 +386,14 @@ class AnswerView(APIView):
         self.answer_serializer = AnswerSerializer
 
     def get(self, request):
-                # Check if request data is empty
-        if not request.data:
-            raise ValidationError("Request body cannot be empty")
+        # Check if request data is empty
+        quiz_attempt_id     = request.query_params.get('quiz_attempt_id')
+
+        if not quiz_attempt_id:
+            raise ValidationError("Quiz attempt id cannot be empty")
         
         try:
-            quiz_attempt = QuizAttempt.objects.get(id=request.data['quiz_attempt'], student=request.user)
+            quiz_attempt = QuizAttempt.objects.get(id=quiz_attempt_id, student=request.user)
 
             answers = Answer.objects.filter(attempt=quiz_attempt)
             serializer = self.answer_serializer(answers, many=True)
