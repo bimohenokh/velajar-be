@@ -40,8 +40,8 @@ class QuestionSerializer(serializers.ModelSerializer):
 
             if q_type == 'single' and len(correct_options) != 1:
                 raise serializers.ValidationError("Single choice questions must have exactly one correct option.")
-            elif q_type == 'multiple' and len(correct_options) < 2:
-                raise serializers.ValidationError("Multiple choice questions must have at least two correct options.")
+            elif q_type == 'multiple' and len(correct_options) < 1:
+                raise serializers.ValidationError("Multiple choice questions must have at least 1 correct options.")
 
         return data
 
